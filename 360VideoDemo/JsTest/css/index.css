@@ -1,0 +1,20 @@
+#traffic li{
+	list-style-type: none;
+}
+#traffic span{
+	width: 50px;
+	height: 50px;
+	display: block;
+	border-radius: 25px;
+	margin-bottom: 10px;
+	background-color: gray;
+}
+#traffic.stop li:nth-child(1) span{
+	background-color: red;
+}
+#traffic.pass li:nth-child(2) span{
+	background-color: green;
+}
+#traffic.wait li:nth-child(3) span{
+	background-color: yellow;
+}

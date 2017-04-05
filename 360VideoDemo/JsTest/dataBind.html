@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			ul,
+			li {
+				margin: 5px;
+			}
+			
+			ul *,
+			button {
+				font-size: 24px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<ul>
+			<li>
+				<label for="name">姓名</label>
+				<input type="text" name="name" id="name" value="" />
+			</li>
+			<li>
+				<label for="age">年龄</label>
+				<select id="age" name="age">
+					<option>80后</option>
+					<option>90后</option>
+					<option>00后</option>
+					<option>其他</option>
+				</select>
+			</li>
+			<button id="confirm" type="submit">提交</button>
+		</ul>
+		<script type="text/javascript">
+			//getter/setter与数据双向绑定
+			const view = {
+				nameEl: document.getElementById('name'),
+				ageEl: document.getElementById('age'),
+				submitBtn: document.getElementById('confirm')
+			};
+			view.submitBtn.addEventListener('click', function(evt) {
+				console.log('你要提交的数据是：' + [user.name,user.age]);
+				evt.preventDefault();
+			});
+
+			function User(name, age) {
+				this.name = name;
+				this.age = age;
+			}
+			User.prototype.bind = function(view) {
+				view.nameEl.addEventListener('change', evt => {					
+					this.name = evt.target.value;
+				});
+				view.ageEl.addEventListener('change', evt => {
+					this.age = evt.target.value;
+				});
+			};
+			Object.defineProperty(User.prototype, 'name', {
+				set: function(name) {
+					view.nameEl.value = name;
+				},
+				get: function() {
+					return view.nameEl.value;
+				}
+			});
+			Object.defineProperty(User.prototype, 'age', {
+				set: function(age) {
+					var ageOptins = Array.from(view.ageEl.options)
+						.map(item => item.innerHTML);
+					if(ageOptins.indexOf(age) === -1) {
+						throw new Error('无效的年龄格式');
+					}
+					view.ageEl.value = age;
+				},
+				get: function() {
+					return view.ageEl.value;
+				}
+			});
+			var user = new User('akira', '00后');
+			user.bind(view);
+		</script>
+	</body>
+
+</html>

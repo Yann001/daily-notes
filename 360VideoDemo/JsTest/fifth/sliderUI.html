@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			#my-slider {
+				position: relative;
+				height: 340px;
+			}
+			
+			.slider-list ul {
+				list-style-type: none;
+				position: relative;
+				width: 100%;
+				height: 100%;
+				padding: 0;
+				margin: 0;
+			}
+			.slider-list-item,
+			.slider-list-item-selected{
+				position: absolute;
+				transition: opacity 1s;
+				opacity: 0;
+			}
+			.slider-list-item-selected{
+				transition: opacity 1s;
+				opacity: 1;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="my-slider" class="slider-list">
+			<ul>
+				<li class="slider-list-item-selected"><img src="../img/slider/j1.jpg" alt="" /></li>
+				<li class="slider-list-item"><img src="../img/slider/j2.jpg" alt="" /></li>
+				<li class="slider-list-item"><img src="../img/slider/j3.jpg" alt="" /></li>
+				<li class="slider-list-item"><img src="../img/slider/j4.jpg" alt="" /></li>
+			</ul>
+		</div>
+		<script src="../js/fifth/slider.js" type="text/javascript" charset="utf-8"></script>
+	</body>
+
+</html>

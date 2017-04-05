@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+
+	<body>
+		<script type="text/javascript">
+			//注意不是单引号
+			const mulStr = `这里是
+			多行
+			字符串 `;
+			console.log(mulStr,typeof mulStr);
+			let who = 'YXY',
+				what = 'JS';
+			let	str = `${who} like ${what}`;
+			console.log(str,typeof str);
+			let output = (a,b) => `${a} + ${b} is ${a + b}`;
+			console.log(output(3,4));
+		</script>
+	</body>
+
+</html>
