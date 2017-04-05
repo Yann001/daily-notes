@@ -1,0 +1,50 @@
+#my-slider {
+	position: relative;
+	height: 340px;
+}
+
+.slider-list ul {
+	list-style-type: none;
+	position: relative;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+}
+
+.slider-list-item,
+.slider-list-item-selected {
+	position: absolute;
+	transition: opacity 1s;
+	opacity: 0;
+}
+
+.slider-list-item-selected {
+	transition: opacity 1s;
+	opacity: 1;
+}
+
+.slider-list-control {
+	position: relative;
+	display: table;
+	background-color: rgba(255, 255, 255, 0.5);
+	padding: 5px;
+	border-radius: 15px;
+	bottom: 30px;
+	margin: auto;
+}
+
+.slider-list-control-button,
+.slider-list-control-button-selected {
+	display: inline-block;
+	width: 15px;
+	height: 15px;
+	border-radius: 50%;
+	margin: 0 5px;
+	background-color: white;
+	cursor: pointer;
+}
+
+.slider-list-control-button-selected {
+	background-color: red;
+}

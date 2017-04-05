@@ -1,7 +1,32 @@
 class Slider {
-	constructor(id) {
+	constructor(id, cycle = 3000) {
 		this.container = document.getElementById(id);
 		this.items = this.container.querySelectorAll('.slider-list-item,.slider-list-item-selected');
+		this.cycle = cycle;
+		this.slideHandlers = [];
+
+		let controller = this.container.querySelector('.slider-list-control');
+		if(controller) {
+			let buttons = document.querySelectorAll('.slider-list-control-button, .slider-list-control-button-selected');
+			controller.addEventListener('mouseover', evt => {				
+				let idx = Array.from(buttons).indexOf(evt.target);
+				console.log(idx);
+				if(idx >= 0) {
+					this.slideTo(idx);
+					this.stop();
+				}
+			});
+			controller.addEventListener('mouseover', evt => {
+				this.start();
+			});
+			this.addSlideListener(function(idx) {
+				let selected = controller.querySelector('.slider-list-control-button-selected');
+				if(selected) {
+					selected.className = 'slider-list-control-button';
+				}
+				buttons[idx].className = 'slider-list-control-button-selected';
+			});
+		}
 	}
 	getSelectedItem() {
 		let selected = this.container.querySelector('.slider-list-item-selected');
@@ -19,17 +44,36 @@ class Slider {
 		if(item) {
 			item.className = 'slider-list-item-selected';
 		}
+		this.slideHandlers.forEach(handler => { 
+			handler(index); 
+		});
+//		this.slideHandlers.forEach(function(item){
+//			item(index);
+//		});
 	}
 	slideNext() {
-		let currentIndex = this.getSelectedItem();
+		let currentIndex = this.getSelectedItemIndex();
 		let nextIndex = (currentIndex + 1) % this.items.length;
 		this.slideTo(nextIndex);
 	}
-	slideNext() {
-		let currentIndex = this.getSelectedItem();
+	slidePrevious() {
+		let currentIndex = this.getSelectedItemIndex();
 		let previousIndex = (this.items.length + currentIndex - 1) % this.items.length;
 		this.slideTo(previousIndex);
 	}
+	start() {
+		this.stop();
+		this.slideTimer = setInterval(() => { 
+			this.slideNext(); 
+		}, this.cycle);
+	}
+	stop() {
+		clearInterval(this.slideTimer);
+	}
+	addSlideListener(handler) {
+		this.slideHandlers.push(handler);
+	}
 }
 let slider = new Slider('my-slider');
-setInterval(slider.slideNext.bind(slider),1000);
+slider.start();
+//setInterval(slider.slideNext.bind(slider),1000);

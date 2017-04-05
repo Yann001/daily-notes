@@ -4,31 +4,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<title></title>
-		<style type="text/css">
-			#my-slider {
-				position: relative;
-				height: 340px;
-			}
-			
-			.slider-list ul {
-				list-style-type: none;
-				position: relative;
-				width: 100%;
-				height: 100%;
-				padding: 0;
-				margin: 0;
-			}
-			.slider-list-item,
-			.slider-list-item-selected{
-				position: absolute;
-				transition: opacity 1s;
-				opacity: 0;
-			}
-			.slider-list-item-selected{
-				transition: opacity 1s;
-				opacity: 1;
-			}
-		</style>
+		<link rel="stylesheet" type="text/css" href="../css/fifth/slider.css" />
 	</head>
 
 	<body>
@@ -39,7 +15,14 @@
 				<li class="slider-list-item"><img src="../img/slider/j3.jpg" alt="" /></li>
 				<li class="slider-list-item"><img src="../img/slider/j4.jpg" alt="" /></li>
 			</ul>
+			<div class="slider-list-control">
+				<span class="slider-list-control-button-selected"></span>
+				<span class="slider-list-control-button"></span>
+				<span class="slider-list-control-button"></span>
+				<span class="slider-list-control-button"></span>
+			</div>
 		</div>
+
 		<script src="../js/fifth/slider.js" type="text/javascript" charset="utf-8"></script>
 	</body>
 
