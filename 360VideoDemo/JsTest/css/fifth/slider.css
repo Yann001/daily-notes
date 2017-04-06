@@ -9,7 +9,7 @@
 	width: 100%;
 	height: 100%;
 	padding: 0;
-	margin: 0;
+	margin: 0 auto;
 }
 
 .slider-list-item,
@@ -17,6 +17,8 @@
 	position: absolute;
 	transition: opacity 1s;
 	opacity: 0;
+	left: 50%;
+	transform: translate(-50%, 0);
 }
 
 .slider-list-item-selected {

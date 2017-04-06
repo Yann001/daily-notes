@@ -360,8 +360,31 @@ setColor(list, "red");
 ---
 ## 第五讲 BOM&DOM
 ### UI组件设计
-如何设计一个UI组件
-1. 结构设计
-2. API设计
-3. 控制流设计
+如何设计一个UI组件  
+设计原则：松耦合、结构控制分离  
+设计过程：结构设计、API设计、控制流设计  
+### 浏览器常用API
+- alert/confirm/~~prompt~~
+- ~~open/close~~
+- Location
+- navigator.userAgent
+- Cookie
+- Storage
+- XHR (Ajax)
+- WebSockets
+- Canvas
+
+**Cookie**  
+- 网站跟踪用户行为，服务器用以标记 Session
+- 少量数据，跟随 HTTP 请求（header）发送
+- 可设置过期时间
+- 网站 Cookie 数量有限制
+- 支持 http-only
+- JavaScript 原生的 Cookie API 不好用
+
+**Storage**  
+- 可以存储的数据量比较大，但仍有限制，别滥用
+- 数据格式为字符串，可以用 JSON 解析
+- 有 LocalStorage 和 SessionStorage 两种类型，默认无过期时间（可以自己用程序逻辑实现过期时间）
+- 并不会随着 HTTP 请求发给服务器
 

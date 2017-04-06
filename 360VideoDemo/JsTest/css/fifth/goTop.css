@@ -1,0 +1,17 @@
+#go-top {
+	width: 0;
+	height: 0;
+	border-bottom: 25px solid maroon;
+	border-left: 25px solid transparent;
+	border-right: 25px solid transparent;
+	opacity: 0.6;
+	position: fixed;
+	bottom: 60px;
+	right: 20px;
+	cursor: pointer;
+	display: none;
+}
+
+#go-top.scroll {
+	display: inline-block;
+}
