@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>Ebook</title>
+	<style>
+		html,
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		* {
+			box-sizing: inherit;
+		}
+		.container {
+			width: 100vw;
+			height: 100vh;
+			box-sizing: border-box;
+			padding: 10px;
+		}
+		.container .ebook {
+			width: 320px;
+			height: 640px;
+			margin: 0 auto;
+			position: relative;
+			/*overflow: hidden;*/
+		}
+		.container .ebook .page {
+			width: 320px;
+			height: 640px;
+			position: absolute;
+			top: 0;
+			left: 0;
+			transition: transform 3s ease;
+		}
+		.container .ebook .page.page1 {
+			z-index: 5;
+			transform: rotate3d(0, 10, 10, -50deg);
+			/*transform: translateZ(20);*/
+		}
+		.container .ebook .page.page2 {
+			z-index: 4;
+			display: none;
+		}
+		.container .ebook .page.page3 {
+			z-index: 3;	
+			display: none;		
+		}
+		.container .ebook .page.page4 {
+			z-index: 2;
+			display: none;
+		}
+		.container .ebook .page.page5 {
+			z-index: 1;
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="ebook">
+			<div class="page page1">
+				<h2>第一章</h2>
+				<p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
+				<p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
+			</div>
+			<div class="page page2">
+				<h2>第二章</h2>
+				<p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
+				<p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
+			</div>
+			<div class="page page3">
+				<h2>第三章</h2>
+				<p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
+				<p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
+			</div>
+			<div class="page page4">
+				<h2>第四章</h2>
+				<p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
+				<p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
+			</div>
+			<div class="page page5">
+				<h2>第五章</h2>
+				<p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
+				<p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
+			</div>
+		</div>
+	</div>
+	<script>
+		let ebook = document.querySelector('.ebook');
+		let prePage = 0;
+		let curPage = 1;
+		let nextPage = 2;
+		let firstPage = 1;
+		let totalPage = 5;
+		ebook.addEventListener('click', (e) => {
+			console.log(e.target);
+			if(e.offsetX > window.screen.width / 2) {
+				showNext();
+			}
+			else {
+				showPrevious();
+			}			
+		});
+		function showNext() {					
+			curPage++;
+			curPage = curPage > totalPage ? totalPage : curPage;
+			prePage = curPage - 1;
+			nextPage = curPage + 1;				
+			let preEl = document.querySelector('.page' + prePage);
+			hideEl(preEl);
+			let curEl = document.querySelector('.page' + curPage);
+			showEl(curEl);
+			let nextEl = document.querySelector('.page' + nextPage);
+			hideEl(nextEl);	
+		}
+		function showPrevious() {
+			curPage--;
+			curPage = curPage < firstPage ? firstPage : curPage;
+			prePage = curPage - 1;
+			nextPage = curPage + 1;
+			let preEl = document.querySelector('.page' + prePage);
+			hideEl(preEl);
+			let curEl = document.querySelector('.page' + curPage);
+			showEl(curEl);
+			let nextEl = document.querySelector('.page' + nextPage);
+			hideEl(nextEl);	
+		}
+		function hideEl(el) {
+			if(el) {
+				el.style.display = 'none';
+				// el.style.zIndex = -1;
+			}			
+		}
+		function showEl(el) {
+			if(el) {
+				el.style.display = 'block';
+				// el.style.zIndex = 5;
+			}			
+		}
+	</script>
+</body>
+</html>
