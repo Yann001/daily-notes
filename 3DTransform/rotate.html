@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>Rotate Demo</title>
+	<style>
+		html,
+		body {
+			margin: 0;
+			padding: 0;
+		}
+		.stage {
+		    min-height: 200px;
+		    margin-left: auto;
+		    margin-right: auto;
+		    padding: 50px;
+		    background-color: #f0f0f0;
+		    box-shadow: inset 0 0 3px rgba(0,0,0,.35);
+		    perspective: 800px;
+		    position: relative;
+		}
+		.stage .container {
+			width: 108px;
+		    height: 150px;
+		    margin-left: -50px;		    
+		    transform-style: preserve-3d;
+		    position: absolute;
+		    left: 50%;
+		}
+		.stage .container div {
+			width: 100px;
+			height: 150px;
+			position: absolute;
+			transition: transform 3s ease;		
+		}
+		.stage .container div:nth-child(1) {
+			background-color: red;
+			/*transform: rotateY(0deg) translateZ(86.6px);*/
+			transform: rotateY(0deg) translateZ(100px);
+		}
+		.stage .container div:nth-child(2) {
+			background-color: green;
+			/*transform: rotateY(0deg) translateZ(86.6px);*/
+			transform: rotateY(60deg) translateZ(100px);
+		}
+		.stage .container div:nth-child(3) {
+			background-color: blue;
+			/*transform: rotateY(0deg) translateZ(86.6px);*/
+			transform: rotateY(120deg) translateZ(100px);
+		}
+		.stage .container div:nth-child(4) {
+			background-color: darkturquoise;
+			/*transform: rotateY(0deg) translateZ(86.6px);*/
+			transform: rotateY(180deg) translateZ(100px);
+		}
+		.stage .container div:nth-child(5) {
+			background-color: pink;
+			/*transform: rotateY(0deg) translateZ(86.6px);*/
+			transform: rotateY(240deg) translateZ(100px);
+		}
+		.stage .container div:nth-child(6) {
+			background-color: purple;
+			/*transform: rotateY(0deg) translateZ(86.6px);*/
+			transform: rotateY(300deg) translateZ(100px);
+		}
+	</style>
+</head>
+<body>
+	<div class="stage">
+		<div class="container">
+			<div class="img-div">点我旋转</div>
+			<div class="img-div">点我旋转</div>
+			<div class="img-div">点我旋转</div>
+			<div class="img-div">点我旋转</div>
+			<div class="img-div">点我旋转</div>
+			<div class="img-div">点我旋转</div>
+			<!-- <img src="images/1.jpg" alt="">
+			<img src="images/2.jpg" alt="">
+			<img src="images/3.jpg" alt="">
+			<img src="images/4.jpg" alt="">
+			<img src="images/5.jpg" alt="">
+			<img src="images/6.jpg" alt=""> -->		
+		</div>
+	</div>
+	<script>
+		let container = document.querySelector('.container');
+		let count = 0;
+		container.addEventListener('click', function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			let imgDiv = document.getElementsByClassName('img-div');
+			for (var i = 0; i < imgDiv.length; i++) {
+				imgDiv[i].style.transform = 'rotateY(' + 60 * (i + count + 1) +'deg)  translateZ(100px)';
+			}
+			count++;
+		}, false);
+	</script>
+</body>
+</html>
