@@ -67,7 +67,34 @@ $("p").wrapInner("<strong></strong>");
 *电子书 HTML 解析*
 1. replaceWith() 方法：用指定的 HTML 内容或元素替换被选元素。
 
+## CSS
 
+#### transition相关
+
+1. **transform-origin** 属性：设置旋转元素的基点位置
+``` css
+transform-origin: x-axis y-axis z-axis;
+```
+x-axis: 定义视图被置于 X 轴的何处。可能的值：
+[ left, center,| right, length, % ]
+y-axis: 定义视图被置于 Y 轴的何处。可能的值：
+[ top, center, bottom, length, % ]
+z-axis: 定义视图被置于 Z 轴的何处。可能的值：
+[ length ]
+
+2. **gradient** 属性
+``` css
+-webkit-gradient(type, start_point, end_point, / stop...)
+-webkit-gradient(type, inner_center, inner_radius, outer_center, outer_radius, / stop...)
+```
+type:	渐变的类型，可以是线性渐变(linear)或是径向渐变(radial)
+start_point:	渐变图像中渐变的起始点
+end_point:	渐变图像中渐变的结束点
+stop:	color-stop()方法，指定渐变进程中特定的颜色
+inner_center:	内部中心点，径向渐变起始圆环
+inner_radius:	内部半径，径向渐变起始圆
+outer_center:	外部渐变结束圆的中心点
+outer_radius:	外部渐变结束圆的半径
 
 
 

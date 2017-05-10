@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<script src="js/jquery-3.2.1.min.js"></script>
 	<title>Ebook</title>
 	<style>
 		html,
@@ -45,7 +46,7 @@
 		}
 		.container .ebook .page.page3 {
 			z-index: 3;	
-			display: none;		
+			display: none;
 		}
 		.container .ebook .page.page4 {
 			z-index: 2;
@@ -64,16 +65,23 @@
 			height: 640px;
 			overflow: visible;
 			z-index: 1999;
+			display: none;
 		}
 		.keepOut2 {
-			pointer-events: none;
 			position: absolute;
 			top: 0px;
 			left: 0px;
+			overflow: hidden;
+			z-index: auto;
 			width: 320px;
+			/*width: 640px;*/
 			height: 640px;
-			overflow: visible;
-			z-index: 1999;
+			-webkit-transform-origin: 0% 100% 0px;
+			transform-origin: 0% 100% 0px;
+			-webkit-transform: translate3d(0px, 0px, 0px) rotate(-90deg);
+			transform: translate3d(0px, 0px, 0px) rotate(-90deg);
+			display: block;
+			background: transparent;
 		}
 		.keepOut3 {
 			position: absolute;
@@ -86,8 +94,10 @@
 			cursor: default;
 			width: 320px;
 			height: 640px;
+			-webkit-transform-origin: 0% 100% 0px;
 			transform-origin: 0% 100% 0px;
-			transform: rotate(44.9989deg) translate3d(157.506px, -217.5px, 0px) rotate(90.0022deg);
+			-webkit-transform: rotate(90deg) translate3d(0px, 0px, 0px) rotate(0deg);
+			transform: rotate(90deg) translate3d(0px, 0px, 0px) rotate(0deg);
 		}
 		.keepOut4 {
 			position: absolute;
@@ -97,7 +107,7 @@
 			z-index: 1;
 			width: 320px;
 			height: 640px;
-			background: -webkit-gradient(linear, 0% 100%, 9.0665% 94.9025%, color-stop(0.6, rgba(0, 0, 0, 0)), color-stop(0.8, rgba(0, 0, 0, 0.2)), to(rgba(255, 255, 255, 0.2)));
+			background: -webkit-gradient(linear, 0% 100%, 0% 100%, from(rgba(0, 0, 0, 0)), color-stop(0.8, rgba(0, 0, 0, 0.2)), to(rgba(255, 255, 255, 0.2)));
 		}
 		.keepOut5 {
 			float: left;
@@ -108,12 +118,17 @@
 			left: 0px;
 			bottom: auto;
 			right: auto;
-			box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px;
 			-webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px;
+			box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px;
 			background: #FFFFFF;
 			transform-origin: 0% 100% 0px;
 			-webkit-transform-origin: 0% 100% 0px;
-
+			transform-origin: 0% 100% 0px;
+		}
+		/*操作区样式*/
+		.element label,
+		.element input:hover{
+			cursor: pointer;
 		}
 	</style>
 </head>
@@ -145,16 +160,55 @@
 				<p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
 				<p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
 			</div>
-			<div class="keepOut1">
-				<div class="keepOut2">
-					<div class="keepOut3">
-						<div class="keepOut4"></div>
-						<div class="keepOut5"></div>
+			<div class="keepOut1" id="k1">
+				<div class="keepOut2" id="k2">
+					<div class="keepOut3" id="k3">
+						<div class="keepOut4" id="k4"></div>
+						<div class="keepOut5" id="k5"></div>
 					</div>
 				</div>
 			</div>
 		</div>
+		<div class="action" id="action">
+			<div class="element">element: 
+				<label for="el_k1">k1
+					<input type="radio" name="el" id="el_k1" value="k1">
+				</label>
+				<label for="el_k2">k2
+					<input type="radio" name="el" id="el_k2" value="k2">
+				</label>
+				<label for="el_k3">k3
+					<input type="radio" name="el" id="el_k3" value="k3">
+				</label>
+				<label for="el_k4">k4
+					<input type="radio" name="el" id="el_k4" value="k4">
+				</label>
+				<label for="el_k5">k5
+					<input type="radio" name="el" id="el_k5" value="k5">
+				</label>
+			</div>
+			<div id="setValue">
+				<label>
+					translate3d: 
+					<input type="number" name="" id="t3x" placeholder="x">
+					<input type="number" name="" id="t3y" placeholder="y">
+					<input type="number" name="" id="t3z" placeholder="z">
+				</label><br>
+				<label>
+					rotate: 
+					<input type="number" id="rdeg" placeholder="deg">
+				</label><br>
+				<label>
+					bg_gradient: 
+					<input type="number" name="" id="sx" placeholder="startX">
+					<input type="number" name="" id="sy" placeholder="startY">
+					<input type="number" name="" id="ex" placeholder="endX">
+					<input type="number" name="" id="ey" placeholder="endY">
+				</label>
+			</div>
+		</div>
 	</div>
+	
 	<script>
 		let ebook = document.querySelector('.ebook');
 		let prePage = 0;
@@ -207,6 +261,52 @@
 				// el.style.zIndex = 5;
 			}			
 		}
+		// 仿真翻页
+		let k1 = $('#k1'),
+		k2 = $('#k2'),
+		k3 = $('#k3'),
+		k4 = $('#k4'),
+		k5 = $('#k5');
+		function setTranslate3d($el, x, y, z) {
+			let val = 'translate3d(' + x + ', ' + y + ', ' + z + ')';
+			$el.css('transform', val);
+		}
+		function setRotate($el, deg) {
+			let val = 'rotate(' + deg + ')';
+			$el.css('transform', val);
+		}
+		function setTransform($el, x, y, z, deg) {
+			let val = 'translate3d(' + x + ', ' + y + ', ' + z + ')' + ' '
+						+ 'rotate(' + deg + ')';
+			$el.css('transform', val);
+		}
+		function setBgGradient($el, startX, startY, endX, endY) {
+			let val = '-webkit-gradient(linear, '+ startX +' ' + startY +', '+ endX + ' ' + endY + ', from(rgba(0, 0, 0, 0)), color-stop(0.8, rgba(0, 0, 0, 0.2)), to(rgba(255, 255, 255, 0.2)));';
+			$el.css('background', val);
+		}
+		$('#action input').bind('input', () => {
+			k1.css('display', 'block');
+			let el = $('input[name="el"]:checked').val();
+			let t3x = $('#t3x').val() + 'px',
+				t3y = $('#t3y').val() + 'px',
+				t3z = $('#t3z').val() + 'px';
+			let rdeg = $('#rdeg').val() + 'deg';
+			let sx = $('#sx').val() + '%',
+				sy = $('#sy').val() + '%',
+				ex = $('#ex').val() + '%',
+				ey = $('#ey').val() + '%';
+			switch(el) {
+				case 'k3': {
+					setTranslate3d(k3, t3x, t3y, t3z);
+					setRotate(k3, rdeg);
+					break;
+				}
+				case 'k4': {
+					setBgGradient(k4, sx, sy, ex, ey);
+					break;
+				}
+			}
+		});
 	</script>
 </body>
 </html>
