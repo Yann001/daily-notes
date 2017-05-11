@@ -281,7 +281,8 @@
 			$el.css('transform', val);
 		}
 		function setBgGradient($el, startX, startY, endX, endY) {
-			let val = '-webkit-gradient(linear, '+ startX +' ' + startY +', '+ endX + ' ' + endY + ', from(rgba(0, 0, 0, 0)), color-stop(0.8, rgba(0, 0, 0, 0.2)), to(rgba(255, 255, 255, 0.2)));';
+			// let val = '-webkit-gradient(linear, '+ startX +' ' + startY +', '+ endX + ' ' + endY + ', from(rgba(0, 0, 0, 0)), color-stop(0.8, rgba(0, 0, 0, 0.2)), to(rgba(255, 255, 255, 0.2)));';
+			let val = '-webkit-gradient(linear, '+ startX +' ' + startY +', ' + endX +' ' + endY + ', from(rgba(0, 0, 0, 0)), color-stop(0.8, rgba(0, 0, 0, 0.2)), to(rgba(255, 255, 255, 0.2)))';
 			$el.css('background', val);
 		}
 		$('#action input').bind('input', () => {
@@ -297,8 +298,9 @@
 				ey = $('#ey').val() + '%';
 			switch(el) {
 				case 'k3': {
-					setTranslate3d(k3, t3x, t3y, t3z);
-					setRotate(k3, rdeg);
+					// setTranslate3d(k3, t3x, t3y, t3z);
+					// setRotate(k3, rdeg);
+					setTransform(k3, t3x, t3y, t3z, rdeg);
 					break;
 				}
 				case 'k4': {
