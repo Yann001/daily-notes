@@ -28,8 +28,8 @@
 			/*overflow: hidden;*/
 		}
 		.container .ebook .page {
-			width: 320px;
-			height: 640px;
+			padding: 10px 20px;
+			border: 1px dotted #2d2929;
 			position: absolute;
 			top: 0;
 			left: 0;
@@ -37,12 +37,14 @@
 		}
 		.container .ebook .page.page1 {
 			z-index: 5;
-			/*transform: rotate3d(0, 10, 0, 150deg);*/
-			/*transform: translateZ(20);*/
+			background: antiquewhite;
+			transform-origin: 0 0;
+			/*transform: rotate3d(20, 0, 0, 40deg);*/
+			transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
 		}
 		.container .ebook .page.page2 {
 			z-index: 4;
-			display: none;
+			/*display: none;*/
 		}
 		.container .ebook .page.page3 {
 			z-index: 3;	
@@ -130,6 +132,18 @@
 		.element input:hover{
 			cursor: pointer;
 		}
+		.test .rectangle {
+			display: none;
+			position: absolute;
+			top: 32px;
+			left: 90px;
+			width: 300px;
+			height: 500px;
+			border: 1px solid black;
+			transform-origin: 0 0;
+			transform: rotate(-45deg) translate(0px, 0px);
+			background: -webkit-gradient(linear, 0% 50%, 100% 50%, from(rgba(0,0,0,1)),color-stop(0.7,rgba(255,255,255,0)),to(rgba(255,255,255,0)));
+		}
 	</style>
 </head>
 <body>
@@ -170,6 +184,9 @@
 			</div>
 		</div>
 		<div class="action" id="action">
+			<div class="setting">
+				<button id="set-matrix">设置matrix</button>
+			</div>
 			<div class="element">element: 
 				<label for="el_k1">k1
 					<input type="radio" name="el" id="el_k1" value="k1">
@@ -207,6 +224,10 @@
 				</label>
 			</div>
 		</div>
+		<div class="test">
+			<div class="rectangle">
+		</div>
+	</div>
 	</div>
 	
 	<script>
@@ -309,6 +330,21 @@
 				}
 			}
 		});
+		// ------------ matrix -----------
+		$('#set-matrix').bind('click', function() {
+			setMatrix($('.page1'), 0);
+		});
+		function setMatrix(el, k) {
+			var a = (1-k*k)/(k*k+1);
+			var b = 2*k/(k*k+1);
+			var c = 2*k/(k*k+1);
+			var d = (k*k-1)/(k*k+1);
+			var e = 0;
+			var f = 0;
+			var params = a + ',' + b + ',' + c +',' + d + ',' + e + ',' + f;
+			el.css({'transform': 'matrix(' + params + ')'});
+			console.log(el.css('transform'));
+		}
 	</script>
 </body>
 </html>

@@ -7,13 +7,18 @@
 **张鑫旭博客文章**
 
 >1.  http://www.zhangxinxu.com
->1.  http://www.zhangxinxu.com/wordpress/2011/12/css3-pointer-events-none-javascript/
->3. http://www.zhangxinxu.com/wordpress/2012/09/css3-3d-transform-perspective-animate-transition/
->4. http://www.zhangxinxu.com/wordpress/?p=1907
+>1.  [CSS3 pointer-events:none应用举例及扩展](http://www.zhangxinxu.com/wordpress/2011/12/css3-pointer-events-none-javascript/)
+>3. [好吧，CSS3 3D transform变换，不过如此！](http://www.zhangxinxu.com/wordpress/2012/09/css3-3d-transform-perspective-animate-transition/)
+>4. [CSSOM视图模式(CSSOM View Module)相关整理](http://www.zhangxinxu.com/wordpress/?p=1907)
+>5. [CSS3 Transitions, Transforms和Animation使用简介与应用展示](http://www.zhangxinxu.com/wordpress/?p=1268)
+>6. [理解CSS3 transform中的Matrix(矩阵)](http://www.zhangxinxu.com/wordpress/?p=2427)
 
 **正则表达式**
 
 >1. http://www.jb51.net/tools/zhengze.html#mission
+
+**angular, ionic**
+>1. http://www.jianshu.com/p/ea0dcf1d31c9#
 
 ## jQuery方法
 
@@ -95,6 +100,9 @@ inner_center:	内部中心点，径向渐变起始圆环
 inner_radius:	内部半径，径向渐变起始圆
 outer_center:	外部渐变结束圆的中心点
 outer_radius:	外部渐变结束圆的半径
+
+3. **transform**  中的Matrix（矩阵）
+
 
 
 
