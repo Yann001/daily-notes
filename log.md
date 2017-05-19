@@ -12,6 +12,7 @@
 >4. [CSSOM视图模式(CSSOM View Module)相关整理](http://www.zhangxinxu.com/wordpress/?p=1907)
 >5. [CSS3 Transitions, Transforms和Animation使用简介与应用展示](http://www.zhangxinxu.com/wordpress/?p=1268)
 >6. [理解CSS3 transform中的Matrix(矩阵)](http://www.zhangxinxu.com/wordpress/?p=2427)
+>7. [JS Range HTML文档/文字内容选中、库及应用介绍](http://www.zhangxinxu.com/wordpress/?p=1591)
 
 **正则表达式**
 

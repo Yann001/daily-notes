@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+	<title>JS Range Obj Test</title>
+	<style>
+		body {
+			position: relative;
+		}
+		.text .note-mark {
+			border-bottom: 1px dotted #f00;
+		}
+		.note {
+			position: absolute;
+			top: 25%;
+			left: 25%;
+			z-index: 999;
+			padding: 5px;
+			width: 230px;
+			background: rgba(0,0,0,0.9);
+			-webkit-border-radius: 4px;
+			-moz-border-radius: 4px;
+			-ms-border-radius: 4px;
+			-o-border-radius: 4px;
+			border-radius: 4px;
+		}
+		.note ul {
+			list-style: none;
+			margin: 0px;
+			padding: 0px;
+		}
+		.note .btns {
+			display: block;
+			overflow: hidden;
+			zoom: 1;
+			margin-bottom: 5px;
+		}
+		.note .btns li {
+			float: left;
+			width: 25%;
+			position: relative;
+			box-sizing: border-box;
+			padding: 4px 5px;
+		}
+		.note .btns li:after {
+			content: " ";
+			position: absolute;
+			right: 0px;
+			top: 8px;
+			bottom: 8px;
+			border-right: 1px solid #777777;
+			-webkit-transform-origin: 100% 0;
+			transform-origin: 100% 0;
+			-webkit-transform: scaleX(0.5);
+			transform: scaleX(0.5);
+		}
+		.note .btns li:last-child {
+			border-right: 0px;
+		}
+		.note .btns li a {
+			text-decoration: none;
+			display: block;
+			white-space: nowrap;
+			color: #ffffff;
+			line-height: 24px;
+			text-align: center;
+			font-size: 14px;
+		}
+		.note .colors {
+			overflow: hidden;
+			zoom: 1;
+		}
+		.note .colors li {
+			float: left;
+			width: 20%;
+			padding: 4px 5px;
+			overflow: hidden;
+			box-sizing: border-box;
+		}
+		.note .colors li a {
+			display: block;
+			height: 20px;
+			background: #cccccc;
+			box-sizing: border-box;
+			border-radius: 4px;
+		}
+		.note .colors .red {
+			background-color: #e25656;
+		}
+		.note .colors .green {
+			background-color: #ffcf3e;
+		}
+		.note .colors .green {
+			background-color: #ffcf3e;
+		}
+		.note .colors .blue {
+			background-color: #3ea6ff;
+		}
+		.note .colors .purple {
+			background-color: #a313ff;
+		}
+	</style>
+</head>
+<body>
+	<div class="text">
+		<h2>一、前面的些话</h2>
+		<p>
+			本文的内容基本上是基于“区域范围对象(Range objects)”这个概念来说的。这个玩意，可以让你选择HTML文档的任意部分，并可以拿这些选择的信息做你想做的事情。其中，最常见的Range是用户用鼠标选择的内容(user selection)。
+		</p>
+		<p>本文有不少篇幅就是讲如何将用户的这种选择转换为W3C Range或Microsoft Text Range对象。</p>
+		<h2>二、什么是Range？</h2>
+		<p>
+			所谓"Range"，是指HTML文档中任意一段内容。一个Range的起始点和结束点位置任意，甚至起始点和结束点可以是一样的（也就是空Range）。最常见的Range是用户文本选择范围(user text selection)。当用户选择了页面上的某一段文字后，你就可以把这个选择转为Range。当然，你也可以直接用程序定义Range。
+		</p>
+		<p>例如下面这个模样的例子：</p>
+	</div>
+	<div class="btn">
+		<button id="btn-test">Test</button>
+	</div>
+	<div class="result">
+		<textarea name="" id="result" cols="30" rows="10"></textarea>
+	</div>
+	<div class="note">
+		<ul class="btns">
+			<li><a href="#" id="search">搜索</a></li>
+			<li><a href="#" id="addNote">笔记</a></li>
+			<li><a href="#" id="addFeedBack">纠错</a></li>
+			<li><a href="#" id="delete">删除</a></li>
+		</ul>
+		<ul class="colors">
+			<li><a href="javascript:void(0)" class="red" id="red"></a></li>
+			<li><a href="javascript:void(0)" class="yellow" id="yellow"></a></li>
+			<li><a href="javascript:void(0)" class="green" id="green"></a></li>
+			<li><a href="javascript:void(0)" class="blue" id="blue"></a></li>
+			<li><a href="javascript:void(0)" class="purple" id="purple"></a></li>
+		</ul>
+	</div>
+	<script>
+		var btnTest = document.getElementById('btn-test');
+		var result = document.getElementById('result');
+
+		btnTest.addEventListener('click', function () {
+			// var range = document.createRange();
+			var range = [];
+			var selection = document.getSelection() || window.getSelection();
+			if(selection.rangeCount > 0) {
+				for (var i = 0, len = selection.rangeCount; i < len; i++) {
+					range.push(selection.getRangeAt(i));
+				}
+			}
+			result.innerHTML = 'range: '+ range;
+			replaceSelectText();
+		});
+
+		document.body.addEventListener('touchend', function (e) {
+			e.preventDefault();
+			replaceSelectText();
+		})
+
+		function replaceSelectText (text) {
+			if (window.getSelection) {
+				var sel = window.getSelection();
+				if (sel.rangeCount > 0) {
+					var ran = sel.getRangeAt(0);
+					var selClone = ran.cloneContents();
+
+					var span = document.createElement('span');
+					span.innerHTML = ran;
+					span.className = 'note-mark';
+					sel.deleteFromDocument();
+					ran.insertNode(span);
+				}
+			}
+			else if (document.selection && document.selection.createRange) {
+				// IE浏览器
+				var sel = document.selection.createRange();
+				var selHtml = sel.htmlText;
+				sel.pasteHTML('<span class="note-mark">'+selHtml+'</span>')
+			}
+		}
+	</script>
+</body>
+</html>
