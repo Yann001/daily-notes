@@ -15,6 +15,7 @@
     }
 
     .note {
+      display: none;
       position: absolute;
       top: 25%;
       left: 25%;
@@ -135,6 +136,7 @@
   </div>
   <div class="btn">
     <button id="btn-test">Test</button>
+    <button id="btn-test1">Test1</button>
   </div>
   <div class="result">
     <textarea name="" id="result" cols="30" rows="10"></textarea>
@@ -156,9 +158,22 @@
   </div>
   <script>
     var btnTest = document.getElementById('btn-test');
+    var btnTest1 = document.getElementById('btn-test1');
     var result = document.getElementById('result');
 
     btnTest.addEventListener('click', function () {
+      // var range = document.createRange();
+      var range = [];
+      var selection = document.getSelection() || window.getSelection();
+      if (selection.rangeCount > 0) {
+        for (var i = 0, len = selection.rangeCount; i < len; i++) {
+          range.push(selection.getRangeAt(i));
+        }
+      }
+      result.innerHTML = 'range: ' + range;
+      replaceSelectText();
+    });
+    btnTest1.addEventListener('click', function () {
       // var range = document.createRange();
       var range = [];
       var selection = document.getSelection() || window.getSelection();

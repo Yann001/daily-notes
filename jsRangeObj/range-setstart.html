@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <div id="div">
+    这里是第一段文字
+  </div>
+  <input type="button" onclick="dele()" value="删除">
+  <script>
+    function dele() {
+      var div = document.getElementById("div");
+      var range = document.createRange();
+      var content = div.firstChild;
+      range.setStart(content, 1);
+      range.setEnd(content, 7);
+      range.deleteContents();
+    }
+  </script>
+</body>
+
+</html>
