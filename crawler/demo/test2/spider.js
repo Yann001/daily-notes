@@ -22,7 +22,7 @@ function startRequest(x) {
     });
     //监听end事件， 如果整个网页内容的html都获取完毕，就执行回调函数
     res.on('end', function () {
-      //采用cheerio加息html
+      //采用cheerio解析html
       //console.log(html);
       var $ = cheerio.load(html);
       var time = $('.article-info a:first-child').next().text().trim();
