@@ -196,7 +196,7 @@
         var sel = window.getSelection();
         if (sel.rangeCount > 0) {
           var ran = sel.getRangeAt(0);
-          var selClone = ran.cloneContents();
+          // var selClone = ran.cloneContents();
 
           var span = document.createElement('span');
           span.innerHTML = ran;
