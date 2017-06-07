@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-  <script src="js/jquery-3.2.1.min.js"></script>
   <title>Ebook</title>
   <style>
     html,
@@ -25,12 +24,12 @@
     }
 
     .container .ebook {
-      width: 320px;
-      height: 640px;
+      width: 100%;
+      height: 100%;
       margin: 0 auto;
       position: relative;
       line-height: 1.5em;
-      /*overflow: hidden;*/
+      overflow: hidden;
     }
 
     .container .ebook .page {
@@ -41,15 +40,11 @@
       bottom: 0;
       left: 0;
       right: 0;
-      transition: transform 3s ease;
     }
 
     .container .ebook .page.page1 {
       z-index: 5;
       background: antiquewhite;
-      transform-origin: 0 0;
-      /*transform: rotate3d(20, 0, 0, 40deg);*/
-      transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
     }
 
     .container .ebook .page.page2 {
@@ -71,147 +66,101 @@
       z-index: 1;
       display: none;
     }
-
-    .keepOut1 {
-      pointer-events: none;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      width: 320px;
-      height: 640px;
-      overflow: visible;
-      z-index: 1999;
-      display: none;
-    }
-
-    .keepOut2 {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      overflow: hidden;
-      z-index: auto;
-      width: 320px;
-      /*width: 640px;*/
-      height: 640px;
-      -webkit-transform-origin: 0% 100% 0px;
-      transform-origin: 0% 100% 0px;
-      -webkit-transform: translate3d(0px, 0px, 0px) rotate(-90deg);
-      transform: translate3d(0px, 0px, 0px) rotate(-90deg);
-      display: block;
-      background: transparent;
-    }
-
-    .keepOut3 {
-      position: absolute;
-      top: auto;
-      left: 0px;
-      right: auto;
-      bottom: 0px;
-      overflow: hidden;
-      z-index: auto;
-      cursor: default;
-      width: 320px;
-      height: 640px;
-      -webkit-transform-origin: 0% 100% 0px;
-      transform-origin: 0% 100% 0px;
-      -webkit-transform: rotate(90deg) translate3d(0px, 0px, 0px) rotate(0deg);
-      transform: rotate(90deg) translate3d(0px, 0px, 0px) rotate(0deg);
-    }
-
-    .keepOut4 {
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      overflow: hidden;
-      z-index: 1;
-      width: 320px;
-      height: 640px;
-      background: -webkit-gradient(linear, 0% 100%, 0% 100%, from(rgba(0, 0, 0, 0)), color-stop(0.8, rgba(0, 0, 0, 0.2)), to(rgba(255, 255, 255, 0.2)));
-    }
-
-    .keepOut5 {
-      float: left;
-      width: 320px;
-      height: 640px;
-      position: absolute;
-      top: 0px;
-      left: 0px;
-      bottom: auto;
-      right: auto;
-      -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px;
-      box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px;
-      background: #FFFFFF;
-      transform-origin: 0% 100% 0px;
-      -webkit-transform-origin: 0% 100% 0px;
-      transform-origin: 0% 100% 0px;
-    }
-    /*操作区样式*/
-
-    .element label,
-    .element input:hover {
-      cursor: pointer;
-    }
-
-    .test .rectangle {
-      display: none;
-      position: absolute;
-      top: 32px;
-      left: 90px;
-      width: 300px;
-      height: 500px;
-      border: 1px solid black;
-      transform-origin: 0 0;
-      transform: rotate(-45deg) translate(0px, 0px);
-      background: -webkit-gradient(linear, 0% 50%, 100% 50%, from(rgba(0, 0, 0, 1)), color-stop(0.7, rgba(255, 255, 255, 0)), to(rgba(255, 255, 255, 0)));
-    }
   </style>
   <style>
     .container .ebook {
-      user-select: none
+      /*-webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -moz-user-select: none;*/
+      user-select: none;
     }
 
     .btn-selection-start {
       position: relative;
-      width: 2px;
-      height: 1.2rem;
-      vertical-align: top;
+      width: 0px;
+      height: 1em;
+      vertical-align:middle;
       background-color: #0582e8;
       border: none;
       margin: 0;
       padding: 0;
+      z-index: 10;
     }
 
     .btn-selection-start:before {
-      width: 8px;
-      height: 8px;
-      border-radius: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 5px;
       background-color: #0582e8;
       content: '';
       position: absolute;
-      top: -4px;
-      left: -3px;
+      top: -12px;
+      left: -5px;
+    }
+
+    .btn-selection-start:after {
+      content: '';
+      width: 2px;
+      height: 1.6em;
+      position: absolute;
+      top: -0.3em;
+      left: -1px;
+      background-color: #0582e8;
+    }
+
+    .btn-selection-start .btn-expand {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-color: red;
+      top: 50%;
+      margin-top: -20px;
+      left: -20px;
+      opacity: 0;
     }
 
     .btn-selection-end {
       position: relative;
-      width: 2px;
-      height: 1.2rem;
-      vertical-align: bottom;
+      width: 0px;
+      height: 1em;
+      vertical-align: middle;
       background-color: #0582e8;
       border: none;
       margin: 0;
       padding: 0;
+      z-index: 10;
+    }
+
+    .btn-selection-end:before {
+      content: '';
+      width: 2px;
+      height: 1.6em;
+      position: absolute;
+      bottom: -0.3em;
+      left: -1px;
+      background-color: #0582e8;
     }
 
     .btn-selection-end:after {
-      width: 8px;
-      height: 8px;
-      border-radius: 4px;
+      width: 10px;
+      height: 10px;
+      border-radius: 5px;
       background-color: #0582e8;
       content: '';
       position: absolute;
-      bottom: -4px;
-      left: -3px;
+      bottom: -12px;
+      left: -5px;
+    }
+    .btn-selection-end .btn-expand {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-color: green;
+      top: 50%;
+      margin-top: -20px;
+      left: -20px;
+      opacity: 0;
     }
   </style>
 </head>
@@ -250,59 +199,6 @@
         <p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
         <p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
       </div>
-      <div class="keepOut1" id="k1">
-        <div class="keepOut2" id="k2">
-          <div class="keepOut3" id="k3">
-            <div class="keepOut4" id="k4"></div>
-            <div class="keepOut5" id="k5"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="action" id="action">
-      <div class="setting">
-        <button id="set-matrix">设置matrix</button>
-      </div>
-      <div class="element">element:
-        <label for="el_k1">k1
-					<input type="radio" name="el" id="el_k1" value="k1">
-				</label>
-        <label for="el_k2">k2
-					<input type="radio" name="el" id="el_k2" value="k2">
-				</label>
-        <label for="el_k3">k3
-					<input type="radio" name="el" id="el_k3" value="k3">
-				</label>
-        <label for="el_k4">k4
-					<input type="radio" name="el" id="el_k4" value="k4">
-				</label>
-        <label for="el_k5">k5
-					<input type="radio" name="el" id="el_k5" value="k5">
-				</label>
-      </div>
-      <div id="setValue">
-        <label>
-					translate3d: 
-					<input type="number" name="" id="t3x" placeholder="x">
-					<input type="number" name="" id="t3y" placeholder="y">
-					<input type="number" name="" id="t3z" placeholder="z">
-				</label><br>
-        <label>
-					rotate: 
-					<input type="number" id="rdeg" placeholder="deg">
-				</label><br>
-        <label>
-					bg_gradient: 
-					<input type="number" name="" id="sx" placeholder="startX">
-					<input type="number" name="" id="sy" placeholder="startY">
-					<input type="number" name="" id="ex" placeholder="endX">
-					<input type="number" name="" id="ey" placeholder="endY">
-				</label>
-      </div>
-    </div>
-    <div class="test">
-      <div class="rectangle">
-      </div>
     </div>
   </div>
 
@@ -313,14 +209,7 @@
     window.onselect = function (e) {
       e.preventDefault();
     }
-    let ebook = document.querySelector('.ebook');
-    let prePage = 0;
-    let curPage = 1;
-    let nextPage = 2;
-    let firstPage = 1;
-    let totalPage = 5;
-
-    //-----------------长按选取文字操作 开始----------------
+    var ebook = document.querySelector('.ebook');
     var Selection_ = (function () {
       document.Range_ = null;
       var range = document.Range_
@@ -337,7 +226,7 @@
         if (document.caretRangeFromPoint) {
           range = document.caretRangeFromPoint(point.x, point.y);
           var n = 1;
-          while (range.toString().length < 1 && n < 20) {
+          while (range.toString().length < 2 && n < 16) {
             //为使坐标向左右扩展的速度更快，故设为2n
             var caretRangeStart = document.caretRangeFromPoint(point.x - 2 * n, point.y - n);
             var caretRangeEnd = document.caretRangeFromPoint(point.x + 2 * n, point.y + n);
@@ -360,6 +249,10 @@
           var selectionStart = document.createElement('button');
           selectionStart.className = 'btn-selection-start';
           selectionStart.setAttribute('id', 'btn-ss-js');
+          //扩大滑动按钮时的点选区域
+          var startBtnExpand = document.createElement('span');
+          startBtnExpand.className = 'btn-expand';
+          selectionStart.appendChild(startBtnExpand);
           var startRange = document.createRange();
           startRange.setStart(range.startContainer, range.startOffset);
           startRange.insertNode(selectionStart);
@@ -369,6 +262,10 @@
           var selectionEnd = document.createElement('button');
           selectionEnd.className = 'btn-selection-end';
           selectionEnd.setAttribute('id', 'btn-se-js');
+          //扩大滑动按钮时的点选区域
+          var endBtnExpand = document.createElement('span');
+          endBtnExpand.className = 'btn-expand';
+          selectionEnd.appendChild(endBtnExpand);
           var endRange = document.createRange();
           endRange.setStart(range.endContainer, range.endOffset);
           endRange.insertNode(selectionEnd);
@@ -382,20 +279,20 @@
           if (range.startContainer.parentNode == range.endContainer.parentNode) {
             //不跨标签
             var parentHtml = range.startContainer.parentNode.innerHTML;
-            var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"></button>');
-            var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"></button>');
+            var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+            var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
             range.startContainer.parentNode.innerHTML = parentNewHtml;
           } else {
             //跨标签
             var startParentHtml = range.startContainer.parentNode.innerHTML;
-            var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"></button>');
-            var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"></button><mark>');
+            var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>');
+            var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>');
             range.startContainer.parentNode.innerHTML = startParentNewHtml;
 
             var endSelectionText = range.endContainer.textContent;
             var endParentHtml = range.endContainer.parentNode.innerHTML;
-            var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"></button>');
-            var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"></button>');
+            var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+            var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
             range.endContainer.parentNode.innerHTML = endParentNewHtml;
           }
         }
@@ -427,6 +324,10 @@
           var selectionStart = document.createElement('button');
           selectionStart.className = 'btn-selection-start';
           selectionStart.setAttribute('id', 'btn-ss-js');
+          //扩大滑动按钮时的点选区域
+          var startBtnExpand = document.createElement('span');
+          startBtnExpand.className = 'btn-expand';
+          selectionStart.appendChild(startBtnExpand);
           var startRange = document.caretRangeFromPoint(touch.endX, touch.endY);
           startRange.insertNode(selectionStart);
           startRange.detach();
@@ -447,8 +348,8 @@
           if (ssBtn.parentNode == seBtn.parentNode) {
             //不跨标签
             var parentHtml = ssBtn.parentNode.innerHTML;
-            var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"></button>');
-            var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"></button>');
+            var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+            var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
             ssBtn.parentNode.innerHTML = parentNewHtml;
           } else {
             //跨标签
@@ -456,13 +357,13 @@
             var endSelectionText = range.endContainer.firstChild.textContent;
 
             var startParentHtml = ssBtn.parentNode.innerHTML;
-            var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"></button>');
-            var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"></button><mark>');
+            var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>');
+            var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>');
             ssBtn.parentNode.innerHTML = startParentNewHtml;
 
             var endParentHtml = seBtn.parentNode.innerHTML;
-            var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"></button>');
-            var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"></button>');
+            var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+            var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
             seBtn.parentNode.innerHTML = endParentNewHtml;
           }
         }
@@ -493,6 +394,10 @@
           var selectionEnd = document.createElement('button');
           selectionEnd.className = 'btn-selection-end';
           selectionEnd.setAttribute('id', 'btn-se-js');
+          //扩大滑动按钮时的点选区域
+          var endBtnExpand = document.createElement('span');
+          endBtnExpand.className = 'btn-expand';
+          selectionEnd.appendChild(endBtnExpand);
           var endRange = document.caretRangeFromPoint(touch.endX, touch.endY);
           endRange.insertNode(selectionEnd);
           endRange.detach();
@@ -513,8 +418,8 @@
           if (ssBtn.parentNode == seBtn.parentNode) {
             //不跨标签
             var parentHtml = ssBtn.parentNode.innerHTML;
-            var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"></button>');
-            var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"></button>');
+            var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+            var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
             ssBtn.parentNode.innerHTML = parentNewHtml;
           } else {
             //跨标签
@@ -522,13 +427,13 @@
             var endSelectionText = range.endContainer.firstChild.textContent;
 
             var startParentHtml = ssBtn.parentNode.innerHTML;
-            var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"></button>');
-            var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"></button><mark>');
+            var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>');
+            var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>');
             ssBtn.parentNode.innerHTML = startParentNewHtml;
 
             var endParentHtml = seBtn.parentNode.innerHTML;
-            var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"></button>');
-            var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"></button>');
+            var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+            var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
             seBtn.parentNode.innerHTML = endParentNewHtml;
           }
         }
@@ -673,140 +578,33 @@
       }
     })();
     var longPressFlag = false;
-    var selection = null;
     ebook.addEventListener('touchstart', function (e) {
       longPressFlag = true;
       var point = {
         x: e.touches[0].clientX,
         y: e.touches[0].clientY
       }
+      if (Selection_) {
+        Selection_.destorySelectionArea();
+      }
       var longPressTimer = setTimeout(function () {
         if (longPressFlag) {
-          selection = Selection_.createSelectionArea(point);
+          longPressFlag = false;
+          var selection = Selection_.createSelectionArea(point);
         }
       }, 800);
     });
-    ebook.addEventListener('touchmove', function () {
+    ebook.addEventListener('touchmove', function (e) {
       longPressFlag = false;
     });
-    ebook.addEventListener('touchend', function () {
+    ebook.addEventListener('touchend', function (e) {
       longPressFlag = false;
+
     });
     ebook.addEventListener('click', (e) => {
-      //Selection_.createSelectionArea(e);
-      Selection_.destorySelectionArea();
-      //------------------------------------------------
-      // console.log(e.target);
-      // if (e.offsetX > window.screen.width / 2) {
-      //   showNext();
-      // }
-      // else {
-      //   showPrevious();
-      // }
+      // Selection_.createSelectionArea(e);
+      // Selection_.destorySelectionArea();
     });
-
-    //-----------------长按选取文字操作 结束----------------
-
-    //----------------------------------------------------
-    function showNext() {
-      curPage++;
-      curPage = curPage > totalPage ? totalPage : curPage;
-      prePage = curPage - 1;
-      nextPage = curPage + 1;
-      let preEl = document.querySelector('.page' + prePage);
-      hideEl(preEl);
-      let curEl = document.querySelector('.page' + curPage);
-      showEl(curEl);
-      let nextEl = document.querySelector('.page' + nextPage);
-      hideEl(nextEl);
-    }
-    function showPrevious() {
-      curPage--;
-      curPage = curPage < firstPage ? firstPage : curPage;
-      prePage = curPage - 1;
-      nextPage = curPage + 1;
-      let preEl = document.querySelector('.page' + prePage);
-      hideEl(preEl);
-      let curEl = document.querySelector('.page' + curPage);
-      showEl(curEl);
-      let nextEl = document.querySelector('.page' + nextPage);
-      hideEl(nextEl);
-    }
-    function hideEl(el) {
-      if (el) {
-        el.style.display = 'none';
-        // el.style.zIndex = -1;
-      }
-    }
-    function showEl(el) {
-      if (el) {
-        el.style.display = 'block';
-        // el.style.zIndex = 5;
-      }
-    }
-    // 仿真翻页
-    let k1 = $('#k1'),
-      k2 = $('#k2'),
-      k3 = $('#k3'),
-      k4 = $('#k4'),
-      k5 = $('#k5');
-    function setTranslate3d($el, x, y, z) {
-      let val = 'translate3d(' + x + ', ' + y + ', ' + z + ')';
-      $el.css('transform', val);
-    }
-    function setRotate($el, deg) {
-      let val = 'rotate(' + deg + ')';
-      $el.css('transform', val);
-    }
-    function setTransform($el, x, y, z, deg) {
-      let val = 'translate3d(' + x + ', ' + y + ', ' + z + ')' + ' '
-        + 'rotate(' + deg + ')';
-      $el.css('transform', val);
-    }
-    function setBgGradient($el, startX, startY, endX, endY) {
-      // let val = '-webkit-gradient(linear, '+ startX +' ' + startY +', '+ endX + ' ' + endY + ', from(rgba(0, 0, 0, 0)), color-stop(0.8, rgba(0, 0, 0, 0.2)), to(rgba(255, 255, 255, 0.2)));';
-      let val = '-webkit-gradient(linear, ' + startX + ' ' + startY + ', ' + endX + ' ' + endY + ', from(rgba(0, 0, 0, 0)), color-stop(0.8, rgba(0, 0, 0, 0.2)), to(rgba(255, 255, 255, 0.2)))';
-      $el.css('background', val);
-    }
-    $('#action input').bind('input', () => {
-      k1.css('display', 'block');
-      let el = $('input[name="el"]:checked').val();
-      let t3x = $('#t3x').val() + 'px',
-        t3y = $('#t3y').val() + 'px',
-        t3z = $('#t3z').val() + 'px';
-      let rdeg = $('#rdeg').val() + 'deg';
-      let sx = $('#sx').val() + '%',
-        sy = $('#sy').val() + '%',
-        ex = $('#ex').val() + '%',
-        ey = $('#ey').val() + '%';
-      switch (el) {
-        case 'k3': {
-          // setTranslate3d(k3, t3x, t3y, t3z);
-          // setRotate(k3, rdeg);
-          setTransform(k3, t3x, t3y, t3z, rdeg);
-          break;
-        }
-        case 'k4': {
-          setBgGradient(k4, sx, sy, ex, ey);
-          break;
-        }
-      }
-    });
-    // ------------ matrix -----------
-    $('#set-matrix').bind('click', function () {
-      setMatrix($('.page1'), 0);
-    });
-    function setMatrix(el, k) {
-      var a = (1 - k * k) / (k * k + 1);
-      var b = 2 * k / (k * k + 1);
-      var c = 2 * k / (k * k + 1);
-      var d = (k * k - 1) / (k * k + 1);
-      var e = 0;
-      var f = 0;
-      var params = a + ',' + b + ',' + c + ',' + d + ',' + e + ',' + f;
-      el.css({ 'transform': 'matrix(' + params + ')' });
-      console.log(el.css('transform'));
-    }
   </script>
 </body>
 
