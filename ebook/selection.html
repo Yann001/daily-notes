@@ -10,7 +10,7 @@
     body {
       margin: 0;
       padding: 0;
-      font-family: 18px/1.5 "Arial","Microsoft YaHei","黑体","宋体",sans-serif;
+      font-family: 18px/1.5 "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif;
     }
 
     * {
@@ -45,12 +45,12 @@
     .container .ebook .page.page1 {
       z-index: 5;
       background: antiquewhite;
-      display: none;
+      /*display: none;*/
     }
 
     .container .ebook .page.page2 {
       z-index: 4;
-      /*display: none;*/
+      display: none;
     }
 
     .container .ebook .page.page3 {
@@ -311,7 +311,7 @@
         <p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
       </div>
     </div>
-    <div class="note">
+    <div class="note" id="operate-panel-js">
       <ul class="btns">
         <li><a href="#" id="search">搜索</a></li>
         <li><a href="#" id="addNote">笔记</a></li>
@@ -358,7 +358,7 @@
           var n = 1;
           var caretRangeStart = null, caretRangeEnd = null;
           while (range.toString().length < 2 && n < 16) {
-            //为使坐标向左右扩展的速度更快，故设为2n
+            // 为使坐标向左右扩展的速度更快，故设为2n
             touch.startBtnX = point.x - 2 * n;
             touch.startBtnY = point.y - n;
             touch.endBtnX = point.x + 2 * n;
@@ -369,6 +369,7 @@
             range.setEnd(caretRangeEnd.endContainer, caretRangeEnd.endOffset);
             n++;
           }
+          console.log('loop ', n, ' times');
           textNode = range.startContainer;
         }
         caretRangeStart.detach();
@@ -378,13 +379,14 @@
 
         var selectionText = range.toString();
         console.log(selectionText);
-        //只针对文本节点
+        // 只针对文本节点
         if (textNode && textNode.nodeType == 3) {
-          //添加起点标志
+          // 添加开始点光标
+          //addStartBtn();
           var selectionStart = document.createElement('button');
           selectionStart.className = 'btn-selection-start';
           selectionStart.setAttribute('id', 'btn-ss-js');
-          //扩大滑动按钮时的点选区域
+          // 扩大滑动按钮时的点选区域
           var startBtnExpand = document.createElement('span');
           startBtnExpand.className = 'btn-expand';
           selectionStart.appendChild(startBtnExpand);
@@ -393,32 +395,32 @@
           startRange.insertNode(selectionStart);
           startRange.detach();
           startRange = null;
-          //添加终点标志
+          // 添加结束点光标
+          //addEndBtn();
           var selectionEnd = document.createElement('button');
           selectionEnd.className = 'btn-selection-end';
           selectionEnd.setAttribute('id', 'btn-se-js');
-          //扩大滑动按钮时的点选区域
+          // 扩大滑动按钮时的点选区域
           var endBtnExpand = document.createElement('span');
           endBtnExpand.className = 'btn-expand';
           selectionEnd.appendChild(endBtnExpand);
           var endRange = document.createRange();
           endRange.setStart(range.endContainer, range.endOffset);
           endRange.insertNode(selectionEnd);
-          // range.startContainer.parentNode.insertBefore(selectionEnd,range.startContainer.nextSibling);
-          // range.endContainer.parentNode.insertBefore(selectionStart,range.endContainer.nextSibling);
-          //添加选区背景颜色（替换选区）
+
+          // 添加选区背景颜色（替换选区）
           var selectionNode = document.createElement('mark');
           selectionNode.innerHTML = selectionText;
-          //替换选区
-          //判断是否跨标签
+          // 替换选区
+          // 判断是否跨标签
           if (range.startContainer.parentNode == range.endContainer.parentNode) {
-            //不跨标签
+            // 不跨标签
             var parentHtml = range.startContainer.parentNode.innerHTML;
             var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
             var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
             range.startContainer.parentNode.innerHTML = parentNewHtml;
           } else {
-            //跨标签
+            // 跨标签
             var startParentHtml = range.startContainer.parentNode.innerHTML;
             var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>');
             var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>');
@@ -431,13 +433,8 @@
             range.endContainer.parentNode.innerHTML = endParentNewHtml;
           }
         }
-        //重设range对象
-        ssBtn = document.getElementById('btn-ss-js');
-        seBtn = document.getElementById('btn-se-js');
-        if (ssBtn && seBtn) {
-          range.setStartAfter(ssBtn);
-          range.setEndBefore(seBtn);
-        }
+        // 重设range对象，因为修改了innerHTML后range对象就不是原来的了
+        resetRangeByBtn();
         var selection = {
           position: 'not sure',
           content: range.toString(),
@@ -446,7 +443,9 @@
         if (selection.content.length > 0) {
           bindEventForSelection();
         }
+        // 浅复制（引用复制），后面操作range，document.Range_也会改变
         document.Range_ = range;
+        showOperatePanel();
         return selection;
       };
       // 移动start
@@ -461,21 +460,11 @@
           console.log('reset selection...');
           destoryBackground();
           destoryStartBtn();
-          // 添加起点标志
-          var selectionStart = document.createElement('button');
-          selectionStart.className = 'btn-selection-start';
-          selectionStart.setAttribute('id', 'btn-ss-js');
-          // 扩大滑动按钮时的点选区域
-          var startBtnExpand = document.createElement('span');
-          startBtnExpand.className = 'btn-expand';
-          selectionStart.appendChild(startBtnExpand);
-          var startRange = document.caretRangeFromPoint(touch.startBtnX, touch.startBtnY);
-          startRange.insertNode(selectionStart);
-          startRange.detach();
-          startRange = null;
+          // 添加起点光标
+          addStartBtn();
           // 判断是否交换startBtn与endBtn
           if ((touch.startBtnX - touch.endBtnX > 40 && Math.abs(touch.endBtnY - touch.startBtnY) < 10)
-              || touch.startBtnY - touch.endBtnY > 10) {
+            || touch.startBtnY - touch.endBtnY > 10) {
             console.log('change start and end...');
             var ssBtnTemp = document.getElementById('btn-ss-js');
             var seBtnTemp = document.getElementById('btn-se-js');
@@ -487,56 +476,14 @@
             touch.startBtnY = [touch.endBtnY, touch.endBtnY = touch.startBtnY][0];
           }
           // 添加选区背景颜色（替换选区）
-          // 判断是否跨标签
-          ssBtn = document.getElementById('btn-ss-js');
-          seBtn = document.getElementById('btn-se-js');
-          // 创建新的range
-          if (ssBtn && seBtn) {
-            range.setStartAfter(ssBtn);
-            range.setEndBefore(seBtn);
-          }
-          var selectionText = range.toString();
-          console.log(selectionText);
-          var selectionNode = document.createElement('mark');
-          selectionNode.innerHTML = selectionText;
-          if (ssBtn.parentNode == seBtn.parentNode) {
-            // 不跨标签
-            var parentHtml = ssBtn.parentNode.innerHTML;
-            var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
-            var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
-            ssBtn.parentNode.innerHTML = parentNewHtml;
-          } else {
-            // 跨标签
-            // 需要先获取该字符串，因为修改innerHTML后再获取就不一样了
-            var endSelectionText = range.endContainer.firstChild.textContent;
-
-            var startParentHtml = ssBtn.parentNode.innerHTML;
-            var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>');
-            var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>');
-            ssBtn.parentNode.innerHTML = startParentNewHtml;
-
-            var endParentHtml = seBtn.parentNode.innerHTML;
-            var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
-            var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
-            seBtn.parentNode.innerHTML = endParentNewHtml;
-          }
+          addSelectionBg();
         }
         // 重设range对象，因为修改了innerHTML后range对象就不是原来的了
-        ssBtn = document.getElementById('btn-ss-js');
-        seBtn = document.getElementById('btn-se-js');
-        if (ssBtn && seBtn) {
-          range.setStartAfter(ssBtn);
-          range.setEndBefore(seBtn);
-        }
-        var selection = {
-          position: 'not sure',
-          content: range.toString(),
-          range: range
-        }
-        if (selection.content.length > 0) {
+        resetRangeByBtn();
+        if (range.toString().length > 0) {
+          // 重新绑定选区光标拖动事件
           bindEventForSelection();
         }
-        return selection;
       };
       // 移动end
       var moveEndBtn = function () {
@@ -550,21 +497,11 @@
           console.log('reset selection...');
           destoryBackground();
           destoryEndBtn();
-          // 添加终点标志
-          var selectionEnd = document.createElement('button');
-          selectionEnd.className = 'btn-selection-end';
-          selectionEnd.setAttribute('id', 'btn-se-js');
-          // 扩大滑动按钮时的点选区域
-          var endBtnExpand = document.createElement('span');
-          endBtnExpand.className = 'btn-expand';
-          selectionEnd.appendChild(endBtnExpand);
-          var endRange = document.caretRangeFromPoint(touch.endBtnX, touch.endBtnY);
-          endRange.insertNode(selectionEnd);
-          endRange.detach();
-          endRange = null;
+          // 添加结束点光标
+          addEndBtn();
           // 判断是否交换startBtn与endBtn
           if ((touch.startBtnX - touch.endBtnX > 40 && Math.abs(touch.endBtnY - touch.startBtnY) < 10)
-              || touch.startBtnY - touch.endBtnY > 10) {
+            || touch.startBtnY - touch.endBtnY > 10) {
             console.log('change start and end...');
             var ssBtnTemp = document.getElementById('btn-ss-js');
             var seBtnTemp = document.getElementById('btn-se-js');
@@ -576,40 +513,17 @@
             touch.startBtnY = [touch.endBtnY, touch.endBtnY = touch.startBtnY][0];
           }
           // 添加选区背景颜色（替换选区）
-          // 判断是否跨标签
-          var ssBtn = document.getElementById('btn-ss-js');
-          var seBtn = document.getElementById('btn-se-js');
-          // 创建新的range
-          if (ssBtn && seBtn) {
-            range.setStartAfter(ssBtn);
-            range.setEndBefore(seBtn);
-          }
-          var selectionText = range.toString();
-          console.log(selectionText);
-          var selectionNode = document.createElement('mark');
-          selectionNode.innerHTML = selectionText;
-          if (ssBtn.parentNode == seBtn.parentNode) {
-            // 不跨标签
-            var parentHtml = ssBtn.parentNode.innerHTML;
-            var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
-            var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
-            ssBtn.parentNode.innerHTML = parentNewHtml;
-          } else {
-            // 跨标签
-            // 需要先获取该字符串，因为修改innerHTML后再获取就不一样了
-            var endSelectionText = range.endContainer.firstChild.textContent;
-
-            var startParentHtml = ssBtn.parentNode.innerHTML;
-            var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>');
-            var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>');
-            ssBtn.parentNode.innerHTML = startParentNewHtml;
-
-            var endParentHtml = seBtn.parentNode.innerHTML;
-            var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
-            var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
-            seBtn.parentNode.innerHTML = endParentNewHtml;
-          }
+          addSelectionBg();
         }
+        // 重设range对象，因为修改了innerHTML后range对象就不是原来的了
+        resetRangeByBtn();
+        if (range.toString().length > 0) {
+          // 重新绑定选区光标拖动事件
+          bindEventForSelection();
+        }
+      };
+      // 通过开始结束光标重设range对象
+      var resetRangeByBtn = function () {
         // 重设range对象，因为修改了innerHTML后range对象就不是原来的了
         ssBtn = document.getElementById('btn-ss-js');
         seBtn = document.getElementById('btn-se-js');
@@ -617,15 +531,70 @@
           range.setStartAfter(ssBtn);
           range.setEndBefore(seBtn);
         }
-        var selection = {
-          position: 'not sure',
-          content: range.toString(),
-          range: range
+      };
+      // 添加开始点光标
+      var addStartBtn = function () {
+        var selectionStart = document.createElement('button');
+        selectionStart.className = 'btn-selection-start';
+        selectionStart.setAttribute('id', 'btn-ss-js');
+        // 扩大滑动按钮时的点选区域
+        var startBtnExpand = document.createElement('span');
+        startBtnExpand.className = 'btn-expand';
+        selectionStart.appendChild(startBtnExpand);
+        var startRange = document.caretRangeFromPoint(touch.startBtnX, touch.startBtnY);
+        startRange.insertNode(selectionStart);
+        startRange.detach();
+        startRange = null;
+      };
+      // 添加结束点光标
+      var addEndBtn = function () {
+        var selectionEnd = document.createElement('button');
+        selectionEnd.className = 'btn-selection-end';
+        selectionEnd.setAttribute('id', 'btn-se-js');
+        // 扩大滑动按钮时的点选区域
+        var endBtnExpand = document.createElement('span');
+        endBtnExpand.className = 'btn-expand';
+        selectionEnd.appendChild(endBtnExpand);
+        var endRange = document.caretRangeFromPoint(touch.endBtnX, touch.endBtnY);
+        endRange.insertNode(selectionEnd);
+        endRange.detach();
+        endRange = null;
+      };
+      // 添加选区背景色
+      var addSelectionBg = function () {
+        var ssBtn = document.getElementById('btn-ss-js');
+        var seBtn = document.getElementById('btn-se-js');
+        // 设置新的range对象
+        if (ssBtn && seBtn) {
+          range.setStartAfter(ssBtn);
+          range.setEndBefore(seBtn);
         }
-        if (selection.content.length > 0) {
-          bindEventForSelection();
+        var selectionText = range.toString();
+        console.log(selectionText);
+        var selectionNode = document.createElement('mark');
+        selectionNode.innerHTML = selectionText;
+        // 判断是否跨标签
+        if (ssBtn.parentNode == seBtn.parentNode) {
+          // 不跨标签
+          var parentHtml = ssBtn.parentNode.innerHTML;
+          var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+          var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+          ssBtn.parentNode.innerHTML = parentNewHtml;
+        } else {
+          // 跨标签
+          // 需要先获取该字符串，因为修改innerHTML后再获取就不一样了
+          var endSelectionText = range.endContainer.firstChild.textContent;
+
+          var startParentHtml = ssBtn.parentNode.innerHTML;
+          var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>');
+          var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>');
+          ssBtn.parentNode.innerHTML = startParentNewHtml;
+
+          var endParentHtml = seBtn.parentNode.innerHTML;
+          var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+          var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+          seBtn.parentNode.innerHTML = endParentNewHtml;
         }
-        return selection;
       };
       // 销毁背景色,如果同时要销毁start，end，则应先执行销毁背景色
       var destoryBackground = function () {
@@ -694,8 +663,39 @@
           range = null;
           document.Range_ = range;
         }
+        hideOperatePanel();
       };
-      // 绑定选区事件
+      // 显示操作面板
+      var showOperatePanel = function () {
+        var operatePanel = document.querySelector('#operate-panel-js');
+        var ssBtn = document.querySelector('#btn-ss-js');
+        var seBtn = document.querySelector('#btn-se-js');
+        if (operatePanel && ssBtn && seBtn) {
+          var ssTop = ssBtn.getBoundingClientRect().top;
+          var seTop = seBtn.getBoundingClientRect().top;
+          // 显示在startBtn上面
+          var panelTop = ssTop - 100;
+          // 显示在endBtn下面
+          if (ssTop < 200) {
+            panelTop = seTop + 30;
+            // 显示在页面中间
+            if (seTop + 30 + 100 > 568) {
+              panelTop = 568 / 2 - 50
+            }
+          }
+          panelTop = panelTop + 'px';
+          operatePanel.style.top = panelTop;
+          operatePanel.style.display = 'block';
+        }
+      };
+      // 隐藏操作面板
+      var hideOperatePanel = function () {
+        var operatePanel = document.querySelector('#operate-panel-js');
+        if (operatePanel) {
+          operatePanel.style.display = 'none';
+        }
+      }
+      // 绑定选区光标拖动事件
       var bindEventForSelection = function () {
         var ssBtn = document.getElementById('btn-ss-js');
         var seBtn = document.getElementById('btn-se-js');
@@ -709,7 +709,8 @@
             ssDragFlag = true;
           });
           ssBtn.addEventListener('touchmove', function (e) {
-            e.stopPropagation();
+            // e.stopPropagation();
+            hideOperatePanel();
             touch.endX = e.touches[0].clientX;
             touch.endY = e.touches[0].clientY;
             if (ssDragFlag) {
@@ -717,8 +718,9 @@
             }
           });
           ssBtn.addEventListener('touchend', function (e) {
-            e.stopPropagation();
+            // e.stopPropagation();
             ssDragFlag = false;
+            showOperatePanel();
           });
         }
         if (seBtn) {
@@ -729,7 +731,8 @@
             seDragFlag = true;
           });
           seBtn.addEventListener('touchmove', function (e) {
-            e.stopPropagation();
+            // e.stopPropagation();
+            hideOperatePanel();
             touch.endX = e.touches[0].clientX;
             touch.endY = e.touches[0].clientY;
             if (seDragFlag) {
@@ -737,8 +740,9 @@
             }
           });
           seBtn.addEventListener('touchend', function (e) {
-            e.stopPropagation();
+            // e.stopPropagation();
             seDragFlag = false;
+            showOperatePanel();
           });
         }
       };
@@ -758,29 +762,11 @@
       }
       if (Selection_) {
         Selection_.destorySelectionArea();
-        noteDiv.style.display = 'none';
       }
       var longPressTimer = setTimeout(function () {
         if (longPressFlag) {
           longPressFlag = false;
           var selection = Selection_.createSelectionArea(point);
-          var ssBtn = document.querySelector('#btn-ss-js');
-          var seBtn = document.querySelector('#btn-se-js');
-          var ssTop = ssBtn.getBoundingClientRect().top;
-          var seTop = seBtn.getBoundingClientRect().top;
-          // 显示在startBtn上面
-          var noteTop = ssTop - 100;
-          // 显示在endBtn下面
-          if (ssTop < 200) {
-            noteTop = seTop + 30;
-            // 显示在页面中间
-            if (seTop + 30 + 100 > 568) {
-              noteTop = 568 / 2 - 50
-            }
-          }
-          noteTop = noteTop + 'px';
-          noteDiv.style.top = noteTop;
-          // noteDiv.style.display = 'block';
         }
       }, 500);
     });
