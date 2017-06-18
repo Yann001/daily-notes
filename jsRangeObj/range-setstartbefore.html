@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <body>
+    <table id="table" border="1" cellspacing="0" cellpadding="0">
+      <tr>
+        <td>表格1</td>
+        <td>表格1</td>
+        <td>表格1</td>
+      </tr>
+      <tr>
+        <td>表格2</td>
+        <td>表格2</td>
+        <td>表格2</td>
+      </tr>
+      <tr>
+        <td>表格3</td>
+        <td>表格3</td>
+        <td>表格3</td>
+      </tr>
+    </table>
+    <input type="button" onclick="btn()" value="删除第一行">
+    <script>
+      function btn() {
+        var table = document.getElementById("table");
+        var rangeDiv = document.createRange();
+        if (table.rows.length > 0) {
+          var row = table.rows[0];
+          rangeDiv.setStartBefore(row);
+          rangeDiv.setEndAfter(row);
+          rangeDiv.deleteContents();
+        }
+      }
+    </script>
+  </body>
+
+</html>

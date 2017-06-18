@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <title>Ebook</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 18px/1.5 "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif;
+    }
+
+    * {
+      box-sizing: inherit;
+    }
+
+    .container {
+      width: 100vw;
+      height: 100vh;
+      box-sizing: border-box;
+      padding: 10px;
+    }
+
+    .container .ebook {
+      width: 100%;
+      height: 100%;
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container .ebook .page {
+      padding: 10px 20px;
+      border: 1px dotted #2d2929;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+
+    .container .ebook .page.page1 {
+      z-index: 5;
+      background: antiquewhite;
+      /*display: none;*/
+    }
+
+    .container .ebook .page.page2 {
+      z-index: 4;
+      display: none;
+    }
+
+    .container .ebook .page.page3 {
+      z-index: 3;
+      display: none;
+    }
+
+    .container .ebook .page.page4 {
+      z-index: 2;
+      display: none;
+    }
+
+    .container .ebook .page.page5 {
+      z-index: 1;
+      display: none;
+    }
+  </style>
+  <style>
+    .container .ebook {
+      /*-webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -moz-user-select: none;*/
+      user-select: none;
+    }
+
+    .container .ebook mark {
+      background-color: #bacddc;
+    }
+
+    .btn-selection-start {
+      position: relative;
+      width: 0px;
+      height: 1em;
+      vertical-align: middle;
+      border: none;
+      margin: 0;
+      padding: 0;
+      z-index: 10;
+    }
+
+    .btn-selection-start:before {
+      width: 10px;
+      height: 10px;
+      border-radius: 5px;
+      background-color: #0582e8;
+      content: '';
+      position: absolute;
+      top: -1.4em;
+      left: -5px;
+    }
+
+    .btn-selection-start:after {
+      content: '';
+      width: 2px;
+      height: 2em;
+      position: absolute;
+      top: -0.8em;
+      left: -1px;
+      background-color: #0582e8;
+    }
+
+    .btn-selection-start .btn-expand {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-color: red;
+      top: 50%;
+      margin-top: -20px;
+      left: -20px;
+      opacity: 0;
+    }
+
+    .btn-selection-end {
+      position: relative;
+      width: 0px;
+      height: 1em;
+      vertical-align: middle;
+      border: none;
+      margin: 0;
+      padding: 0;
+      z-index: 10;
+    }
+
+    .btn-selection-end:before {
+      content: '';
+      width: 2px;
+      height: 2em;
+      position: absolute;
+      bottom: -0.5em;
+      left: -1px;
+      background-color: #0582e8;
+    }
+
+    .btn-selection-end:after {
+      width: 10px;
+      height: 10px;
+      border-radius: 5px;
+      background-color: #0582e8;
+      content: '';
+      position: absolute;
+      bottom: -1.2em;
+      left: -5px;
+    }
+
+    .btn-selection-end .btn-expand {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background-color: green;
+      top: 50%;
+      margin-top: -20px;
+      left: -20px;
+      opacity: 0;
+    }
+  </style>
+  <style>
+    .note {
+      display: none;
+      position: absolute;
+      top: 25%;
+      left: 50%;
+      z-index: 999;
+      padding: 5px;
+      margin-left: -115px;
+      width: 230px;
+      background: rgba(0, 0, 0, 0.9);
+      -webkit-border-radius: 4px;
+      -moz-border-radius: 4px;
+      -ms-border-radius: 4px;
+      -o-border-radius: 4px;
+      border-radius: 4px;
+    }
+
+    .note ul {
+      list-style: none;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .note .btns {
+      display: block;
+      overflow: hidden;
+      zoom: 1;
+      margin-bottom: 5px;
+    }
+
+    .note .btns li {
+      float: left;
+      width: 25%;
+      position: relative;
+      box-sizing: border-box;
+      padding: 4px 5px;
+    }
+
+    .note .btns li:after {
+      content: " ";
+      position: absolute;
+      right: 0px;
+      top: 8px;
+      bottom: 8px;
+      border-right: 1px solid #777777;
+      -webkit-transform-origin: 100% 0;
+      transform-origin: 100% 0;
+      -webkit-transform: scaleX(0.5);
+      transform: scaleX(0.5);
+    }
+
+    .note .btns li:last-child {
+      border-right: 0px;
+    }
+
+    .note .btns li a {
+      text-decoration: none;
+      display: block;
+      white-space: nowrap;
+      color: #ffffff;
+      line-height: 24px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .note .colors {
+      overflow: hidden;
+      zoom: 1;
+    }
+
+    .note .colors li {
+      float: left;
+      width: 20%;
+      padding: 4px 5px;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .note .colors li a {
+      display: block;
+      height: 20px;
+      background: #cccccc;
+      box-sizing: border-box;
+      border-radius: 4px;
+    }
+
+    .note .colors .red {
+      background-color: #e25656;
+    }
+
+    .note .colors .green {
+      background-color: #ffcf3e;
+    }
+
+    .note .colors .green {
+      background-color: #ffcf3e;
+    }
+
+    .note .colors .blue {
+      background-color: #3ea6ff;
+    }
+
+    .note .colors .purple {
+      background-color: #a313ff;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="ebook">
+      <div class="page page1">
+        <h2>第一章</h2>
+        <p>1.setStart:表示某个节点的range对象的起点位置;2.setEnd:表示某个节点的range对象的结束位置;</p>
+        <p>3.setStartBefore:表示用于将某个节点的起点位置设置为range对象的起点位置;
+        </p>
+        <p>4.setStartAfter:表示用于将某个节点的终点位置设置为range对象的起点位置;
+        </p>
+        <p>5.setEndBefore:表示用于将某个节点的起点位置设置为range对象的终点位置; 6.setEndAfter:表示用于将某个节点的终点位置设置为range对象的终点位置;
+        </p>
+
+      </div>
+      <div class="page page2">
+        <h2>第二章</h2>
+        <p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
+        <p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
+      </div>
+      <div class="page page3">
+        <h2>第三章</h2>
+        <p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
+        <p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
+      </div>
+      <div class="page page4">
+        <h2>第四章</h2>
+        <p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
+        <p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
+      </div>
+      <div class="page page5">
+        <h2>第五章</h2>
+        <p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
+        <p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
+      </div>
+    </div>
+    <div class="note" id="operate-panel-js">
+      <ul class="btns">
+        <li><a href="#" id="search">搜索</a></li>
+        <li><a href="#" id="addNote">笔记</a></li>
+        <li><a href="#" id="addFeedBack">纠错</a></li>
+        <li><a href="#" id="delete">删除</a></li>
+      </ul>
+      <ul class="colors">
+        <li><a href="javascript:void(0)" class="red" id="red"></a></li>
+        <li><a href="javascript:void(0)" class="yellow" id="yellow"></a></li>
+        <li><a href="javascript:void(0)" class="green" id="green"></a></li>
+        <li><a href="javascript:void(0)" class="blue" id="blue"></a></li>
+        <li><a href="javascript:void(0)" class="purple" id="purple"></a></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    window.ontouchstart = function (e) {
+      e.preventDefault();
+    }
+    window.onselect = function (e) {
+      e.preventDefault();
+    }
+    var ebook = document.querySelector('.ebook');
+    var Selection_ = (function () {
+      document.Range_ = null;
+      var range = document.Range_
+      var ssBtn, seBtn;
+      var touch = {
+        startX: 0,
+        startY: 0,
+        endX: 0,
+        endY: 0,
+        startBtnX: 0,
+        startBtnY: 0,
+        endBtnX: 0,
+        endBtnY: 0
+      };
+      // 创建选区
+      var createSelectionArea = function (point) {
+        var textNode;
+        if (document.caretRangeFromPoint) {
+          range = document.caretRangeFromPoint(point.x, point.y);
+          var n = 1;
+          var caretRangeStart = null, caretRangeEnd = null;
+          while (range.toString().length < 2 && n < 16) {
+            // 为使坐标向左右扩展的速度更快，故设为2n
+            touch.startBtnX = point.x - 2 * n;
+            touch.startBtnY = point.y - n;
+            touch.endBtnX = point.x + 2 * n;
+            touch.endBtnY = point.y + n;
+            caretRangeStart = document.caretRangeFromPoint(touch.startBtnX, touch.startBtnY);
+            caretRangeEnd = document.caretRangeFromPoint(touch.endBtnX, touch.endBtnY);
+            range.setStart(caretRangeStart.startContainer, caretRangeStart.startOffset);
+            range.setEnd(caretRangeEnd.endContainer, caretRangeEnd.endOffset);
+            n++;
+          }
+          console.log('loop ', n, ' times');
+          textNode = range.startContainer;
+        }
+        caretRangeStart.detach();
+        caretRangeStart = null;
+        caretRangeEnd.detach();
+        caretRangeEnd = null;
+
+        var selectionText = range.toString();
+        console.log(selectionText);
+        // 只针对文本节点
+        if (textNode && textNode.nodeType == 3) {
+          // 添加开始点光标
+          //addStartBtn();
+          var selectionStart = document.createElement('button');
+          selectionStart.className = 'btn-selection-start';
+          selectionStart.setAttribute('id', 'btn-ss-js');
+          // 扩大滑动按钮时的点选区域
+          var startBtnExpand = document.createElement('span');
+          startBtnExpand.className = 'btn-expand';
+          selectionStart.appendChild(startBtnExpand);
+          var startRange = document.createRange();
+          startRange.setStart(range.startContainer, range.startOffset);
+          startRange.insertNode(selectionStart);
+          startRange.detach();
+          startRange = null;
+          // 添加结束点光标
+          //addEndBtn();
+          var selectionEnd = document.createElement('button');
+          selectionEnd.className = 'btn-selection-end';
+          selectionEnd.setAttribute('id', 'btn-se-js');
+          // 扩大滑动按钮时的点选区域
+          var endBtnExpand = document.createElement('span');
+          endBtnExpand.className = 'btn-expand';
+          selectionEnd.appendChild(endBtnExpand);
+          var endRange = document.createRange();
+          endRange.setStart(range.endContainer, range.endOffset);
+          endRange.insertNode(selectionEnd);
+
+          // 添加选区背景颜色（替换选区）
+          var selectionNode = document.createElement('mark');
+          selectionNode.innerHTML = selectionText;
+          // 替换选区
+          // 判断是否跨标签
+          if (range.startContainer.parentNode == range.endContainer.parentNode) {
+            // 不跨标签
+            var parentHtml = range.startContainer.parentNode.innerHTML;
+            var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+            var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+            range.startContainer.parentNode.innerHTML = parentNewHtml;
+          } else {
+            // 跨标签
+            var startParentHtml = range.startContainer.parentNode.innerHTML;
+            var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>');
+            var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>');
+            range.startContainer.parentNode.innerHTML = startParentNewHtml;
+
+            var endSelectionText = range.endContainer.textContent;
+            var endParentHtml = range.endContainer.parentNode.innerHTML;
+            var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+            var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+            range.endContainer.parentNode.innerHTML = endParentNewHtml;
+          }
+        }
+        // 重设range对象，因为修改了innerHTML后range对象就不是原来的了
+        resetRangeByBtn();
+        var selection = {
+          position: 'not sure',
+          content: range.toString(),
+          range: range
+        }
+        if (selection.content.length > 0) {
+          bindEventForSelection();
+        }
+        // 浅复制（引用复制），后面操作range，document.Range_也会改变
+        document.Range_ = range;
+        showOperatePanel();
+        return selection;
+      };
+      // 移动start
+      var moveStartBtn = function () {
+        touch.startBtnX = touch.endX;
+        touch.startBtnY = touch.endY;
+        console.log('touch.endBtnX, touch.endBtnY', touch.endBtnX, touch.endBtnY);
+        // 判断移动距离
+        if (Math.abs(touch.endBtnX - touch.startBtnX) < 40 && Math.abs(touch.endBtnY - touch.startBtnY) < 40) {
+          return;
+        } else {
+          console.log('reset selection...');
+          destoryBackground();
+          destoryStartBtn();
+          // 添加起点光标
+          addStartBtn();
+          // 判断是否交换startBtn与endBtn
+          if ((touch.startBtnX - touch.endBtnX > 40 && Math.abs(touch.endBtnY - touch.startBtnY) < 10)
+            || touch.startBtnY - touch.endBtnY > 10) {
+            console.log('change start and end...');
+            var ssBtnTemp = document.getElementById('btn-ss-js');
+            var seBtnTemp = document.getElementById('btn-se-js');
+            ssBtnTemp.setAttribute('id', 'btn-se-js');
+            ssBtnTemp.className = 'btn-selection-end';
+            seBtnTemp.setAttribute('id', 'btn-ss-js');
+            seBtnTemp.className = 'btn-selection-start';
+            touch.startBtnX = [touch.endBtnX, touch.endBtnX = touch.startBtnX][0];
+            touch.startBtnY = [touch.endBtnY, touch.endBtnY = touch.startBtnY][0];
+          }
+          // 添加选区背景颜色（替换选区）
+          addSelectionBg();
+        }
+        // 重设range对象，因为修改了innerHTML后range对象就不是原来的了
+        resetRangeByBtn();
+        if (range.toString().length > 0) {
+          // 重新绑定选区光标拖动事件
+          bindEventForSelection();
+        }
+      };
+      // 移动end
+      var moveEndBtn = function () {
+        touch.endBtnX = touch.endX;
+        touch.endBtnY = touch.endY;
+        console.log('touch.startBtnX, touch.startBtnY', touch.startBtnX, touch.startBtnY);
+        // 判断移动距离
+        if (Math.abs(touch.endBtnX - touch.startBtnX) < 40 && Math.abs(touch.endBtnY - touch.startBtnY) < 40) {
+          return;
+        } else {
+          console.log('reset selection...');
+          destoryBackground();
+          destoryEndBtn();
+          // 添加结束点光标
+          addEndBtn();
+          // 判断是否交换startBtn与endBtn
+          if ((touch.startBtnX - touch.endBtnX > 40 && Math.abs(touch.endBtnY - touch.startBtnY) < 10)
+            || touch.startBtnY - touch.endBtnY > 10) {
+            console.log('change start and end...');
+            var ssBtnTemp = document.getElementById('btn-ss-js');
+            var seBtnTemp = document.getElementById('btn-se-js');
+            ssBtnTemp.setAttribute('id', 'btn-se-js');
+            ssBtnTemp.className = 'btn-selection-end';
+            seBtnTemp.setAttribute('id', 'btn-ss-js');
+            seBtnTemp.className = 'btn-selection-start';
+            touch.startBtnX = [touch.endBtnX, touch.endBtnX = touch.startBtnX][0];
+            touch.startBtnY = [touch.endBtnY, touch.endBtnY = touch.startBtnY][0];
+          }
+          // 添加选区背景颜色（替换选区）
+          addSelectionBg();
+        }
+        // 重设range对象，因为修改了innerHTML后range对象就不是原来的了
+        resetRangeByBtn();
+        if (range.toString().length > 0) {
+          // 重新绑定选区光标拖动事件
+          bindEventForSelection();
+        }
+      };
+      // 通过开始结束光标重设range对象
+      var resetRangeByBtn = function () {
+        // 重设range对象，因为修改了innerHTML后range对象就不是原来的了
+        ssBtn = document.getElementById('btn-ss-js');
+        seBtn = document.getElementById('btn-se-js');
+        if (ssBtn && seBtn) {
+          range.setStartAfter(ssBtn);
+          range.setEndBefore(seBtn);
+        }
+      };
+      // 添加开始点光标
+      var addStartBtn = function () {
+        var selectionStart = document.createElement('button');
+        selectionStart.className = 'btn-selection-start';
+        selectionStart.setAttribute('id', 'btn-ss-js');
+        // 扩大滑动按钮时的点选区域
+        var startBtnExpand = document.createElement('span');
+        startBtnExpand.className = 'btn-expand';
+        selectionStart.appendChild(startBtnExpand);
+        var startRange = document.caretRangeFromPoint(touch.startBtnX, touch.startBtnY);
+        startRange.insertNode(selectionStart);
+        startRange.detach();
+        startRange = null;
+      };
+      // 添加结束点光标
+      var addEndBtn = function () {
+        var selectionEnd = document.createElement('button');
+        selectionEnd.className = 'btn-selection-end';
+        selectionEnd.setAttribute('id', 'btn-se-js');
+        // 扩大滑动按钮时的点选区域
+        var endBtnExpand = document.createElement('span');
+        endBtnExpand.className = 'btn-expand';
+        selectionEnd.appendChild(endBtnExpand);
+        var endRange = document.caretRangeFromPoint(touch.endBtnX, touch.endBtnY);
+        endRange.insertNode(selectionEnd);
+        endRange.detach();
+        endRange = null;
+      };
+      // 添加选区背景色
+      var addSelectionBg = function () {
+        var ssBtn = document.getElementById('btn-ss-js');
+        var seBtn = document.getElementById('btn-se-js');
+        // 设置新的range对象
+        if (ssBtn && seBtn) {
+          range.setStartAfter(ssBtn);
+          range.setEndBefore(seBtn);
+        }
+        var selectionText = range.toString();
+        console.log(selectionText);
+        var selectionNode = document.createElement('mark');
+        selectionNode.innerHTML = selectionText;
+        // 判断是否跨标签
+        if (ssBtn.parentNode == seBtn.parentNode) {
+          // 不跨标签
+          var parentHtml = ssBtn.parentNode.innerHTML;
+          var selectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>' + selectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+          var parentNewHtml = parentHtml.replace(selectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>' + selectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+          ssBtn.parentNode.innerHTML = parentNewHtml;
+        } else {
+          // 跨标签
+          // 需要先获取该字符串，因为修改innerHTML后再获取就不一样了
+          var endSelectionText = range.endContainer.firstChild.textContent;
+
+          var startParentHtml = ssBtn.parentNode.innerHTML;
+          var startSelectionRegExp = new RegExp('<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button>');
+          var startParentNewHtml = startParentHtml.replace(startSelectionRegExp, '<button class="btn-selection-start" id="btn-ss-js"><span class="btn-expand"></span></button><mark>');
+          ssBtn.parentNode.innerHTML = startParentNewHtml;
+
+          var endParentHtml = seBtn.parentNode.innerHTML;
+          var endSelectionRegExp = new RegExp(endSelectionText + '<button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+          var endParentNewHtml = endParentHtml.replace(endSelectionRegExp, '<mark>' + endSelectionText + '</mark><button class="btn-selection-end" id="btn-se-js"><span class="btn-expand"></span></button>');
+          seBtn.parentNode.innerHTML = endParentNewHtml;
+        }
+      };
+      // 销毁背景色,如果同时要销毁start，end，则应先执行销毁背景色
+      var destoryBackground = function () {
+        var ssBtn = document.getElementById('btn-ss-js');
+        var seBtn = document.getElementById('btn-se-js');
+        if (ssBtn && seBtn) {
+          var ssParentNode = ssBtn.parentNode;
+          var seParentNode = seBtn.parentNode;
+          if (ssParentNode == seParentNode) {
+            var newParentHtml = ssParentNode.innerHTML.replace(/<mark>/, '').replace(/<\/mark>/, '');
+            ssParentNode.innerHTML = newParentHtml;
+          } else {
+            var ssNewParentHtml = ssParentNode.innerHTML.replace(/<mark>/, '').replace(/<\/mark>/, '');
+            ssParentNode.innerHTML = ssNewParentHtml;
+            var seNewParentHtml = seParentNode.innerHTML.replace(/<mark>/, '').replace(/<\/mark>/, '');
+            seParentNode.innerHTML = seNewParentHtml;
+          }
+        }
+      };
+      // 销毁start
+      var destoryStartBtn = function () {
+        var ssBtn = document.getElementById('btn-ss-js');
+        if (ssBtn) {
+          if (ssBtn.parentNode) {
+            ssBtn.parentNode.removeChild(ssBtn);
+          }
+        }
+      };
+      // 销毁end
+      var destoryEndBtn = function () {
+        var seBtn = document.getElementById('btn-se-js');
+        if (seBtn) {
+          if (seBtn.parentNode) {
+            seBtn.parentNode.removeChild(seBtn);
+          }
+        }
+      };
+      // 销毁整个选区
+      var destorySelectionArea = function () {
+        var ssBtn = document.getElementById('btn-ss-js');
+        var seBtn = document.getElementById('btn-se-js');
+        if (ssBtn && seBtn) {
+          var ssParentNode = ssBtn.parentNode;
+          var seParentNode = seBtn.parentNode;
+          if (ssParentNode == seParentNode) {
+            var newParentHtml = ssParentNode.innerHTML.replace(/<mark>/, '').replace(/<\/mark>/, '');
+            ssParentNode.innerHTML = newParentHtml;
+          } else {
+            var ssNewParentHtml = ssParentNode.innerHTML.replace(/<mark>/, '').replace(/<\/mark>/, '');
+            ssParentNode.innerHTML = ssNewParentHtml;
+            var seNewParentHtml = seParentNode.innerHTML.replace(/<mark>/, '').replace(/<\/mark>/, '');
+            seParentNode.innerHTML = seNewParentHtml;
+          }
+          //需要重新获取对象，不然parentNode为null
+          ssBtn = document.getElementById('btn-ss-js');
+          seBtn = document.getElementById('btn-se-js');
+          if (ssBtn.parentNode) {
+            ssBtn.parentNode.removeChild(ssBtn);
+          }
+          if (seBtn.parentNode) {
+            seBtn.parentNode.removeChild(seBtn);
+          }
+        }
+        if (range) {
+          range.detach();
+          range = null;
+          document.Range_ = range;
+        }
+        hideOperatePanel();
+      };
+      // 显示操作面板
+      var showOperatePanel = function () {
+        var operatePanel = document.querySelector('#operate-panel-js');
+        var ssBtn = document.querySelector('#btn-ss-js');
+        var seBtn = document.querySelector('#btn-se-js');
+        if (operatePanel && ssBtn && seBtn) {
+          var ssTop = ssBtn.getBoundingClientRect().top;
+          var seTop = seBtn.getBoundingClientRect().top;
+          // 显示在startBtn上面
+          var panelTop = ssTop - 100;
+          // 显示在endBtn下面
+          if (ssTop < 200) {
+            panelTop = seTop + 30;
+            // 显示在页面中间
+            if (seTop + 30 + 100 > 568) {
+              panelTop = 568 / 2 - 50
+            }
+          }
+          panelTop = panelTop + 'px';
+          operatePanel.style.top = panelTop;
+          operatePanel.style.display = 'block';
+        }
+      };
+      // 隐藏操作面板
+      var hideOperatePanel = function () {
+        var operatePanel = document.querySelector('#operate-panel-js');
+        if (operatePanel) {
+          operatePanel.style.display = 'none';
+        }
+      }
+      // 绑定选区光标拖动事件
+      var bindEventForSelection = function () {
+        var ssBtn = document.getElementById('btn-ss-js');
+        var seBtn = document.getElementById('btn-se-js');
+        var ssDragFlag = false;
+        var seDragFlag = false;
+        if (ssBtn) {
+          ssBtn.addEventListener('touchstart', function (e) {
+            e.stopPropagation();
+            touch.startX = e.touches[0].clientX;
+            touch.startY = e.touches[0].clientY;
+            ssDragFlag = true;
+          });
+          ssBtn.addEventListener('touchmove', function (e) {
+            // e.stopPropagation();
+            hideOperatePanel();
+            touch.endX = e.touches[0].clientX;
+            touch.endY = e.touches[0].clientY;
+            if (ssDragFlag) {
+              moveStartBtn();
+            }
+          });
+          ssBtn.addEventListener('touchend', function (e) {
+            // e.stopPropagation();
+            ssDragFlag = false;
+            showOperatePanel();
+          });
+        }
+        if (seBtn) {
+          seBtn.addEventListener('touchstart', function (e) {
+            e.stopPropagation();
+            touch.startX = e.touches[0].clientX;
+            touch.startY = e.touches[0].clientY;
+            seDragFlag = true;
+          });
+          seBtn.addEventListener('touchmove', function (e) {
+            // e.stopPropagation();
+            hideOperatePanel();
+            touch.endX = e.touches[0].clientX;
+            touch.endY = e.touches[0].clientY;
+            if (seDragFlag) {
+              moveEndBtn();
+            }
+          });
+          seBtn.addEventListener('touchend', function (e) {
+            // e.stopPropagation();
+            seDragFlag = false;
+            showOperatePanel();
+          });
+        }
+      };
+      return {
+        createSelectionArea: createSelectionArea,
+        destorySelectionArea: destorySelectionArea,
+        range: range
+      };
+    })();
+    var longPressFlag = false;
+    var noteDiv = document.querySelector('.note');
+    ebook.addEventListener('touchstart', function (e) {
+      longPressFlag = true;
+      var point = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      }
+      if (Selection_) {
+        Selection_.destorySelectionArea();
+      }
+      var longPressTimer = setTimeout(function () {
+        if (longPressFlag) {
+          longPressFlag = false;
+          var selection = Selection_.createSelectionArea(point);
+        }
+      }, 500);
+    });
+    ebook.addEventListener('touchmove', function (e) {
+      longPressFlag = false;
+    });
+    ebook.addEventListener('touchend', function (e) {
+      longPressFlag = false;
+    });
+    ebook.addEventListener('click', (e) => {
+      // Selection_.createSelectionArea(e);
+      // Selection_.destorySelectionArea();
+    });
+  </script>
+</body>
+
+</html>
