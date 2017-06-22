@@ -1007,34 +1007,170 @@ RegExp 实例继承的toLocaleString()和toString()方法都会返回正则表�
 
 TODO...
 
+#### 模式的局限性
 
+TODO...
 
 
 ### Function类型
-没有重载
-函数声明与函数表达式
-作为值的函数：callSomeFunction(functionName , parameter)
-函数内部属性：
-两个特殊对象：arguments和this。
-arguments主要用途是保存函数参数，还有一个名叫callee的属性，该属性是一个指针，指向拥有这个arguments对象的函数。
-this引用的是函数执行的环境对象，当在网页的全局作用域中调用函数时，this对象引用的就是windows。
-caller属性：保存着调用当前函数的函数的引用。
-函数的属性和方法
-函数是一个对象，每个函数都包含两个属性：length和prototype。
-- length属性表示函数希望接受的命名参数的个数。
-- prototype属性是不可枚举的，因此使用for in无法发现。
-每个函数都包含两个非继承而来的方法：apply()和call()，
-- 扩充了作用域，对象不需要与方法有任何耦合关系。
-- ECMAScript5还定义了一个方法 bind()，该方法创建一个函数实例，其this值会被绑定到传给bind()函数的值。
 
-6. 基本包装类型
-三个特殊的引用类型：Boolean、Number和String。
+函数实际上是对象。每个函数都是Function 类型的实例，而且都与其他引用类型一样具有属性和方法。由于函数是对象，因此函数名实际上也是一个指向函数对象的指针，不会与某个函数绑定。
+
+**函数定义**
+
+``` js
+// 方式一 函数声明形式
+function sum (num1, num2) {
+  return num1 + num2;
+}
+//方式二 函数表达式形式
+var sum = function(num1, num2){
+  return num1 + num2;
+};
+// 方式三 构造函数形式
+var sum = new Function("num1", "num2", "return num1 + num2"); // 不推荐
+```
+
+从技术角度讲，这是一个函数表达式。但是，我们不推荐读者使用这种方法定义函数，因为这种语法会导致解析两次代码（第一次是解析常规ECMAScript 代码，第二次是解析传入构造函数中的字符串），从而影响性能。不过，这种语法对于理解“函数是对象，函数名是指针”的概念倒是非常直观的。
+由于函数名仅仅是指向函数的指针，因此函数名与包含对象指针的其他变量没有什么不同。换句话说，一个函数可能会有多个名字，如下面的例子所示。
+``` js
+function sum(num1, num2){
+  return num1 + num2;
+}
+alert(sum(10,10)); //20
+var anotherSum = sum;
+alert(anotherSum(10,10)); //20
+sum = null;
+alert(anotherSum(10,10)); //20
+```
+
+以上代码首先定义了一个名为sum()的函数，用于求两个值的和。然后，又声明了变量anotherSum，并将其设置为与sum 相等（将sum 的值赋给anotherSum）。注意，使用不带圆括号的函数名是访问函数指针，而非调用函数。此时，anotherSum 和sum 就都指向了同一个函数，因此anotherSum()也可以被调用并返回结果。即使将sum 设置为null，让它与函数“断绝关系”，但仍然可以正常调用anotherSum()。
+
+#### 没有重载
+
+
+#### 函数声明与函数表达式
+
+**区别**
+
+解析器会率先读取函数声明，并使其在执行任何代码之前可用（可以访问）；至于函数表达式，则必须等到解析器执行到它所在的代码行，才会真正被解释执行。
+
+*也可以同时使用函数声明和函数表达式，例如var sum = function sum(){}。不过，这种语法在Safari 中会导致错误。*
+
+#### 作为值的函数
+
+因为ECMAScript 中的函数名本身就是变量，所以函数也可以作为值来使用。也就是说，不仅可以像传递参数一样把一个函数传递给另一个函数，而且可以将一个函数作为另一个函数的结果返回。
+
+#### 函数内部属性
+
+两个特殊对象：arguments和this。
+
+- arguments主要用途是保存函数参数，还有一个名叫callee的属性，该属性是一个指针，指向拥有这个arguments对象的函数。
+- this引用的是函数执行的环境对象，当在网页的全局作用域中调用函数时，this对象引用的就是windows。
+
+ECMAScript 5 也规范化了另一个函数对象的属性：caller。除了Opera 的早期版本不支持，其他浏览器都支持这个ECMAScript 3 并没有定义的属性。这个属性中保存着调用当前函数的函数的引用，如果是在全局作用域中调用当前函数，它的值为null
+
+#### 函数的属性和方法
+
+函数是一个对象，每个函数都包含两个属性：length和prototype。
+
+- length属性表示函数希望接受的命名参数的个数。
+- prototype，对于ECMAScript 中的引用类型而言，prototype 是保存它们所有实例方法的真正所在。换句话说，诸如toString()和valueOf()等方法实际上都保存在prototype 名下，只不过是通过各自对象的实例访问罢了。在创建自定义引用类型以及实现继承时，prototype 属性的作用是极为重要的。在ECMAScript 5 中，prototype 属性是不可枚举的，因此使用for-in 无法发现。
+
+
+每个函数都包含两个非继承而来的方法：
+
+- apply()
+- call()
+
+这两个方法的用途都是在特定的作用域中调用函数，实际上等于设置函数体内this 对象的值。
+apply()方法接收两个参数：一个是在其中运行函数的作用域，另一个是参数数组。其中，第二个参数可以是Array 的实例，也可以是arguments 对象
+例如：
+``` js
+function sum(num1, num2){
+  return num1 + num2;
+}
+function callSum1(num1, num2){
+  return sum.apply(this, arguments); // 传入arguments 对象
+}
+function callSum2(num1, num2){
+  return sum.apply(this, [num1, num2]); // 传入数组
+}
+alert(callSum1(10,10)); //20
+alert(callSum2(10,10)); //20
+```
+
+在上面这个例子中，callSum1()在执行sum()函数时传入了this 作为this 值（因为是在全局作用域中调用的，所以传入的就是window 对象）和arguments 对象。而callSum2 同样也调用了sum()函数，但它传入的则是this 和一个参数数组。这两个函数都会正常执行并返回正确的结果。
+
+*在严格模式下，未指定环境对象而调用函数，则this 值不会转型为window。除非明确把函数添加到某个对象或者调用apply()或call()，否则this 值将是undefined。*
+
+call()方法与apply()方法的作用相同，它们的区别仅在于接收参数的方式不同。对于call()方法而言，第一个参数是this 值没有变化，变化的是其余参数都直接传递给函数。换句话说，在使用call()方法时，传递给函数的参数必须逐个列举出来，如下面的例子所示。
+``` js
+function sum(num1, num2){
+  return num1 + num2;
+}
+function callSum(num1, num2){
+  return sum.call(this, num1, num2);
+}
+alert(callSum(10,10)); //20
+```
+
+在使用call()方法的情况下，callSum()必须明确地传入每一个参数。结果与使用apply()没有什么不同。至于是使用apply()还是call()，完全取决于你采取哪种给函数传递参数的方式最方便。如果你打算直接传入arguments 对象，或者包含函数中先接收到的也是一个数组，那么使用apply()肯定更方便；否则，选择call()可能更合适。（在不给函数传递参数的情况下，使用哪个方法都无所谓。）
+
+事实上，传递参数并非apply()和call()真正的用武之地；它们真正强大的地方是能够扩充函数赖以运行的作用域。下面来看一个例子。
+``` js
+window.color = "red";
+var o = { color: "blue" };
+function sayColor(){
+  alert(this.color);
+}
+sayColor(); //red
+sayColor.call(this); //red
+sayColor.call(window); //red
+sayColor.call(o); //blue
+```
+
+这个例子是在前面说明this 对象的示例基础上修改而成的。这一次，sayColor()也是作为全局函数定义的，而且当在全局作用域中调用它时，它确实会显示"red"——因为对this.color 的求值会转换成对window.color 的求值。而sayColor.call(this)和sayColor.call(window)，则是两种显式地在全局作用域中调用函数的方式，结果当然都会显示"red"。但是，当运行sayColor.call(o)时，函数的执行环境就不一样了，因为此时函数体内的this 对象指向了o，于是结果显示的是"blue"。
+
+使用call()（或apply()）来扩充作用域的最大好处，就是对象不需要与方法有任何耦合关系。在一般的写法中，我们是先将sayColor()函数放到对象o 中，然后再通过o 来调用它的；而在这里重写的例子中，就不需要这个多余的步骤了。
+
+ECMAScript 5 还定义了一个方法：bind()。这个方法会创建一个函数的实例，其this 值会被绑定到传给bind()函数的值。例如：
+``` js
+window.color = "red";
+var o = { color: "blue" };
+function sayColor(){
+  alert(this.color);
+}
+var objectSayColor = sayColor.bind(o);
+objectSayColor(); //blue
+```
+
+在这里，sayColor()调用bind()并传入对象o，创建了objectSayColor()函数。objectSayColor()函数的this 值等于o，因此即使是在全局作用域中调用这个函数，也会看到"blue"。
+
+每个函数继承的toLocaleString()和toString()方法始终都返回函数的代码。返回代码的格式则因浏览器而异——有的返回的代码与源代码中的函数代码一样，而有的则返回函数代码的内部表示，即由解析器删除了注释并对某些代码作了改动后的代码。由于存在这些差异，我们无法根据这两个方法返回的结果来实现任何重要功能；不过，这些信息在调试代码时倒是很有用。另外一个继承的valueOf()方法同样也只返回函数代码。
+
+### 基本包装类型
+
+
+三个特殊的引用类型：
+
+- Boolean
+- Number
+- String。
+
+
 引用类型与基本包装类型的主要区别就是对象的生存期。
-Boolean类型：
+
+#### Boolean类型
+
 布尔表达式中的所有对象都会被转成true
-Number类型：
+
+#### Number类型
+
 toFixed()（四舍五入）、toExponential()（e表示法）、toPrecision()方法（自动选择合适方法）。
-String类型
+
+#### String类型
+
 字符方法：charAt()、charCodeAt()。
 字符串操作方法：concat()、slice()、substr()、substring()。
 字符串位置方法：indexOf()、lastIndexOf()。
