@@ -1206,29 +1206,90 @@ Math对象
 
 扩展知识：属性名前加下划线表示只能通过对象方法访问的属性（p141）
 
-1. 理解对象
-属性类型：数据属性和访问器属性。
-数据属性
+### 理解对象
+
+#### 属性类型
+
+ECMAScript 中有两种属性：数据属性和访问器属性。
+
+**1. 数据属性**
+
 数据属性有四个描述其行为的特性：
-  - [[Configurable]]：表示能否通过delete删除属性从而重新定义属性，能否修改属性的特型，或者能否把属性修改为访问器属性。默认值为true。
-  - [[Enumerable]]：表示能否通过for in 返回属性。默认值为true。
-  - [[Writable]]：表示能否修改属性的值。默认值为true。
-  - [[Value]]：包含这个属性的数据值。默认值为undefined。
+
+- [[Configurable]]：表示能否通过delete删除属性从而重新定义属性，能否修改属性的特型，或者能否把属性修改为访问器属性。默认值为true。
+- [[Enumerable]]：表示能否通过for in 返回属性。默认值为true。
+- [[Writable]]：表示能否修改属性的值。默认值为true。
+- [[Value]]：包含这个属性的数据值。默认值为undefined。
+
+
 要修改属性的默认特性（以上四个），必须使用ECMAScript5的Object.defineProperty()方法。该方法接收三个参数，属性所在对象、属性的名字和一个描述符对象（以上四个）。调用该方法时，如果不指定，四个特性的默认值都是false。
-访问器属性
+例如：
+
+``` js
+var person = {};
+Object.defineProperty(person, "name", {
+  writable: false,
+  value: "Nicholas"
+});
+alert(person.name); //"Nicholas"
+person.name = "Greg";
+alert(person.name); //"Nicholas"
+```
+这个例子创建了一个名为name 的属性，它的值"Nicholas"是只读的。这个属性的值是不可修改的，如果尝试为它指定新值，则在非严格模式下，赋值操作将被忽略；在严格模式下，赋值操作将会导致抛出错误。
+
+
+
+**2. 访问器属性**
+
 访问器属性有四个特性：
-  - [[Configurable]]：表示能否通过delete删除属性从而重新定义属性，能否修改属性的特型，或者能否把属性修改为访问器属性。默认值为true。
-  - [[Enumerable]]：表示能否通过for in 返回属性。默认值为true。
-  - [[Get]]：在读取属性时调用的函数。默认值为undefined。
-  - [[Set]]：在写入属性时调用的函数。默认值为undefined。
+
+- [[Configurable]]：表示能否通过delete删除属性从而重新定义属性，能否修改属性的特型，或者能否把属性修改为访问器属性。默认值为true。
+- [[Enumerable]]：表示能否通过for in 返回属性。默认值为true。
+- [[Get]]：在读取属性时调用的函数。默认值为undefined。
+- [[Set]]：在写入属性时调用的函数。默认值为undefined。
+
+
 访问器属性不能直接定义，必须使用Object.defineProperty()来定义。
-定义多个属性
+如下面的例子：
+``` js
+var book = {
+  _year: 2004,
+  edition: 1
+};
+Object.defineProperty(book, "year", {
+  get: function(){
+    return this._year;
+  },
+  set: function(newValue){
+    if (newValue > 2004) {
+      this._year = newValue;
+      this.edition += newValue - 2004;
+    }
+  }
+});
+book.year = 2005;
+alert(book.edition); //2
+```
+
+以上代码创建了一个book 对象，并给它定义两个默认的属性：_year 和edition。_year 前面的下划线是一种常用的记号，用于表示只能通过对象方法访问的属性。而访问器属性year 则包含一个getter 函数和一个setter 函数。getter 函数返回_year 的值，setter 函数通过计算来确定正确的版本。因此，把year 属性修改为2005 会导致_year 变成 2005，而edition 变为2。这是使用访问器属性的常见方式，即设置一个属性的值会导致其他属性发生变化。
+不一定非要同时指定getter 和setter。只指定getter 意味着属性是不能写，尝试写入属性会被忽略。在严格模式下，尝试写入只指定了getter 函数的属性会抛出错误。类似地，只指定setter 函数的属性也不能读，否则在非严格模式下会返回undefined，而在严格模式下会抛出错误。
+
+
+#### 定义多个属性
+
 Object.defineProperties()方法，第一个参数是要添加和修改其属性的对象，第二个与第一个对象中要添加或修改的属性一一对应。
-读取属性的特性
+
+
+#### 读取属性的特性
+
 Object.getOwnPropertyDescriptor()方法，参数为属性所在对象和要读取属性的名称，返回值是一个对象。
 
-2. 创建对象
-工厂模式，用函数来封装已特定接口创建对象的细节。
+### 创建对象
+
+
+#### 工厂模式
+
+用函数来封装已特定接口创建对象的细节。
 构造函数模式
 原型模式：
 创建的每一个函数都有一个prototype（原型）属性，这个属性是一个指针，指向一个对象，而这个对象的用途是包含可以由特定类型的所有实例共享的属性和方法。
