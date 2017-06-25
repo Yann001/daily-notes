@@ -1291,12 +1291,44 @@ Object.getOwnPropertyDescriptor()方法，参数为属性所在对象和要读�
 
 用函数来封装已特定接口创建对象的细节。
 构造函数模式
-原型模式：
+
+#### 原型模式
+
+创建的每个函数都有一个prototype（原型）属性，这个属性是一个指针，指向一个对象，
+而这个对象的用途是包含可以由特定类型的所有实例共享的属性和方法。如果按照字面意思来理解，那么prototype 就是通过调用构造函数而创建的那个对象实例的原型对象。使用原型对象的好处是可以让所有对象实例共享它所包含的属性和方法。换句话说，不必在构造函数中定义对象实例的信息，而是可以将这些信息直接添加到原型对象中，如下面的例子所示。
+
+``` js
+function Person(){
+}
+Person.prototype.name = "Nicholas";
+Person.prototype.age = 29;
+Person.prototype.job = "Software Engineer";
+Person.prototype.sayName = function(){
+  alert(this.name);
+};
+var person1 = new Person();
+person1.sayName(); //"Nicholas"
+var person2 = new Person();
+person2.sayName(); //"Nicholas"
+alert(person1.sayName == person2.sayName); //true
+```
+
+在此，我们将sayName()方法和所有属性直接添加到了Person 的prototype 属性中，构造函数变成了空函数。即使如此，也仍然可以通过调用构造函数来创建新对象，而且新对象还会具有相同的属性和方法。但与构造函数模式不同的是，新对象的这些属性和方法是由所有实例共享的。换句话说，person1 和person2 访问的都是同一组属性和同一个sayName()函数。
+
+**1. 理解原型对象**
+
+无论什么时候，只要创建了一个新函数，就会根据一组特定的规则为该函数创建一个prototype属性，这个属性指向函数的原型对象。在默认情况下，所有原型对象都会自动获得一个constructor（构造函数）属性，这个属性包含一个指向prototype 属性所在函数的指针。就拿前面的例子来说，Person.prototype. constructor 指向Person。而通过这个构造函数，我们还可继续为原型对象添加其他属性和方法。
+
+
+
+
+
+
 创建的每一个函数都有一个prototype（原型）属性，这个属性是一个指针，指向一个对象，而这个对象的用途是包含可以由特定类型的所有实例共享的属性和方法。
 isPrototypeOf()方法
 Object.getPrototypeOf()方法
 hasOwnProperty()方法
-原型与in操作符，只要能通过对象访问到属性就返回true，hasOwnProperty()只有属性存在于实例中时才返回true，因此只要in操作符返回true，而hasOwnProperty()返回false，就可以确定属性是原型中的属性。 
+原型与in操作符，只要能通过对象访问到属性就返回true，hasOwnProperty()只有属性存在于实例中时才返回true，因此只要in操作符返回true，而hasOwnProperty()返回false，就可以确定属性是原型中的属性。
 Object.keys()方法取得对象上所有可以枚举的属性。
 Object.getOwnPropertyNames()方法取得所有实例属性，包括不可枚举（constructor等）
 原型的动态性
