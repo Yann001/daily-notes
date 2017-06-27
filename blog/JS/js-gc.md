@@ -1370,9 +1370,10 @@ arguments.callee是一个指向正在执行函数的指针。也可使用一个�
 
 #### 关于this对象
 
-内存泄漏
+#### 内存泄漏
 
-3. 模仿块级作用域
+### 模仿块级作用域
+
 ``` js
 (function (){
 	//块级作用域
@@ -1380,37 +1381,90 @@ arguments.callee是一个指向正在执行函数的指针。也可使用一个�
 ```
 函数表达式后面可以跟圆括号，而函数声明后面不能跟圆括号。
 
-4. 私有变量
-特权方法（有权访问私有变量的公有方法）
-静态私有变量
-模块模式：如果必须创建一个对象并以某些数据对其进行初始化，同时还要公开一些能够访问这些私有数据的方法，那么就可以使用模块模式。
-增强的模块模式
+### 私有变量
+
+#### 特权方法
+
+有权访问私有变量的公有方法
+
+#### 静态私有变量
+
+####模块模式
+
+如果必须创建一个对象并以某些数据对其进行初始化，同时还要公开一些能够访问这些私有数据的方法，那么就可以使用模块模式。
+
+#### 增强的模块模式
+
 
 ## 第八章 BOM
 
-1. window对象
-BOM对象的核心是window，它表示浏览器的一个实例。在浏览器中，window对象有双重角色，它既是通过JavaScript访问浏览器窗口的一个接口，又是ECMAScript规定的Global对象。
-全局作用域：全局变量不能通过delete操作符删除，而直接在window对象上定义的属性可以。尝试访问未声明的变量会出错，但可以通过查询window对象，可以知道某个可能未声明的变量是否存在。
-窗口关系及框架：
+### 1. window对象
+
+BOM对象的核心是window，它表示浏览器的一个实例。在浏览器中，window对象有双重角色，它既是通过JavaScript访问浏览器窗口的一个接口，又是ECMAScript规定的Global对象。这意味着在网页中定义的任何一个对象、变量和函数，都以window 作为其Global 对象，因此有权访问parseInt()等方法。
+
+#### 全局作用域
+
+由于window 对象同时扮演着ECMAScript 中Global 对象的角色，因此所有在全局作用域中声明的变量、函数都会变成window 对象的属性和方法。
+
+全局变量不能通过delete操作符删除，而直接在window对象上定义的属性可以。
+例如：
+``` js
+var age = 29;
+window.color = "red";
+//在IE < 9 时抛出错误，在其他所有浏览器中都返回false
+delete window.age;
+//在IE < 9 时抛出错误，在其他所有浏览器中都返回true
+delete window.color; //returns true
+alert(window.age); //29
+alert(window.color); //undefined
+```
+
+尝试访问未声明的变量会出错，但可以通过查询window对象，可以知道某个可能未声明的变量是否存在。
+例如：
+``` js
+//这里会抛出错误，因为oldValue 未定义
+var newValue = oldValue;
+//这里不会抛出错误，因为这是一次属性查询
+//newValue 的值是undefined
+var newValue = window.oldValue;
+```
+
+#### 窗口关系及框架
+
+如果页面中包含框架，则每个框架都拥有自己的window 对象，并且保存在frames 集合中。在frames集合中，可以通过数值索引（从0 开始，从左至右，从上到下）或者框架名称来访问相应的window 对象。每个window 对象都有一个name 属性，其中包含框架的名称。
+
 ``` html
 <frameset><frame></frame></frameset>
 ```
-window.frames[0]、top.frames[0]。
+window.frames[0]、top.frames[0]、frames[0]。
 parent，在没有框架的情况下parent一定等于top，它们都等于window。
-窗口位置：
+
+#### 窗口位置
+
 screenLeft和screenTop属性（screenX，screenY）。moveTo()和moveBy()方法。
-窗口大小：
+
+#### 窗口大小
+
 innerWidth、innerHeight、outerWidth、outerHeight。
 resizeTo()、resizeBy()方法可以调整浏览器窗口的大小。
-导航和打开窗口：
+
+#### 导航和打开窗口
+
 window.open()。
+
+1. 弹出窗口
 window.close()，仅适用于window.open()打开的窗口，对于浏览器的主窗口，如果没有得到用户允许是不能关闭它的。
 新创建的window对象有一个opener属性，其中保存着打开他的原始窗口对象。
-安全限制（弹出窗口）
+
+2. 安全限制（弹出窗口）
 弹出窗口屏蔽程序
-间歇调用和超时调用：
-超时调用，setTimeout()，第一个参数可以是包含JS代码的字符串，也可以是一个函数（推荐），第二个参数是毫秒表示的时间。调用setTimeout()方法之后，会返回一个数值ID，表示超时调用，这个超时调用ID是计划执行代码的唯一标识符，可以通过它来取消超时调用。
-demo：
+
+#### 间歇调用和超时调用：
+
+超时调用：
+setTimeout()，第一个参数可以是包含JS代码的字符串，也可以是一个函数（推荐），第二个参数是毫秒表示的时间。调用setTimeout()方法之后，会返回一个数值ID，表示超时调用，这个超时调用ID是计划执行代码的唯一标识符，可以通过它来取消超时调用。
+例如：
+
 ``` js
 //设置超时调用
 var timeoutId = setTimeout(function(){
@@ -1420,17 +1474,91 @@ var timeoutId = setTimeout(function(){
 clearTimeout(timeoutId);
 //执行以上代码什么都不会发生。
 ```
-间歇调用，setInterval()，clearInterval()使用与超时调用类似。
-系统对话框：
-alert()、confirm()、prompt()。
 
-2. location对象
+间歇调用：
+setInterval()，clearInterval()使用与超时调用类似。
 
-3. navigator对象
+超时调用的代码都是在全局作用域中执行的，因此函数中this 的值在非严格模式下指向window 对象，在严格模式下是undefined。
 
-4. screen对象
+#### 系统对话框：
 
-5. history对象
+- alert()
+- confirm()
+- prompt()
+
+浏览器通过alert()、confirm()和prompt()方法可以调用系统对话框向用户显示消息。系统对话框与在浏览器中显示的网页没有关系，也不包含HTML。它们的外观由操作系统及（或）浏览器设置决定，而不是由CSS 决定。此外，通过这几个方法打开的对话框都是同步和模态的。也就是说，显示这些对话框的时候代码会停止执行，而关掉这些对话框后代码又会恢复执行。
+
+- print()，显示打印对话框
+- find()，显示查找对话框
+
+这两个对话框都是异步显示的，能够将控制权立即交还给脚本。这两个对话框与用户通过浏览器菜单的“查找”和“打印”命令打开的对话框相同。
+
+### location对象
+
+location 是最有用的BOM对象之一，它提供了与当前窗口中加载的文档有关的信息，还提供了一些导航功能。事实上，location 对象是很特别的一个对象，因为它既是window 对象的属性，也是document 对象的属性；换句话说，window.location 和document.location 引用的是同一个对象。location 对象的用处不只表现在它保存着当前文档的信息，还表现在它将URL 解析为独立的片段，让开发人员可以通过不同的属性访问这些片段。下表列出了location 对象的所有属性（注：省略了每个属性前面的location 前缀）。
+
+|属性名|例子|说明
+|--|--|
+|hash |"#contents" |返回URL中的hash（#号后跟零或多个字符），如果URL中不包含散列，则返回空字符串
+|host |"www.wrox.com:80" |返回服务器名称和端口号（如果有）
+|hostname |"www.wrox.com" |返回不带端口号的服务器名称
+|href |"http:/www.wrox.com" |返回当前加载页面的完整URL。而location对象的toString()方法也返回这个值
+|pathname |"/WileyCDA/" |返回URL中的目录和（或）文件名
+|port |"8080" |返回URL中指定的端口号。如果URL中不包含端口号，则这个属性返回空字符串
+|protocol |"http:" |返回页面使用的协议。通常是http:或https:
+|search |"?q=javascript" |返回URL的查询字符串。这个字符串以问号开头
+
+**位置操作**
+
+使用location 对象可以通过很多方式来改变浏览器的位置。首先，也是最常用的方式，就是使用assign()方法并为其传递一个URL，如下所示。
+
+``` js
+location.assign("http://www.wrox.com");
+```
+
+这样，就可以立即打开新URL 并在浏览器的历史记录中生成一条记录。如果是将location.href或window.location 设置为一个URL 值，也会以该值调用assign()方法。例如，下列两行代码与显式调用assign()方法的效果完全一样。
+
+``` js
+window.location = "http://www.wrox.com";
+location.href = "http://www.wrox.com";
+```
+
+在这些改变浏览器位置的方法中，最常用的是设置location.href 属性。
+另外，修改location 对象的其他属性也可以改变当前加载的页面。下面的例子展示了通过将hash、search、hostname、pathname 和port 属性设置为新值来改变URL。
+``` js
+//假设初始URL 为http://www.wrox.com/WileyCDA/
+//将URL 修改为"http://www.wrox.com/WileyCDA/#section1"
+location.hash = "#section1";
+//将URL 修改为"http://www.wrox.com/WileyCDA/?q=javascript"
+location.search = "?q=javascript";
+//将URL 修改为"http://www.yahoo.com/WileyCDA/"
+location.hostname = "www.yahoo.com";
+//将URL 修改为"http://www.yahoo.com/mydir/"
+location.pathname = "mydir";
+//将URL 修改为"http://www.yahoo.com:8080/WileyCDA/"
+location.port = 8080;
+```
+
+每次修改location 的属性（hash 除外），页面都会以新URL 重新加载。
+
+在IE8、Firefox 1、Safari 2+、Opera 9+和Chrome 中，修改hash 的值会在浏览器的历史记录中生成一条新记录。在IE 的早期版本中，hash 属性不会在用户单击“后退”和“前进”按钮时被更新，而只会在用户单击包含hash 的URL 时才会被更新。
+
+当通过上述任何一种方式修改URL 之后，浏览器的历史记录中就会生成一条新记录，因此用户通过单击“后退”按钮都会导航到前一个页面。要禁用这种行为，可以使用replace()方法。这个方法只接受一个参数，即要导航到的URL；结果虽然会导致浏览器位置改变，但不会在历史记录中生成新记录。在调用replace()方法之后，用户不能回到前一个页面。
+
+与位置有关的最后一个方法是reload()，作用是重新加载当前显示的页面。如果调用reload()时不传递任何参数，页面就会以最有效的方式重新加载。也就是说，如果页面自上次请求以来并没有改变过，页面就会从浏览器缓存中重新加载。如果要强制从服务器重新加载，则需要像下面这样为该方法传递参数true。
+``` js
+location.reload(); //重新加载（有可能从缓存中加载）
+location.reload(true); //重新加载（从服务器重新加载）
+```
+
+位于reload()调用之后的代码可能会也可能不会执行，这要取决于网络延迟或系统资源等因素。为此，最好将reload()放在代码的最后一行。
+
+
+### navigator对象
+
+### screen对象
+
+### history对象
 
 ## 第九章 客户端检测
 
