@@ -1553,23 +1553,213 @@ location.reload(true); //重新加载（从服务器重新加载）
 
 位于reload()调用之后的代码可能会也可能不会执行，这要取决于网络延迟或系统资源等因素。为此，最好将reload()放在代码的最后一行。
 
-
 ### navigator对象
+
+- appName，完整的浏览器名称
+- userAgent，浏览器的用户代理字符串
+- platform，浏览器所在的系统平台
+- language，浏览器的主语言
+- plugins，浏览器中安装的插件信息的数组
+
+**1. 插件检测**
+
+非IE：navigator.plugins
+IE：ActiveXObject
+
+plugins 集合有一个名叫refresh()的方法，用于刷新plugins 以反映最新安装的插件。这个方法接收一个参数：表示是否应该重新加载页面的一个布尔值。如果将这个值设置为true，则会重新加载包含插件的所有页面；否则，只更新plugins集合，不重新加载页面。
+
+**2. 注册处理程序**
+
+- registerContentHandler()
+- registerProtocolHandler()
 
 ### screen对象
 
 ### history对象
 
+history 对象保存着用户上网的历史记录，从窗口被打开的那一刻算起。因为history 是window对象的属性，因此每个浏览器窗口、每个标签页乃至每个框架，都有自己的history 对象与特定的window 对象关联。出于安全方面的考虑，开发人员无法得知用户浏览过的URL。不过，借由用户访问过的页面列表，同样可以在不知道实际URL 的情况下实现后退和前进。
+使用go()方法可以在用户的历史记录中任意跳转，可以向后也可以向前。这个方法接受一个参数，表示向后或向前跳转的页面数的一个整数值。负数表示向后跳转（类似于单击浏览器的“后退”按钮），正数表示向前跳转（类似于单击浏览器的“前进”按钮）。
+也可以给go()方法传递一个字符串参数，此时浏览器会跳转到历史记录中包含该字符串的第一个位置——可能后退，也可能前进，具体要看哪个位置最近。如果历史记录中不包含该字符串，那么这个方法什么也不做。
+另外，还可以使用两个简写方法back()和forward()来代替go()。顾名思义，这两个方法可以模仿浏览器的“后退”和“前进”按钮。
+除了上述几个方法外，history 对象还有一个length 属性，保存着历史记录的数量。这个数量包括所有历史记录，即所有向后和向前的记录。对于加载到窗口、标签页或框架中的第一个页面而言，history.length 等于0。通过像下面这样测试该属性的值，可以确定用户是否一开始就打开了你的页面。
+
+*当页面的URL 改变时，就会生成一条历史记录。在IE8 及更高版本、Opera、Firefox、Safari 3 及更高版本以及Chrome 中，这里所说的改变包括URL 中hash 的变化（因此，设置location.hash 会在这些浏览器中生成一条新的历史记录）。*
+
+
 ## 第九章 客户端检测
 
 1. 能力检测（特性检测）
 2. 怪癖检测
-3. 用户代理检测：
+3. 用户代理检测
+用户代理检测通过检测用户代理字符串来确定实际使用的浏览器。在每一次HTTP 请求过程中，用户代理字符串是作为响应首部发送的，而且该字符串可以通过JavaScript 的navigator.userAgent 属性访问。在服务器端，通过检测用户代理字符串来确定用户使用的浏览器是一种常用而且广为接受的做法。而在客户端，用户代理检测一般被当作一种万不得已才用的做法，其优先级排在能力检测和（或）怪癖检测之后。
+
 主流四大浏览器内核：
-	- Trident ：Internet Explore
-	- Gecko：Mozilla Firefox、Netscape
-	- WebKit：Safari、Chrome
-	- Presto：Opera
+- Trident ：Internet Explore
+- Gecko：Mozilla Firefox、Netscape
+- WebKit：Safari、Chrome
+- Presto：Opera
+
+以下是完整的用户代理字符串检测脚本，包括检测呈现引擎、平台、Windows 操作系统、移动设备和游戏系统。
+``` js
+var client = function () {
+  //呈现引擎
+  var engine = {
+    ie: 0,
+    gecko: 0,
+    webkit: 0,
+    khtml: 0,
+    opera: 0,
+    //完整的版本号
+    ver: null
+  };
+  //浏览器
+  var browser = {
+    //主要浏览器
+    ie: 0,
+    firefox: 0,
+    safari: 0,
+    konq: 0,
+    opera: 0,
+    chrome: 0,
+    //具体的版本号
+    ver: null
+  };
+  //平台、设备和操作系统
+  var system = {
+    win: false,
+    mac: false,
+    x11: false,
+    //移动设备
+    iphone: false,
+    ipod: false,
+    ipad: false,
+    ios: false,
+    android: false,
+    nokiaN: false,
+    winMobile: false,
+    //游戏系统
+    wii: false,
+    ps: false
+  };
+  //检测呈现引擎和浏览器
+  var ua = navigator.userAgent;
+  if (window.opera) {
+    engine.ver = browser.ver = window.opera.version();
+    engine.opera = browser.opera = parseFloat(engine.ver);
+  } else if (/AppleWebKit\/(\S+)/.test(ua)) {
+    engine.ver = RegExp["$1"];
+    engine.webkit = parseFloat(engine.ver);
+    //确定是Chrome 还是Safari
+    if (/Chrome\/(\S+)/.test(ua)) {
+      browser.ver = RegExp["$1"];
+      browser.chrome = parseFloat(browser.ver);
+    } else if (/Version\/(\S+)/.test(ua)) {
+      browser.ver = RegExp["$1"];
+      browser.safari = parseFloat(browser.ver);
+    } else {
+      //近似地确定版本号
+      var safariVersion = 1;
+      if (engine.webkit < 100) {
+        safariVersion = 1;
+      } else if (engine.webkit < 312) {
+        safariVersion = 1.2;
+      } else if (engine.webkit < 412) {
+        safariVersion = 1.3;
+      } else {
+        safariVersion = 2;
+      }
+      browser.safari = browser.ver = safariVersion;
+    }
+  } else if (/KHTML\/(\S+)/.test(ua) || /Konqueror\/([^;]+)/.test(ua)) {
+    engine.ver = browser.ver = RegExp["$1"];
+    engine.khtml = browser.konq = parseFloat(engine.ver);
+  } else if (/rv:([^\)]+)\) Gecko\/\d{8}/.test(ua)) {
+    engine.ver = RegExp["$1"];
+    engine.gecko = parseFloat(engine.ver);
+    //确定是不是Firefox
+    if (/Firefox\/(\S+)/.test(ua)) {
+      browser.ver = RegExp["$1"];
+      browser.firefox = parseFloat(browser.ver);
+    }
+  } else if (/MSIE ([^;]+)/.test(ua)) {
+    engine.ver = browser.ver = RegExp["$1"];
+    engine.ie = browser.ie = parseFloat(engine.ver);
+  }
+  //检测浏览器
+  browser.ie = engine.ie;
+  browser.opera = engine.opera;
+  //检测平台
+  var p = navigator.platform;
+  system.win = p.indexOf("Win") == 0;
+  system.mac = p.indexOf("Mac") == 0;
+  system.x11 = (p == "X11") || (p.indexOf("Linux") == 0);
+  //检测Windows 操作系统
+  if (system.win) {
+    if (/Win(?:dows )?([^do]{2})\s?(\d+\.\d+)?/.test(ua)) {
+      if (RegExp["$1"] == "NT") {
+        switch (RegExp["$2"]) {
+          case "5.0":
+            system.win = "2000";
+            break;
+          case "5.1":
+            system.win = "XP";
+            break;
+          case "6.0":
+            system.win = "Vista";
+            break;
+          case "6.1":
+            system.win = "7";
+            break;
+          default:
+            system.win = "NT";
+            break;
+        }
+      } else if (RegExp["$1"] == "9x") {
+        system.win = "ME";
+      } else {
+        system.win = RegExp["$1"];
+      }
+    }
+  }
+  //移动设备
+  system.iphone = ua.indexOf("iPhone") > -1;
+  system.ipod = ua.indexOf("iPod") > -1;
+  system.ipad = ua.indexOf("iPad") > -1;
+  system.nokiaN = ua.indexOf("NokiaN") > -1;
+  //windows mobile
+  if (system.win == "CE") {
+    system.winMobile = system.win;
+  } else if (system.win == "Ph") {
+    if (/Windows Phone OS (\d+.\d+)/.test(ua)) {
+      ;
+      system.win = "Phone";
+      system.winMobile = parseFloat(RegExp["$1"]);
+    }
+  }
+  //检测iOS 版本
+  if (system.mac && ua.indexOf("Mobile") > -1) {
+    if (/CPU (?:iPhone )?OS (\d+_\d+)/.test(ua)) {
+      system.ios = parseFloat(RegExp.$1.replace("_", "."));
+    } else {
+      system.ios = 2; //不能真正检测出来，所以只能猜测
+    }
+  }
+  //检测Android 版本
+  if (/Android (\d+\.\d+)/.test(ua)) {
+    system.android = parseFloat(RegExp.$1);
+  }
+  //游戏系统
+  system.wii = ua.indexOf("Wii") > -1;
+  system.ps = /playstation/i.test(ua);
+  //返回这些对象
+  return {
+    engine: engine,
+    browser: browser,
+    system: system
+  };
+}();
+```
+
 
 ## 第十章 DOM
 
