@@ -2019,27 +2019,308 @@ createElement()方法创建新元素，IE中可以直接传入标签来创建。
 
 ### Text类型
 
-开始标签与结束标签之间只要存在内容，就会创建一个文本节点。
-1. 创建文本节点
+文本节点由Text 类型表示，包含的是可以照字面解释的纯文本内容。纯文本中可以包含转义后的HTML 字符，但不能包含HTML 代码。Text 节点具有以下特征：
+
+- nodeType 的值为3；
+- nodeName 的值为"#text"；
+- nodeValue 的值为节点所包含的文本；
+- parentNode 是一个Element；
+- 不支持（没有）子节点。
+
+可以通过nodeValue 属性或data 属性访问Text 节点中包含的文本，这两个属性中包含的值相同。对nodeValue 的修改也会通过data 反映出来，反之亦然。使用下列方法可以操作节点中的文本：
+
+- appendData(text)：将text 添加到节点的末尾。
+- deleteData(offset, count)：从offset 指定的位置开始删除count 个字符。
+- insertData(offset, text)：在offset 指定的位置插入text。
+- replaceData(offset, count, text)：用text 替换从offset 指定的位置开始到offset+count 为止处的文本。
+- splitText(offset)：从offset 指定的位置将当前文本节点分成两个文本节点。
+- substringData(offset, count)：提取从offset 指定的位置开始到offset+count 为止处的字符串。
+
+除了这些方法之外，文本节点还有一个length 属性，保存着节点中字符的数目。而且，nodeValue.length 和data.length 中也保存着同样的值。在默认情况下，每个可以包含内容的元素最多只能有一个文本节点，而且必须确实有内容存在。
+
+**1. 创建文本节点**
+
 createTextNode()。
-2. 规范化文本节点
+
+**2. 规范化文本节点**
+
 normalize()方法，在包含两个或多个文本节点的父元素上调用normalize方法时，则会将所有文本节点合并成一个节点。
-3. 分隔文本节点
-splitText()方法与normalize()方法相反，按指定位置分隔nodeValue值，返回包含剩余部分的一个节点。
-Comment类型
-Comment类型与Text类型继承自相同的基类。
+
+**3. 分隔文本节点**
+
+Text 类型提供了一个作用与normalize()相反的方法：splitText()。这个方法会将一个文本节点分成两个文本节点，即按照指定的位置分割nodeValue 值。原来的文本节点将包含从开始到指定位置之前的内容，新文本节点将包含剩下的文本。这个方法会返回一个新文本节点，该节点与原节点的。parentNode 相同。
+
+#### Comment类型
+
+注释在DOM中是通过Comment 类型来表示的。Comment 节点具有下列特征：
+
+- nodeType 的值为8；
+- nodeName 的值为"#comment"；
+- nodeValue 的值是注释的内容；
+- parentNode 可能是Document 或Element；
+- 不支持（没有）子节点。
+
+Comment 类型与Text 类型继承自相同的基类，因此它拥有除splitText()之外的所有字符串操作方法。与Text 类型相似，也可以通过nodeValue 或data 属性来取得注释的内容。
+注释节点可以通过其父节点来访问，
+
 createComment()方法创建注释节点，浏览器不会识别位于< html>标签外的注释。
-CDATASection类型
-只针对于XML文档，继承自Text类型。
-createCDataSection()方法来创建CDATA区域。
-DocumentType类型
+
+#### CDATASection类型
+
+CDATASection 类型只针对基于XML 的文档，表示的是CDATA 区域。与Comment 类似，CDATASection 类型继承自Text 类型，因此拥有除splitText()之外的所有字符串操作方法。
+CDATASection 节点具有下列特征：
+
+- nodeType 的值为4；
+- nodeName 的值为"#cdata-section"；
+- nodeValue 的值是CDATA 区域中的内容；
+- parentNode 可能是Document 或Element；
+- 不支持（没有）子节点。
+
+CDATA 区域只会出现在XML 文档中，因此多数浏览器都会把CDATA 区域错误地解析为Comment或Element。
+
+#### DocumentType类型
+
 不常用，仅Firefox，Safari，Opera支持，浏览器会把DocumentType对象保存在document.doctype中，包括三个属性：name，entities，notations。
-DocumentFragment类型
-虽然不能把文档片段直接添加到文档中，但可以将它当做一个仓库来使用，即可以在里面保存将来可能会添加到 文档中的节点。
-Attr类型
-元素的特性在DOM中以Attr类型来表示，特性就是存在于attributes属性中的节点。
-2、DOM操作技术
-1. 动态脚本
+
+#### DocumentFragment类型
+
+在所有节点类型中，只有DocumentFragment 在文档中没有对应的标记。DOM 规定文档片段（document fragment）是一种“轻量级”的文档，可以包含和控制节点，但不会像完整的文档那样占用额外的资源。
+DocumentFragment 节点具有下列特征：
+
+- nodeType 的值为11；
+- nodeName 的值为"#document-fragment"；
+- nodeValue 的值为null；
+- parentNode 的值为null；
+- 子节点可以是Element、ProcessingInstruction、Comment、Text、CDATASection 或EntityReference。
+
+虽然不能把文档片段直接添加到文档中，但可以将它作为一个“仓库”来使用，即可以在里面保存将来可能会添加到文档中的节点。要创建文档片段，可以使用document.createDocumentFragment()方法。
+
+
+#### Attr类型
+
+元素的特性在DOM 中以Attr 类型来表示。在所有浏览器中（包括IE8），都可以访问Attr 类型的构造函数和原型。从技术角度讲，特性就是存在于元素的attributes 属性中的节点。特性节点具有下列特征：
+
+- nodeType 的值为2；
+- nodeName 的值是特性的名称；
+- nodeValue 的值是特性的值；
+- parentNode 的值为null；
+- 在HTML 中不支持（没有）子节点；
+- 在XML 中子节点可以是Text 或EntityReference。
+- 尽管它们也是节点，但特性却不被认为是DOM 文档树的一部分。开发人员最常使用的是getAttribute()、setAttribute()和remveAttribute()方法，很少直接引用特性节点。
+
+Attr 对象有3 个属性：name、value 和specified。其中，name 是特性名称（与nodeName 的值相同），value 是特性的值（与nodeValue 的值相同），而specified 是一个布尔值，用以区别特性是在代码中指定的，还是默认的。
+
+使用document.createAttribute()并传入特性的名称可以创建新的特性节点。例如，要为元素添加align 特性，可以使用下列代码：
+
+``` js
+var attr = document.createAttribute("align");
+attr.value = "left";
+element.setAttributeNode(attr);
+alert(element.attributes["align"].value); //"left"
+alert(element.getAttributeNode("align").value); //"left"
+alert(element.getAttribute("align")); //"left"
+```
+
+这个例子创建了一个新的特性节点。由于在调用createAttribute()时已经为name 属性赋了值，所以后面就不必给它赋值了。之后，又把value 属性的值设置为"left"。为了将新创建的特性添加到元素中，必须使用元素的setAttributeNode()方法。添加特性之后，可以通过下列任何方式访问该特性：attributes 属性、getAttributeNode()方法以及getAttribute()方法。其中，attributes和getAttributeNode()都会返回对应特性的Attr 节点，而getAttribute()则只返回特性的值。
+
+### DOM操作技术
+
+#### 1. 动态脚本
+
+使用<script>元素可以向页面中插入JavaScript 代码，一种方式是通过其src 特性包含外部文件，另一种方式就是用这个元素本身来包含代码。而这一节要讨论的动态脚本，指的是在页面加载时不存在，但将来的某一时刻通过修改DOM 动态添加的脚本。跟操作HTML 元素一样，创建动态脚本也有两种方式：插入外部文件和直接插入JavaScript 代码。
+
+动态加载的外部JavaScript 文件能够立即运行，比如下面的<script>元素：
+
+``` xml
+<script type="text/javascript" src="client.js"></script>
+```
+
+``` js
+function loadScript(url){
+  var script = document.createElement("script");
+  script.type = "text/javascript";
+  script.src = url;
+  document.body.appendChild(script);
+}
+loadScript("client.js");
+```
+
+``` js
+function loadScriptString(code){
+	var script = document.createElement("script");
+	script.type = "text/javascript";
+	try {
+	  script.appendChild(document.createTextNode(code));
+	} catch (ex){
+	  script.text = code; // 兼容IE
+	}
+	document.body.appendChild(script);
+}
+loadScriptString("function sayHi(){alert('hi');}");
+```
+*以这种方式加载的代码会在全局作用域中执行，而且当脚本执行后将立即可用。实际上，这样执行代码与在全局作用域中把相同的字符串传递给eval()是一样的。*
+
+### 2. 动态样式
+
+能够把CSS 样式包含到HTML 页面中的元素有两个。其中，<link>元素用于包含来自外部的文件，而<style>元素用于指定嵌入的样式。与动态脚本类似，所谓动态样式是指在页面刚加载时不存在的样式；动态样式是在页面加载完成后动态添加到页面中的。
+
+``` js
+function loadStyles(url){
+  var link = document.createElement("link");
+  link.rel = "stylesheet";
+	link.type = "text/css";
+	link.href = url;
+	var head = document.getElementsByTagName("head")[0];
+	head.appendChild(link);
+}
+loadStyles("styles.css");
+```
+
+需要注意的是，必须将<link>元素添加到<head>而不是<body>元素，才能保证在所有浏览器中的行为一致。
+
+加载外部样式文件的过程是异步的，也就是加载样式与执行JavaScript 代码的过程没有固定的次序。
+
+``` js
+function loadStyleString(css){
+	var style = document.createElement("style");
+	style.type = "text/css";
+	try{
+	  style.appendChild(document.createTextNode(css));
+	} catch (ex){
+	  style.styleSheet.cssText = css; // 兼容IE
+	}
+	var head = document.getElementsByTagName("head")[0];
+	head.appendChild(style);
+}
+loadStyleString("body{background-color:red}");
+```
+
+#### 3. 操作表格
+
+为了方便构建表格，HTML DOM 还为<table>、<tbody>和<tr>元素添加了一些属性和方法。
+
+为<table>元素添加的属性和方法如下：
+
+- caption：保存着对<caption>元素（如果有）的指针。
+- tBodies：是一个<tbody>元素的HTMLCollection。
+- tFoot：保存着对<tfoot>元素（如果有）的指针。
+- tHead：保存着对<thead>元素（如果有）的指针。
+- rows：是一个表格中所有行的HTMLCollection。
+- createTHead()：创建<thead>元素，将其放到表格中，返回引用。
+- createTFoot()：创建<tfoot>元素，将其放到表格中，返回引用。
+- createCaption()：创建<caption>元素，将其放到表格中，返回引用。
+- deleteTHead()：删除<thead>元素。
+- deleteTFoot()：删除<tfoot>元素。
+- deleteCaption()：删除<caption>元素。
+- deleteRow(pos)：删除指定位置的行。
+- insertRow(pos)：向rows 集合中的指定位置插入一行。
+
+为<tbody>元素添加的属性和方法如下：
+
+- rows：保存着<tbody>元素中行的HTMLCollection。
+- deleteRow(pos)：删除指定位置的行。
+- insertRow(pos)：向rows 集合中的指定位置插入一行，返回对新插入行的引用。
+
+为<tr>元素添加的属性和方法如下：
+
+- cells：保存着<tr>元素中单元格的HTMLCollection。
+- deleteCell(pos)：删除指定位置的单元格。
+- insertCell(pos)：向cells 集合中的指定位置插入一个单元格，返回对新插入单元格的引用。
+
+使用这些属性和方法，可以极大地减少创建表格所需的代码数量
+
+#### 4. 使用NodeList
+
+理解NodeList 及其“近亲”NamedNodeMap 和HTMLCollection，是从整体上透彻理解DOM的关键所在。这三个集合都是“动态的”；换句话说，每当文档结构发生变化时，它们都会得到更新。因此，它们始终都会保存着最新、最准确的信息。从本质上说，所有NodeList 对象都是在访问DOM文档时实时运行的查询。
+例如，下列代码会导致无限循环：
+
+``` js
+var divs = document.getElementsByTagName("div"), i, div;
+for(i=0len=divs.length; i < len; i++){
+  div = document.createElement("div");
+  document.body.appendChild(div);
+}
+// >
+```
+
+第一行代码会取得文档中所有<div>元素的HTMLCollection。由于这个集合是“动态的”，因此只要有新<div>元素被添加到页面中，这个元素也会被添加到该集合中。浏览器不会将创建的所有集合都保存在一个列表中，而是在下一次访问集合时再更新集合。结果，在遇到上例中所示的循环代码时，就会导致一个有趣的问题。每次循环都要对条件i < divs.length 求值，意味着会运行取得所有<div>元素的查询。考虑到循环体每次都会创建一个新<div>元素并将其添加到文档中，因此divs.length 的值在每次循环后都会递增。既然i 和divs.length 每次都会同时递增，结果它们的值永远也不会相等。
+
+如果想要迭代一个NodeList，最好是使用length 属性初始化第二个变量，然后将迭代器与该变量进行比较，如下面的例子所示：
+
+``` js
+var divs = document.getElementsByTagName("div"), i, len, div;
+for (i=0, len=divs.length; i < len; i++){
+  div = document.createElement("div");
+  document.body.appendChild(div);
+}
+// >
+```
+
+这个例子中初始化了第二个变量len。由于len 中保存着对divs.length 在循环开始时的一个快照，因此就会避免上一个例子中出现的无限循环问题。
+
+一般来说，应该尽量减少访问NodeList 的次数。因为每次访问NodeList，都会运行一次基于文档的查询。所以，可以考虑将从NodeList 中取得的值缓存起来。
+
+## 第十一章 DOM 扩展
+
+尽管DOM 作为API 已经非常完善了，但为了实现更多的功能，仍然会有一些标准或专有的扩
+展。2008 年之前，浏览器中几乎所有的DOM扩展都是专有的。此后，W3C 着手将一些已经
+成为事实标准的专有扩展标准化并写入规范当中。
+
+对DOM 的两个主要的扩展是Selectors API（选择符API）和HTML5。这两个扩展都源自开发社区，而将某些常见做法及API 标准化一直是众望所归。此外，还有一个不那么引人瞩目的Element Traversal（元素遍历）规范，为DOM添加了一些属性。虽然前述两个主要规范（特别是HTML5）已经涵盖了大量的DOM 扩展，但专有扩展依然存在。
+
+### 1. 选择符API
+
+众多JavaScript 库中最常用的一项功能，就是根据CSS 选择符选择与某个模式匹配的DOM 元素。实际上，jQuery（www.jquery.com）的核心就是通过CSS 选择符查询DOM文档取得元素的引用，从而抛开了getElementById()和getElementsByTagName()。
+
+Selectors API（www.w3.org/TR/selectors-api/）是由W3C 发起制定的一个标准，致力于让浏览器原生支持CSS 查询。所有实现这一功能的JavaScript 库都会写一个基础的CSS 解析器，然后再使用已有的DOM 方法查询文档并找到匹配的节点。尽管库开发人员在不知疲倦地改进这一过程的性能，但到头来都只能通过运行JavaScript 代码来完成查询操作。而把这个功能变成原生API 之后，解析和树查询操作可以在浏览器内部通过编译后的代码来完成，极大地改善了性能。
+
+Selectors API Level 1 的核心是两个方法：querySelector()和querySelectorAll()。在兼容的浏览器中，可以通过Document 及Element 类型的实例调用它们。目前已完全支持Selectors API Level 1的浏览器有IE 8+、Firefox 3.5+、Safari 3.1+、Chrome 和Opera 10+。
+
+#### querySelector()方法
+
+querySelector()方法接收一个CSS 选择符，返回与该模式匹配的第一个元素，如果没有找到匹配的元素，返回null。
+
+通过Document 类型调用querySelector()方法时，会在文档元素的范围内查找匹配的元素。而通过Element 类型调用querySelector()方法时，只会在该元素后代元素的范围内查找匹配的元素。CSS 选择符可以简单也可以复杂，视情况而定。如果传入了不被支持的选择符，querySelector()会抛出错误。
+
+#### querySelectorAll()方法
+
+querySelectorAll()方法接收的参数与querySelector()方法一样，都是一个CSS 选择符，但返回的是所有匹配的元素而不仅仅是一个元素。这个方法返回的是一个NodeList 的实例。
+
+具体来说，返回的值实际上是带有所有属性和方法的NodeList，而其底层实现则类似于一组元素的快照，而非不断对文档进行搜索的动态查询。这样实现可以避免使用NodeList 对象通常会引起的大多数性能问题。
+
+只要传给querySelectorAll()方法的CSS 选择符有效，该方法都会返回一个NodeList 对象，而不管找到多少匹配的元素。如果没有找到匹配的元素，NodeList 就是空的。
+
+与querySelector()类似，能够调用querySelectorAll()方法的类型包括Document、
+DocumentFragment 和Element。
+
+要取得返回的NodeList 中的每一个元素，可以使用item()方法，也可以使用方括号语法。
+
+同样与querySelector()类似，如果传入了浏览器不支持的选择符或者选择符中有语法错误，querySelectorAll()会抛出错误。
+
+#### matchesSelector()方法
+
+Selectors API Level 2 规范为Element 类型新增了一个方法matchesSelector()。这个方法接收一个参数，即CSS 选择符，如果调用元素与该选择符匹配，返回true；否则，返回false。
+
+*目前已不支持*
+
+### 元素遍历
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## 第二十章 JSON
 
