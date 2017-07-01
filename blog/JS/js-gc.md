@@ -2305,6 +2305,15 @@ Selectors API Level 2 规范为Element 类型新增了一个方法matchesSelecto
 
 ### 元素遍历
 
+对于元素间的空格，IE9 及之前版本不会返回文本节点，而其他所有浏览器都会返回文本节点。这样，就导致了在使用childNodes 和firstChild 等属性时的行为不一致。为了弥补这一差异，而同时又保持DOM规范不变，Element Traversal 规范（www.w3.org/TR/ElementTraversal/）新定义了一组属性。
+
+Element Traversal API 为DOM元素添加了以下5 个属性。
+
+- childElementCount：返回子元素（不包括文本节点和注释）的个数。
+- firstElementChild：指向第一个子元素；firstChild 的元素版。
+- lastElementChild：指向最后一个子元素；lastChild 的元素版。
+- previousElementSibling：指向前一个同辈元素；previousSibling 的元素版。
+- nextElementSibling：指向后一个同辈元素；nextSibling 的元素版。
 
 
 
