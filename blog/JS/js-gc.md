@@ -2315,19 +2315,289 @@ Element Traversal API 为DOM元素添加了以下5 个属性。
 - previousElementSibling：指向前一个同辈元素；previousSibling 的元素版。
 - nextElementSibling：指向后一个同辈元素；nextSibling 的元素版。
 
+支持的浏览器为DOM 元素添加了这些属性，利用这些元素不必担心空白文本节点，从而可以更方便地查找DOM 元素了。
 
+### HTML5
 
+#### 与类相关的扩充
 
+**1. getElementsByClassName()方法**
 
+getElementsByClassName()方法接收一个参数，即一个包含一或多个类名的字符串，返回带有指定类的所有元素的NodeList。传入多个类名时，类名的先后顺序不重要。
 
+**2. classList 属性**
 
+在操作类名时，需要通过className 属性添加、删除和替换类名。因为className 中是一个字符串，所以即使只修改字符串一部分，也必须每次都设置整个字符串的值。
 
+HTML5 新增了一种操作类名的方式，可以让操作更简单也更安全，那就是为所有元素添加classList 属性。这个classList 属性是新集合类型DOMTokenList 的实例。与其他DOM 集合类似，DOMTokenList 有一个表示自己包含多少元素的length 属性，而要取得每个元素可以使用item()方法，也可以使用方括号语法。此外，这个新类型还定义如下方法。
 
+- add(value)：将给定的字符串值添加到列表中。如果值已经存在，就不添加了。
+- contains(value)：表示列表中是否存在给定的值，如果存在则返回true，否则返回false。
+- remove(value)：从列表中删除给定的字符串。
+- toggle(value)：如果列表中已经存在给定的值，删除它；如果列表中没有给定的值，添加它。
 
+使用例子如下：
 
+``` js
+//删除"disabled"类
+div.classList.remove("disabled");
+//添加"current"类
+div.classList.add("current");
+//切换"user"类
+div.classList.toggle("user");
+//确定元素中是否包含既定的类名
+if (div.classList.contains("bd") && !div.classList.contains("disabled")){
+//执行操作
+)
+//迭代类名
+for (var i=0, len=div.classList.length; i < len; i++){
+  doSomething(div.classList[i]);
+}
+// >
+```
+有了classList 属性，除非你需要全部删除所有类名，或者完全重写元素的class 属性，否则也就用不到className 属性了。
 
+支持classList 属性的浏览器有Firefox 3.6+和Chrome。
 
+#### 焦点管理
 
+HTML5 也添加了辅助管理DOM 焦点的功能。首先就是document.activeElement 属性，这个属性始终会引用DOM 中当前获得了焦点的元素。元素获得焦点的方式有页面加载、用户输入（通常是通过按Tab 键）和在代码中调用focus()方法。来看几个例子。
+
+``` js
+var button = document.getElementById("myButton");
+button.focus();
+alert(document.activeElement === button); //true
+```
+
+默认情况下，文档刚刚加载完成时，document.activeElement 中保存的是document.body 元素的引用。文档加载期间，document.activeElement 的值为null。另外就是新增了document.hasFocus()方法，这个方法用于确定文档是否获得了焦点。
+
+``` js
+var button = document.getElementById("myButton");
+button.focus();
+alert(document.hasFocus()); //true
+```
+
+通过检测文档是否获得了焦点，可以知道用户是不是正在与页面交互。查询文档获知哪个元素获得了焦点，以及确定文档是否获得了焦点，这两个功能最重要的用途是提高Web 应用的无障碍性。无障碍Web 应用的一个主要标志就是恰当的焦点管理，而确切地知道哪个元素获得了焦点是一个极大的进步，至少我们不用再像过去那样靠猜测了。
+
+#### HTMLDocument的变化
+
+**1. readyState 属性**
+
+IE4 最早为document 对象引入了readyState 属性。然后，其他浏览器也都陆续添加这个属性，最终HTML5 把这个属性纳入了标准当中。Document 的readyState 属性有两个可能的值：
+
+- loading，正在加载文档；
+- complete，已经加载完文档。
+
+使用document.readyState 的最恰当方式，就是通过它来实现一个指示文档已经加载完成的指示器。在这个属性得到广泛支持之前，要实现这样一个指示器，必须借助onload 事件处理程序设置一个标签，表明文档已经加载完毕。document.readyState 属性的基本用法如下。
+
+``` js
+if (document.readyState == "complete"){
+  //执行操作
+}
+```
+
+**2. 兼容模式**
+
+自从IE6 开始区分渲染页面的模式是标准的还是混杂的，检测页面的兼容模式就成为浏览器的必要功能。IE 为此给document 添加了一个名为compatMode 的属性，这个属性就是为了告诉开发人员浏览器采用了哪种渲染模式。就像下面例子中所展示的那样，在标准模式下，document.compatMode 的值等于"CSS1Compat"，而在混杂模式下，document.compatMode 的值等于"BackCompat"。
+
+``` js
+if (document.compatMode == "CSS1Compat"){
+  alert("Standards mode");
+} else {
+  alert("Quirks mode");
+}
+```
+
+**3. head 属性**
+
+作为对document.body 引用文档的<body>元素的补充，HTML5 新增了document.head 属性，引用文档的<head>元素。
+
+#### 字符集属性
+
+HTML5 新增了几个与文档字符集有关的属性。其中，charset 属性表示文档中实际使用的字符集，也可以用来指定新字符集。默认情况下，这个属性的值为"UTF-16"，但可以通过<meta>元素、响应头部或直接设置charset 属性修改这个值。来看一个例子。
+
+``` js
+alert(document.charset); //"UTF-16"
+document.charset = "UTF-8";
+```
+
+另一个属性是defaultCharset，表示根据默认浏览器及操作系统的设置，当前文档默认的字符集应该是什么。如果文档没有使用默认的字符集，那charset 和defaultCharset 属性的值可能会不一样，例如：
+
+``` js
+if (document.charset != document.defaultCharset){
+  alert("Custom character set being used.");
+}
+```
+
+通过这两个属性可以得到文档使用的字符编码的具体信息，也能对字符编码进行准确地控制。运行适当的情况下，可以保证用户正常查看页面或使用应用。
+
+#### 自定义数据属性
+
+HTML5 规定可以为元素添加非标准的属性，但要添加前缀data-，目的是为元素提供与渲染无关的信息，或者提供语义信息。这些属性可以任意添加、随便命名，只要以data-开头即可。来看一个例子。
+
+``` js
+<div id="myDiv" data-appId="12345" data-myname="Nicholas"></div>
+```
+
+添加了自定义属性之后，可以通过元素的dataset 属性来访问自定义属性的值。dataset 属性的值是DOMStringMap 的一个实例，也就是一个名值对儿的映射。在这个映射中，每个data-name 形式的属性都会有一个对应的属性，只不过属性名没有data-前缀（比如，自定义属性是data-myname，那映射中对应的属性就是myname）。
+
+如果需要给元素添加一些不可见的数据以便进行其他处理，那就要用到自定义数据属性。在跟踪链接或混搭应用中，通过自定义数据属性能方便地知道点击来自页面中的哪个部分。
+
+**1. innerHTML 属性**
+
+在读模式下，innerHTML 属性返回与调用元素的所有子节点（包括元素、注释和文本节点）对应的HTML 标记。在写模式下，innerHTML 会根据指定的值创建新的DOM树，然后用这个DOM树完全替换调用元素原先的所有子节点。
+
+但是，不同浏览器返回的文本格式会有所不同。IE 和Opera 会将所有标签转换为大写形式，而Safari、Chrome 和Firefox 则会原原本本地按照原先文档中（或指定这些标签时）的格式返回HTML，包括空格和缩进。不要指望所有浏览器返回的innerHTML 值完全相同。
+
+在写模式下，innerHTML 的值会被解析为DOM 子树，替换调用元素原来的所有子节点。因为它的值被认为是HTML，所以其中的所有标签都会按照浏览器处理HTML 的标准方式转换为元素（同样，这里的转换结果也因浏览器而异）。如果设置的值仅是文本而没有HTML 标签，那么结果就是设置纯文本
+
+*为innerHTML 设置HTML 字符串后，浏览器会将这个字符串解析为相应的DOM树。因此设置了innerHTML 之后，再从中读取HTML 字符串，会得到与设置时不一样的结果。原因在于返回的字符串是根据原始HTML 字符串创建的DOM树经过序列化之后的结果。*
+
+**2. outerHTML 属性**
+
+在读模式下，outerHTML 返回调用它的元素及所有子节点的HTML 标签。在写模式下，outerHTML会根据指定的HTML 字符串创建新的DOM 子树，然后用这个DOM子树完全替换调用元素。
+
+**3. insertAdjacentHTML()方法**
+
+插入标记的最后一个新增方式是insertAdjacentHTML()方法。这个方法最早也是在IE 中出现的，它接收两个参数：插入位置和要插入的HTML 文本。第一个参数必须是下列值之一：
+
+- "beforebegin"，在当前元素之前插入一个紧邻的同辈元素；
+- "afterbegin"，在当前元素之下插入一个新的子元素或在第一个子元素之前再插入新的子元素；
+- "beforeend"，在当前元素之下插入一个新的子元素或在最后一个子元素之后再插入新的子元素；
+- "afterend"，在当前元素之后插入一个紧邻的同辈元素。
+
+注意，这些值都必须是小写形式。第二个参数是一个HTML 字符串（与innerHTML 和outerHTML的值相同），如果浏览器无法解析该字符串，就会抛出错误。以下是这个方法的基本用法示例。
+
+``` js
+//作为前一个同辈元素插入
+element.insertAdjacentHTML("beforebegin", "<p>Hello world!</p>");
+//作为第一个子元素插入
+element.insertAdjacentHTML("afterbegin", "<p>Hello world!</p>");
+//作为最后一个子元素插入
+element.insertAdjacentHTML("beforeend", "<p>Hello world!</p>");
+//作为后一个同辈元素插入
+element.insertAdjacentHTML("afterend", "<p>Hello world!</p>");
+```
+
+支持insertAdjacentHTML()方法的浏览器有IE、Firefox 8+、Safari、Opera 和Chrome。
+
+**4. 内存与性能问题**
+
+使用本节介绍的方法替换子节点可能会导致浏览器的内存占用问题，尤其是在IE 中，问题更加明显。在删除带有事件处理程序或引用了其他JavaScript 对象子树时，就有可能导致内存占用问题。假设某个元素有一个事件处理程序（或者引用了一个JavaScript 对象作为属性），在使用前述某个属性将该元素从文档树中删除后，元素与事件处理程序（或JavaScript 对象）之间的绑定关系在内存中并没有一并删除。如果这种情况频繁出现，页面占用的内存数量就会明显增加。因此，在使用innerHTML、outerHTML 属性和insertAdjacentHTML()方法时，最好先手工删除要被替换的元素的所有事件处理
+程序和JavaScript 对象属性。
+
+不过，使用这几个属性——特别是使用innerHTML，仍然还是可以为我们提供很多便利的。一般来说，在插入大量新HTML 标记时，使用innerHTML 属性与通过多次DOM 操作先创建节点再指定它们之间的关系相比，效率要高得多。这是因为在设置innerHTML 或outerHTML 时，就会创建一个HTML解析器。这个解析器是在浏览器级别的代码（通常是C++编写的）基础上运行的，因此比执行JavaScript快得多。不可避免地，创建和销毁HTML 解析器也会带来性能损失，所以最好能够将设置innerHTML或outerHTML 的次数控制在合理的范围内。
+
+#### scrollIntoView()方法
+
+如何滚动页面也是DOM 规范没有解决的一个问题。为了解决这个问题，浏览器实现了一些方法，以方便开发人员更好地控制页面滚动。在各种专有方法中，HTML5 最终选择了scrollIntoView()作为标准方法。
+
+scrollIntoView()可以在所有HTML 元素上调用，通过滚动浏览器窗口或某个容器元素，调用元素就可以出现在视口中。如果给这个方法传入true 作为参数，或者不传入任何参数，那么窗口滚动之后会让调用元素的顶部与视口顶部尽可能平齐。如果传入false 作为参数，调用元素会尽可能全部出现在视口中，（可能的话，调用元素的底部会与视口顶部平齐。）不过顶部不一定平齐，例如：
+
+``` js
+//让元素可见
+document.forms[0].scrollIntoView();
+```
+
+当页面发生变化时，一般会用这个方法来吸引用户的注意力。实际上，为某个元素设置焦点也会导致浏览器滚动并显示出获得焦点的元素。
+
+### 专有扩展
+
+#### 文档模式
+
+IE8 引入了一个新的概念叫“文档模式”（document mode）。页面的文档模式决定了可以使用什么功能。换句话说，文档模式决定了你可以使用哪个级别的CSS，可以在JavaScript 中使用哪些API，以及如何对待文档类型（doctype）。到了IE9，总共有以下4 种文档模式。
+
+- IE5：以混杂模式渲染页面（IE5 的默认模式就是混杂模式）。IE8 及更高版本中的新功能都无法使用。
+- IE7：以IE7 标准模式渲染页面。IE8 及更高版本中的新功能都无法使用。
+- IE8：以IE8 标准模式渲染页面。IE8 中的新功能都可以使用，因此可以使用Selectors API、更多CSS2 级选择符和某些CSS3 功能，还有一些HTML5 的功能。不过IE9 中的新功能无法使用。
+- IE9：以IE9 标准模式渲染页面。IE9 中的新功能都可以使用，比如ECMAScript 5、完整的CSS3以及更多HTML5 功能。这个文档模式是最高级的模式。
+
+要理解IE8 及更高版本的工作原理，必须理解文档模式。
+要强制浏览器以某种模式渲染页面，可以使用HTTP 头部信息X-UA-Compatible，或通过等价的<meta>标签来设置：
+
+``` xml
+<meta http-equiv="X-UA-Compatible" content="IE=IEVersion">
+```
+
+注意，这里IE 的版本（IEVersion）有以下一些不同的值，而且这些值并不一定与上述4 种文档模式对应。
+
+- Edge：始终以最新的文档模式来渲染页面。忽略文档类型声明。对于IE8，始终保持以IE8 标准模式渲染页面。对于IE9，则以IE9 标准模式渲染页面。
+- EmulateIE9：如果有文档类型声明，则以IE9 标准模式渲染页面，否则将文档模式设置为IE5。
+- EmulateIE8：如果有文档类型声明，则以IE8 标准模式渲染页面，否则将文档模式设置为IE5。
+- EmulateIE7：如果有文档类型声明，则以IE7 标准模式渲染页面，否则将文档模式设置为IE5。
+- 9：强制以IE9 标准模式渲染页面，忽略文档类型声明。
+- 8：强制以IE8 标准模式渲染页面，忽略文档类型声明。
+- 7：强制以IE7 标准模式渲染页面，忽略文档类型声明。
+- 5：强制将文档模式设置为IE5，忽略文档类型声明。
+
+比如，要想让文档模式像在IE7 中一样，可以使用下面这行代码：
+
+``` xml
+<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7">
+```
+
+如果不打算考虑文档类型声明，而直接使用IE7 标准模式，那么可以使用下面这行代码：
+
+``` xml
+<meta http-equiv="X-UA-Compatible" content="IE=7">
+```
+
+没有规定说必须在页面中设置X-UA-Compatible。默认情况下，浏览器会通过文档类型声明来确定是使用最佳的可用文档模式，还是使用混杂模式。
+通过document.documentMode 属性可以知道给定页面使用的是什么文档模式。这个属性是IE8中新增的，它会返回使用的文档模式的版本号（在IE9 中，可能返回的版本号为5、7、8、9）：
+
+``` js
+var mode = document.documentMode;
+```
+
+知道页面采用的是什么文档模式，有助于理解页面的行为方式。无论在什么文档模式下，都可以访问这个属性。
+
+#### children属性
+
+由于IE9 之前的版本与其他浏览器在处理文本节点中的空白符时有差异，因此就出现了children属性。这个属性是HTMLCollection 的实例，只包含元素中同样还是元素的子节点。除此之外，children 属性与childNodes 没有什么区别，即在元素只包含元素子节点时，这两个属性的值相同。
+下面是访问children 属性的示例代码：
+
+``` js
+var childCount = element.children.length;
+var firstChild = element.children[0];
+```
+
+支持children 属性的浏览器有IE5、Firefox 3.5、Safari 2（但有bug）、Safari 3（完全支持）、Opera8和Chrome（所有版本）。IE8 及更早版本的children 属性中也会包含注释节点，但IE9 之后的版本则只返回元素节点。
+
+#### contains()方法
+
+在实际开发中，经常需要知道某个节点是不是另一个节点的后代。IE 为此率先引入了contains()方法，以便不通过在DOM文档树中查找即可获得这个信息。调用contains()方法的应该是祖先节点，也就是搜索开始的节点，这个方法接收一个参数，即要检测的后代节点。如果被检测的节点是后代节点，该方法返回true；否则，返回false。
+
+使用DOM Level 3 compareDocumentPosition()也能够确定节点间的关系。支持这个方法的浏览器有IE9+、Firefox、Safari、Opera 9.5+和Chrome。如前所述，这个方法用于确定两个节点间的关系，返回一个表示该关系的位掩码（ bitmask）。下表列出了这个位掩码的值。
+
+|掩码 |节点关系|
+|--|--|
+|1 |无关（给定的节点不在当前文档中）
+|2 |居前（给定的节点在DOM树中位于参考节点之前）
+|4 |居后（给定的节点在DOM树中位于参考节点之后）
+|8 |包含（给定的节点是参考节点的祖先）
+|16 |被包含（给定的节点是参考节点的后代）
+
+#### 插入文本
+
+**1. innerText 属性**
+
+通过innertText 属性可以操作元素中包含的所有文本内容，包括子文档树中的文本。在通过innerText 读取值时，它会按照由浅入深的顺序，将子文档树中的所有文本拼接起来。在通过innerText 写入值时，结果会删除元素的所有子节点，插入包含相应文本值的文本节点。
+
+*innerText 与textContent 返回的内容并不完全一样。比如，innerText 会忽略行内的样式和脚本，而textContent 则会像返回其他文本一样返回行内的样式和脚本代码。避免跨浏览器兼容问题的最佳途径，就是从不包含行内样式或行内脚本的DOM 子树副本或DOM片段中读取文本。*
+
+**2. outerText 属性**
+
+除了作用范围扩大到了包含调用它的节点之外，outerText 与innerText 基本上没有多大区别。在读取文本值时，outerText 与innerText 的结果完全一样。但在写模式下，outerText 就完全不同了：outerText 不只是替换调用它的元素的子节点，而是会替换整个元素（包括子节点）。
+
+#### 滚动
+
+HTML5 之前的规范并没有就与页面滚动相关的API 做出任何规定。但HTML5 在将scrollIntoView()纳入规范之后，仍然还有其他几个专有方法可以在不同的浏览器中使用。下面列出的几个方法都是对HTMLElement 类型的扩展，因此在所有元素中都可以调用。
+
+- scrollIntoViewIfNeeded(alignCenter)：只在当前元素在视口中不可见的情况下，才滚动浏览器窗口或容器元素，最终让它可见。如果当前元素在视口中可见，这个方法什么也不做。如果将可选的alignCenter 参数设置为true，则表示尽量将元素显示在视口中部（垂直方向）。Safari 和Chrome 实现了这个方法。
+- scrollByLines(lineCount)：将元素的内容滚动指定的行高，lineCount 值可以是正值，也可以是负值。Safari 和Chrome 实现了这个方法。
+- scrollByPages(pageCount)：将元素的内容滚动指定的页面高度，具体高度由元素的高度决定。Safari 和Chrome 实现了这个方法。
+
+*scrollIntoView()和scrollIntoViewIfNeeded()的作用对象是元素的容器，而scrollByLines()和scrollByPages()影响的则是元素自身。*
 
 
 
