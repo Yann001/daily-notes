@@ -2599,6 +2599,123 @@ HTML5 之前的规范并没有就与页面滚动相关的API 做出任何规定�
 
 *scrollIntoView()和scrollIntoViewIfNeeded()的作用对象是元素的容器，而scrollByLines()和scrollByPages()影响的则是元素自身。*
 
+## 第十二章 DOM2和DOM3
+
+DOM2 级和3 级的目的在于扩展DOM API，以满足操作XML 的所有需求，同时提供更好的错误处理及特性检测能力。从某种意义上讲，实现这一目的很大程度意味着对命名空间的支持。“DOM2 级核心”没有引入新类型，它只是在DOM1 级的基础上通过增加新方法和新属性来增强了既有类型。“DOM3级核心”同样增强了既有类型，但也引入了一些新类型。
+
+### DOM 变化
+
+**1. 针对XML命名空间的变化**
+
+有了XML 命名空间，不同XML 文档的元素就可以混合在一起，共同构成格式良好的文档，而不必担心发生命名冲突。从技术上说，HTML 不支持XML 命名空间，但XHTML 支持XML 命名空间。
+
+**2. 其他方面的变化**
+
+1. DocumentType 类型的变化
+DocumentType 类型新增了3 个属性：publicId、systemId 和internalSubset。其中，前两个属性表示的是文档类型声明中的两个信息段，这两个信息段在DOM1 级中是没有办法访问到的。
+
+2. Document 类型的变化
+Document 类型的变化中唯一与命名空间无关的方法是importNode()。这个方法的用途是从一个文档中取得一个节点，然后将其导入到另一个文档，使其成为这个文档结构的一部分。需要注意的是，每个节点都有一个ownerDocument 属性，表示所属的文档。如果调用appendChild()时传入的节点属于不同的文档（ownerDocument 属性的值不一样），则会导致错误。但在调用importNode()时传入不同文档的节点则会返回一个新节点，这个新节点的所有权归当前文档所有。
+
+### 样式
+
+在HTML 中定义样式的方式有3 种：通过<link/>元素包含外部样式表文件、使用<style/>元素定义嵌入式样式，以及使用style 特性定义针对特定元素的样式。“DOM2 级样式”模块围绕这3 种应用样式的机制提供了一套API。要确定浏览器是否支持DOM2 级定义的CSS 能力，可以使用下列代码。
+
+``` js
+var supportsDOM2CSS = document.implementation.hasFeature("CSS", "2.0");
+var supportsDOM2CSS2 = document.implementation.hasFeature("CSS2", "2.0");
+```
+
+#### 访问元素的样式
+
+任何支持style 特性的HTML 元素在JavaScript 中都有一个对应的style 属性。这个style 对象是CSSStyleDeclaration 的实例，包含着通过HTML 的style 特性指定的所有样式信息，但不包含与外部样式表或嵌入样式表经层叠而来的样式。在style 特性中指定的任何CSS 属性都将表现为这个style 对象的相应属性。对于使用短划线（分隔不同的词汇，例如background-image）的CSS 属性名，必须将其转换成驼峰大小写形式，才能通过JavaScript 来访问。下表列出了几个常见的CSS 属性及其在style 对象中对应的属性名。
+
+多数情况下，都可以通过简单地转换属性名的格式来实现转换。其中一个不能直接转换的CSS 属性就是float。由于float 是JavaScript 中的保留字，因此不能用作属性名。“DOM2 级样式”规范规定样式对象上相应的属性名应该是cssFloat；Firefox、Safari、Opera 和Chrome 都支持这个属性，而IE支持的则是styleFloat。
+
+*在标准模式下，所有度量值都必须指定一个度量单位。在混杂模式下，可以将style.width 设置为"20"，浏览器会假设它是"20px"；但在标准模式下，将style.width 设置为"20"会导致被忽略——因为没有度量单位。在实践中，最好始终都指定度量单位。*
+
+**1. DOM 样式属性和方法**
+
+“DOM2级样式”规范还为style 对象定义了一些属性和方法。这些属性和方法在提供元素的style特性值的同时，也可以修改样式。下面列出了这些属性和方法。
+
+- cssText：如前所述，通过它能够访问到style 特性中的CSS 代码。
+- length：应用给元素的CSS 属性的数量。
+- parentRule：表示CSS 信息的CSSRule 对象。本节后面将讨论CSSRule 类型。
+- getPropertyCSSValue(propertyName)：返回包含给定属性值的CSSValue 对象。
+- getPropertyPriority(propertyName)：如果给定的属性使用了!important 设置，则返回"important"；否则，返回空字符串。
+- getPropertyValue(propertyName)：返回给定属性的字符串值。
+- item(index)：返回给定位置的CSS 属性的名称。
+- removeProperty(propertyName)：从样式中删除给定属性。
+- setProperty(propertyName,value,priority)：将给定属性设置为相应的值，并加上优先权标志（"important"或者一个空字符串）。
+
+通过cssText 属性可以访问style 特性中的CSS代码。在读取模式下，cssText 返回浏览器对style特性中CSS 代码的内部表示。在写入模式下，赋给cssText 的值会重写整个style 特性的值；也就是说，以前通过style 特性指定的样式信息都将丢失。例如，如果通过style 特性为元素设置了边框，然后再以不包含边框的规则重写cssText，那么就会抹去元素上的边框。
+
+设置cssText 是为元素应用多项变化最快捷的方式，因为可以一次性地应用所有变化。设计length 属性的目的，就是将其与item()方法配套使用，以便迭代在元素中定义的CSS 属性。在使用length 和item()时，style 对象实际上就相当于一个集合，都可以使用方括号语法来代替item()来取得给定位置的CSS 属性。
+
+**2. 计算的样式**
+
+虽然style 对象能够提供支持style 特性的任何元素的样式信息，但它不包含那些从其他样式表层叠而来并影响到当前元素的样式信息。“DOM2 级样式”增强了document.defaultView，提供了getComputedStyle()方法。这个方法接受两个参数：要取得计算样式的元素和一个伪元素字符串（例如":after"）。如果不需要伪元素信息，第二个参数可以是null。getComputedStyle()方法返回一个CSSStyleDeclaration 对象（与style 属性的类型相同），其中包含当前元素的所有计算的样式。
+
+IE 不支持getComputedStyle()方法，但它有一种类似的概念。在IE 中，每个具有style 属性的元素还有一个currentStyle 属性。这个属性是CSSStyleDeclaration 的实例，包含当前元素全部计算后的样式。取得这些样式的方式也差不多。
+
+#### 操作样式表
+
+。。。
+
+#### 元素大小
+
+**1. 偏移量**
+
+元素的可见大小由其高度、宽度决定，包括所有内边距、滚动条和边框大小（注意，不包括外边距）。通过下列4 个属性可以取得元素的偏移量。
+
+- offsetHeight：元素在垂直方向上占用的空间大小，以像素计。包括元素的高度、（可见的）水平滚动条的高度、上边框高度和下边框高度。
+- offsetWidth：元素在水平方向上占用的空间大小，以像素计。包括元素的宽度、（可见的）垂直滚动条的宽度、左边框宽度和右边框宽度。
+- offsetLeft：元素的左外边框至包含元素的左内边框之间的像素距离。
+- offsetTop：元素的上外边框至包含元素的上内边框之间的像素距离。
+
+其中，offsetLeft 和offsetTop 属性与包含元素有关，包含元素的引用保存在offsetParent属性中。offsetParent 属性不一定与parentNode 的值相等。例如，<td>元素的offsetParent 是作为其祖先元素的<table>元素，因为<table>是在DOM层次中距<td>最近的一个具有大小的元素。
+
+*所有这些偏移量属性都是只读的，而且每次访问它们都需要重新计算。因此，应该尽量避免重复访问这些属性；如果需要重复使用其中某些属性的值，可以将它们保存在局部变量中，以提高性能。*
+
+**2. 客户区大小**
+
+元素的客户区大小（client dimension），指的是元素内容及其内边距所占据的空间大小。有关客户区大小的属性有两个：clientWidth 和clientHeight。其中，clientWidth 属性是元素内容区宽度加上左右内边距宽度；clientHeight 属性是元素内容区高度加上上下内边距高度。
+
+**3. 滚动大小**
+
+最后要介绍的是滚动大小（scroll dimension），指的是包含滚动内容的元素的大小。有些元素（例如<html>元素），即使没有执行任何代码也能自动地添加滚动条；但另外一些元素，则需要通过CSS 的overflow 属性进行设置才能滚动。以下是4 个与滚动大小相关的属性。
+
+- scrollHeight：在没有滚动条的情况下，元素内容的总高度。
+- scrollWidth：在没有滚动条的情况下，元素内容的总宽度。
+- scrollLeft：被隐藏在内容区域左侧的像素数。通过设置这个属性可以改变元素的滚动位置。
+- scrollTop：被隐藏在内容区域上方的像素数。通过设置这个属性可以改变元素的滚动位置。
+
+**4. 确定元素大小**
+
+IE、Firefox 3+、Safari 4+、Opera 9.5 及Chrome 为每个元素都提供了一个getBoundingClientRect()方法。这个方法返回会一个矩形对象，包含4 个属性：left、top、right 和bottom。这些属性给出了元素在页面中相对于视口的位置。但是，浏览器的实现稍有不同。IE8 及更早版本认为文档的左上角坐标是(2, 2)，而其他浏览器包括IE9 则将传统的(0,0)作为起点坐标。因此，就需要在一开始检查一下位于(0,0)处的元素的位置，在IE8 及更早版本中，会返回(2,2)，而在其他浏览器中会返回(0,0)。
+
+### 遍历
+
+**1. NodeIterator**
+
+**2. TreeWalker**
+
+### 范围
+
+为了让开发人员更方便地控制页面，“DOM2 级遍历和范围”模块定义了“范围”（range）接口。通过范围可以选择文档中的一个区域，而不必考虑节点的界限（选择在后台完成，对用户是不可见的）。在常规的DOM 操作不能更有效地修改文档时，使用范围往往可以达到目的。Firefox、Opera、Safari 和Chrome 都支持DOM 范围。IE 以专有方式实现了自己的范围特性。
+
+#### DOM中的范围
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## 第二十章 JSON
