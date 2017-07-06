@@ -3563,8 +3563,417 @@ DOM3 级还定义了“自定义事件”。自定义事件不是由DOM 原生�
 
 调用document.createEventObject()方法可以在IE 中创建event 对象。但与DOM方式不同的是，这个方法不接受参数，结果会返回一个通用的event 对象。然后，你必须手工为这个对象添加所有必要的信息（没有方法来辅助完成这一步骤）。最后一步就是在目标上调用fireEvent()方法，这个方法接受两个参数：事件处理程序的名称和event 对象。在调用fireEvent()方法时，会自动为event 对象添加srcElement 和type 属性；其他属性则都是必须通过手工添加的。换句话说，模拟任何IE 支持的事件都采用相同的模式。
 
+## 第十四章 表单脚本
 
+### 表单基础知识
 
+在HTML 中，表单是由<form>元素来表示的，而在JavaScript 中，表单对应的则是HTMLForm-Element 类型。HTMLFormElement 继承了HTMLElement，因而与其他HTML 元素具有相同的默认属性。不过，HTMLFormElement 也有它自己下列独有的属性和方法。
+
+- acceptCharset：服务器能够处理的字符集；等价于HTML 中的accept-charset 特性。
+- action：接受请求的URL；等价于HTML 中的action 特性。
+- elements：表单中所有控件的集合（HTMLCollection）。
+- enctype：请求的编码类型；等价于HTML 中的enctype 特性。
+- length：表单中控件的数量。
+- method：要发送的HTTP 请求类型，通常是"get"或"post"；等价于HTML 的method 特性。
+- name：表单的名称；等价于HTML 的name 特性。
+- reset()：将所有表单域重置为默认值。
+- submit()：提交表单。
+- target：用于发送请求和接收响应的窗口名称；等价于HTML 的target 特性。
+
+取得<form>元素引用的方式有好几种。其中最常见的方式就是将它看成与其他元素一样，并为其添加id 特性，然后再像下面这样使用getElementById()方法找到它。
+
+``` js
+var form = document.getElementById("form1");
+```
+
+其次，通过document.forms 可以取得页面中所有的表单。在这个集合中，可以通过数值索引或name 值来取得特定的表单。
+
+#### 提交表单
+
+用户单击提交按钮或图像按钮时，就会提交表单。使用<input>或<button>都可以定义提交按钮，只要将其type 特性的值设置为"submit"即可，而图像按钮则是通过将<input>的type 特性值设置为"image"来定义的。因此，只要我们单击以下代码生成的按钮，就可以提交表单。
+
+``` xml
+<!-- 通用提交按钮 -->
+<input type="submit" value="Submit Form">
+<!-- 自定义提交按钮 -->
+<button type="submit">Submit Form</button>
+<!-- 图像按钮 -->
+<input type="image" src="graphic.gif">
+```
+
+只要表单中存在上面列出的任何一种按钮，那么在相应表单控件拥有焦点的情况下，按回车键就可以提交该表单。（textarea 是一个例外，在文本区中回车会换行。）如果表单里没有提交按钮，按回车键不会提交表单。
+
+以这种方式提交表单时，浏览器会在将请求发送给服务器之前触发submit 事件。这样，我们就有机会验证表单数据，并据以决定是否允许表单提交。阻止这个事件的默认行为就可以取消表单提交
+
+在JavaScript 中，以编程方式调用submit()方法也可以提交表单。而且，这种方式无需表单包含提交按钮，任何时候都可以正常提交表单。来看一个例子。
+
+``` js
+var form = document.getElementById("myForm");
+//提交表单
+form.submit();
+```
+
+在以调用submit()方法的形式提交表单时，不会触发submit 事件，因此要记得在调用此方法之前先验证表单数据。
+
+提交表单时可能出现的最大问题，就是重复提交表单。在第一次提交表单后，如果长时间没有反应，用户可能会变得不耐烦。这时候，他们也许会反复单击提交按钮。结果往往很麻烦（因为服务器要处理重复的请求），或者会造成错误（如果用户是下订单，那么可能会多订好几份）。解决这一问题的办法有两个：在第一次提交表单后就禁用提交按钮，或者利用onsubmit 事件处理程序取消后续的表单提交操作。
+
+#### 重置表单
+
+在用户单击重置按钮时，表单会被重置。使用type 特性值为"reset"的<input>或<button>都可以创建重置按钮，如下面的例子所示。
+
+``` xml
+<!-- 通用重置按钮 -->
+<input type="reset" value="Reset Form">
+<!-- 自定义重置按钮 -->
+<button type="reset">Reset Form</button>
+```
+
+这两个按钮都可以用来重置表单。在重置表单时，所有表单字段都会恢复到页面刚加载完毕时的初始值。如果某个字段的初始值为空，就会恢复为空；而带有默认值的字段，也会恢复为默认值。
+用户单击重置按钮重置表单时，会触发reset 事件。利用这个机会，我们可以在必要时取消重置操作。例如，下面展示了阻止重置表单的代码。
+
+``` js
+var form = document.getElementById("myForm");
+EventUtil.addHandler(form, "reset", function(event){
+  //取得事件对象
+  event = EventUtil.getEvent(event);
+  //阻止表单重置
+  EventUtil.preventDefault(event);
+});
+```
+
+与提交表单一样，也可以通过JavaScript 来重置表单，如下面的例子所示。
+
+``` js
+var form = document.getElementById("myForm");
+//重置表单
+form.reset();
+```
+
+与调用submit()方法不同，调用reset()方法会像单击重置按钮一样触发reset 事件。
+
+#### 表单字段
+
+可以像访问页面中的其他元素一样，使用原生DOM 方法访问表单元素。此外，每个表单都有elements 属性，该属性是表单中所有表单元素（字段）的集合。这个elements 集合是一个有序列表，其中包含着表单中的所有字段，例如<input>、<textarea>、<button>和<fieldset>。每个表单字段在elements 集合中的顺序，与它们出现在标记中的顺序相同，可以按照位置和name 特性来访问它们。
+
+如果有多个表单控件都在使用一个name（如单选按钮），那么就会返回以该name 命名的一个NodeList。
+
+**1. 共有的表单字段属性**
+
+除了<fieldset>元素之外，所有表单字段都拥有相同的一组属性。由于<input>类型可以表示多种表单字段，因此有些属性只适用于某些字段，但还有一些属性是所有字段所共有的。表单字段共有的属性如下。
+
+- disabled：布尔值，表示当前字段是否被禁用。
+- form：指向当前字段所属表单的指针；只读。
+- name：当前字段的名称。
+- readOnly：布尔值，表示当前字段是否只读。
+- tabIndex：表示当前字段的切换（tab）序号。
+- type：当前字段的类型，如"checkbox"、"radio"，等等。
+- value：当前字段将被提交给服务器的值。对文件字段来说，这个属性是只读的，包含着文件在计算机中的路径。
+
+除了form 属性之外，可以通过JavaScript 动态修改其他任何属性。
+
+除了<fieldset>之外，所有表单字段都有type 属性。对于<input>元素，这个值等于HTML 特性type 的值。对于其他元素，这个type 属性的值如下表所列。
+
+|说 明 |HTML示例 |type属性的值
+|--|--|--|
+|单选列表 |<select>...</select> |"select-one"
+|多选列表 |<select multiple>...</select> |"select-multiple"
+|自定义按钮 |<button>...</button> |"submit"
+|自定义非提交按钮 |<button type="button">...</button> |"button"
+|自定义重置按钮| <button type="reset">...</buton> |"reset"
+|自定义提交按钮 |<button type="submit">...</buton> |"submit"
+
+此外，<input>和<button>元素的type 属性是可以动态修改的，而<select>元素的type 属性则是只读的。
+
+**2. 共有的表单字段方法**
+
+每个表单字段都有两个方法：focus()和 blur()。其中，focus()方法用于将浏览器的焦点设置到表单字段，即激活表单字段，使其可以响应键盘事件。例如，接收到焦点的文本框会显示插入符号，随时可以接收输入。使用focus()方法，可以将用户的注意力吸引到页面中的某个部位。例如，在页面加载完毕后，将焦点转移到表单中的第一个字段。
+
+要注意的是，如果第一个表单字段是一个<input>元素，且其type 特性的值为"hidden"，那么以上代码会导致错误。另外，如果使用CSS 的display 和visibility 属性隐藏了该字段，同样也会导致错误。
+
+HTML5 为表单字段新增了一个autofocus 属性。在支持这个属性的浏览器中，只要设置这个属性，不用JavaScript 就能自动把焦点移动到相应字段。
+
+*在默认情况下，只有表单字段可以获得焦点。对于其他元素而言，如果先将其tabIndex 属性设置为-1，然后再调用focus()方法，也可以让这些元素获得焦点。只有Opera 不支持这种技术。*
+
+与focus()方法相对的是blur()方法，它的作用是从元素中移走焦点。在调用blur()方法时，并不会把焦点转移到某个特定的元素上；仅仅是将焦点从调用这个方法的元素上面移走而已。
+
+**3. 共有的表单字段事件**
+
+除了支持鼠标、键盘、更改和HTML 事件之外，所有表单字段都支持下列3 个事件。
+
+- blur：当前字段失去焦点时触发。
+- change：对于<input>和<textarea>元素，在它们失去焦点且value 值改变时触发；对于<select>元素，在其选项改变时触发。
+- focus：当前字段获得焦点时触发。
+
+当用户改变了当前字段的焦点，或者我们调用了blur()或focus()方法时，都可以触发blur 和focus 事件。这两个事件在所有表单字段中都是相同的。但是，change 事件在不同表单控件中触发的次数会有所不同。对于<input>和<textarea>元素，当它们从获得焦点到失去焦点且value 值改变时，才会触发change 事件。对于<select>元素，只要用户选择了不同的选项，就会触发change 事件；换句话说，不失去焦点也会触发change 事件。
+
+### 文本框脚本
+
+在HTML 中，有两种方式来表现文本框：一种是使用<input>元素的单行文本框，另一种是使用<textarea>的多行文本框。这两个控件非常相似，而且多数时候的行为也差不多。不过，它们之间仍然存在一些重要的区别。
+要表现文本框，必须将<input>元素的type 特性设置为"text"。而通过设置size 特性，可以指定文本框中能够显示的字符数。通过value 特性，可以设置文本框的初始值，而maxlength 特性则用于指定文本框可以接受的最大字符数。
+
+相对而言，<textarea>元素则始终会呈现为一个多行文本框。要指定文本框的大小，可以使用rows和cols 特性。其中，rows 特性指定的是文本框的字符行数，而cols 特性指定的是文本框的字符列数（类似于<inpu>元素的size 特性）。与<input>元素不同，<textarea>的初始值必须要放在<textarea>和</textarea>之间。
+
+另一个与<input>的区别在于，不能在HTML 中给<textarea>指定最大字符数。
+无论这两种文本框在标记中有什么区别，但它们都会将用户输入的内容保存在value 属性中。可以通过这个属性读取和设置文本框的值。
+
+#### 选择文本
+
+上述两种文本框都支持select()方法，这个方法用于选择文本框中的所有文本。在调用select()方法时，大多数浏览器（Opera 除外）都会将焦点设置到文本框中。这个方法不接受参数，可以在任何时候被调用。下面来看一个例子。
+
+``` js
+var textbox = document.forms[0].elements["textbox1"];
+textbox.select();
+```
+
+在文本框获得焦点时选择其所有文本，这是一种非常常见的做法，特别是在文本框包含默认值的时候。因为这样做可以让用户不必一个一个地删除文本。
+
+**1. 选择（select）事件**
+
+与select()方法对应的，是一个select 事件。在选择了文本框中的文本时，就会触发select事件。不过，到底什么时候触发select 事件，还会因浏览器而异。在IE9+、Opera、Firefox、Chrome和Safari 中，只有用户选择了文本（而且要释放鼠标），才会触发select 事件。而在IE8 及更早版本中，只要用户选择了一个字母（不必释放鼠标），就会触发select 事件。另外，在调用select()方法时也会触发select 事件。
+
+**2. 取得选择的文本**
+
+虽然通过select 事件我们可以知道用户什么时候选择了文本，但仍然不知道用户选择了什么文本。HTML5 通过一些扩展方案解决了这个问题，以便更顺利地取得选择的文本。该规范采取的办法是添加两个属性：selectionStart 和selectionEnd。这两个属性中保存的是基于0 的数值，表示所选择文本的范围（即文本选区开头和结尾的偏移量）。因此，要取得用户在文本框中选择的文本，可以使用如下代码。
+
+``` js
+function getSelectedText(textbox){
+  return textbox.value.substring(textbox.selectionStart, textbox.selectionEnd);
+}
+```
+
+IE9+、Firefox、Safari、Chrome 和Opera 都支持这两个属性。IE8 及之前版本不支持这两个属性，而是提供了另一种方案。
+IE8 及更早的版本中有一个document.selection 对象，其中保存着用户在整个文档范围内选择的文本信息；也就是说，无法确定用户选择的是页面中哪个部位的文本。不过，在与select 事件一起使用的时候，可以假定是用户选择了文本框中的文本，因而触发了该事件。要取得选择的文本，首先必须创建一个范围（第12 章讨论过），然后再将文本从其中提取出来，如下面的例子所示。
+
+``` js
+function getSelectedText(textbox){
+  if (typeof textbox.selectionStart == "number"){
+    return textbox.value.substring(textbox.selectionStart,textbox.selectionEnd);
+  } else if (document.selection){
+    return document.selection.createRange().text;
+  }
+}
+```
+
+**3. 选择部分文本**
+
+HTML5 也为选择文本框中的部分文本提供了解决方案， 即最早由Firefox 引入的setSelectionRange()方法。现在除select()方法之外，所有文本框都有一个setSelectionRange()方法。这个方法接收两个参数：要选择的第一个字符的索引和要选择的最后一个字符之后的字符的索引（类似于substring()方法的两个参数）。
+
+#### 过滤输入
+
+**1. 屏蔽字符**
+
+有时候，我们需要用户输入的文本中包含或不包含某些字符。例如，电话号码中不能包含非数值字符。如前所述，响应向文本框中插入字符操作的是keypress 事件。因此，可以通过阻止这个事件的默认行为来屏蔽此类字符。
+
+``` js
+EventUtil.addHandler(textbox, "keypress", function(event){
+  event = EventUtil.getEvent(event);
+  var target = EventUtil.getTarget(event);
+  var charCode = EventUtil.getCharCode(event);
+  // 只允许输入数字，按上下左右键或ctrl的组合键
+  if (!/\d/.test(String.fromCharCode(charCode)) && charCode > 9 &&!event.ctrlKey){
+    EventUtil.preventDefault(event);
+  }
+});
+```
+
+**2. 操作剪贴板**
+
+IE 是第一个支持与剪贴板相关事件，以及通过JavaScript 访问剪贴板数据的浏览器。IE 的实现成为了事实上的标准，不仅Safari 2、Chrome 和Firefox 3 也都支持类似的事件和剪贴板访问（Opera 不支持通过JavaScript 访问剪贴板），HTML 5 后来也把剪贴板事件纳入了规范。下列就是6 个剪贴板事件。
+
+- beforecopy：在发生复制操作前触发。
+- copy：在发生复制操作时触发。
+- beforecut：在发生剪切操作前触发。
+- cut：在发生剪切操作时触发。
+- beforepaste：在发生粘贴操作前触发。
+- paste：在发生粘贴操作时触发。
+
+由于没有针对剪贴板操作的标准，这些事件及相关对象会因浏览器而异。在Safari、Chrome 和Firefox中，beforecopy、beforecut 和beforepaste 事件只会在显示针对文本框的上下文菜单（预期将发生剪贴板事件）的情况下触发。但是，IE 则会在触发copy、cut 和paste 事件之前先行触发这些事件。至于copy、cut 和paste 事件，只要是在上下文菜单中选择了相应选项，或者使用了相应的键盘组合键，所有浏览器都会触发它们。
+
+在实际的事件发生之前，通过beforecopy、beforecut 和beforepaste 事件可以在向剪贴板发送数据，或者从剪贴板取得数据之前修改数据。不过，取消这些事件并不会取消对剪贴板的操作——只有取消copy、cut 和paste 事件，才能阻止相应操作发生。
+
+要访问剪贴板中的数据，可以使用clipboardData 对象：在IE 中，这个对象是window 对象的属性；而在Firefox 4+、Safari 和Chrome 中，这个对象是相应event 对象的属性。但是，在Firefox、Safari 和Chorme 中，只有在处理剪贴板事件期间clipboardData 对象才有效，这是为了防止对剪贴板的未授权访问；在IE 中，则可以随时访问clipboardData 对象。为了确保跨浏览器兼容性，最好只在发生剪贴板事件期间使用这个对象。
+
+这个clipboardData 对象有三个方法：getData()、setData()和clearData()。其中，getData()用于从剪贴板中取得数据，它接受一个参数，即要取得的数据的格式。在IE 中，有两种数据格式："text"和"URL"。在Firefox、Safari 和Chrome 中，这个参数是一种MIME 类型；不过，可以用"text"代表"text/plain"。
+
+类似地，setData()方法的第一个参数也是数据类型，第二个参数是要放在剪贴板中的文本。对于第一个参数，IE 照样支持"text"和"URL"，而Safari 和Chrome 仍然只支持MIME 类型。但是，与getData()方法不同的是，Safari 和Chrome 的setData()方法不能识别"text"类型。这两个浏览器在成功将文本放到剪贴板中后，都会返回true；否则，返回false。为了弥合这些差异，我们可以向EventUtil 中再添加下列方法。
+
+``` js
+var EventUtil = {
+  //省略的代码
+  getClipboardText: function (event) {
+    var clipboardData = (event.clipboardData || window.clipboardData);
+    return clipboardData.getData("text");
+  },
+  //省略的代码
+  setClipboardText: function (event, value) {
+    if (event.clipboardData) {
+      return event.clipboardData.setData("text/plain", value);
+    } else if (window.clipboardData) {
+      return window.clipboardData.setData("text", value);
+    }
+  },
+  //省略的代码
+};
+```
+
+这里的getClipboardText()方法相对简单；它只要确定clipboardData 对象的位置，然后再以"text"类型调用getData()方法即可。相应地，setClipboardText()方法则要稍微复杂一些。在取得clipboardData 对象之后，需要根据不同的浏览器实现为setData()传入不同的类型（对于Safari和Chrome，是"text/plain"；对于IE，是"text"）。
+
+在需要确保粘贴到文本框中的文本中包含某些字符，或者符合某种格式要求时，能够访问剪贴板是非常有用的。例如，如果一个文本框只接受数值，那么就必须检测粘贴过来的值，以确保有效。在paste事件中，可以确定剪贴板中的值是否有效，如果无效，就可以像下面示例中那样，取消默认的行为。
+
+``` js
+EventUtil.addHandler(textbox, "paste", function(event){
+  event = EventUtil.getEvent(event);
+  var text = EventUtil.getClipboardText(event);
+  if (!/^\d*$/.test(text)){
+    EventUtil.preventDefault(event);
+  }
+});
+```
+
+在这里，onpaste 事件处理程序可以确保只有数值才会被粘贴到文本框中。如果剪贴板的值与正则表达式不匹配，则会取消粘贴操作。Firefox、Safari 和Chrome 只允许在onpaste 事件处理程序中访问getData()方法。
+
+由于并非所有浏览器都支持访问剪贴板，所以更简单的做法是屏蔽一或多个剪贴板操作。在支持copy、cut 和paste 事件的浏览器中（IE、Safari、Chrome 和Firefox 3 及更高版本），很容易阻止这些事件的默认行为。在Opera 中，则需要阻止那些会触发这些事件的按键操作，同时还要阻止在文本框中显示上下文菜单。
+
+#### 自动切换焦点
+
+使用JavaScript 可以从多个方面增强表单字段的易用性。其中，最常见的一种方式就是在用户填写完当前字段时，自动将焦点切换到下一个字段。通常，在自动切换焦点之前，必须知道用户已经输入了既定长度的数据。
+
+#### HTML5 约束验证API
+
+为了在将表单提交到服务器之前验证数据，HTML5 新增了一些功能。有了这些功能，即便JavaScript被禁用或者由于种种原因未能加载，也可以确保基本的验证。换句话说，浏览器自己会根据标记中的规则执行验证，然后自己显示适当的错误消息（完全不用JavaScript 插手）。当然，这个功能只有在支持HTML5 这部分内容的浏览器中才有效，这些浏览器有Firefox 4+、Safari 5+、Chrome 和Opera 10+。
+
+只有在某些情况下表单字段才能进行自动验证。具体来说，就是要在HTML 标记中为特定的字段指定一些约束，然后浏览器才会自动执行表单验证。
+
+**1. 必填字段**
+
+第一种情况是在表单字段中指定了required 属性，如下面的例子所示：
+
+``` js
+<input type="text" name="username" required>
+```
+
+任何标注有required 的字段，在提交表单时都不能空着。这个属性适用于<input>、<textarea>和<select>字段（Opera 11 及之前版本还不支持<select>的required 属性）。在JavaScript 中，通过对应的required 属性，可以检查某个表单字段是否为必填字段。
+
+``` js
+var isUsernameRequired = document.forms[0].elements["username"].required;
+```
+
+另外，使用下面这行代码可以测试浏览器是否支持required 属性。
+
+``` js
+var isRequiredSupported = "required" in document.createElement("input");
+```
+
+以上代码通过特性检测来确定新创建的<input>元素中是否存在required 属性。对于空着的必填字段，不同浏览器有不同的处理方式。Firefox 4 和Opera 11 会阻止表单提交并在相应字段下方弹出帮助框，而Safari（5 之前）和Chrome（9 之前）则什么也不做，而且也不阻止表单提交。
+
+**2. 其他输入类型**
+
+HTML5 为<input>元素的type 属性又增加了几个值。这些新的类型不仅能反映数据类型的信息，而且还能提供一些默认的验证功能。其中，"email"和"url"是两个得到支持最多的类型，各浏览器也都为它们增加了定制的验证机制。
+
+**3. 数值范围**
+
+除了"email"和"url"，HTML5 还定义了另外几个输入元素。这几个元素都要求填写某种基于数字的值："number"、"range"、"datetime"、"datetime-local"、"date"、"month"、"week"，还有"time"。
+对所有这些数值类型的输入元素，可以指定min 属性（最小的可能值）、max 属性（最大的可能值）和step 属性（从min 到max 的两个刻度间的差值）。
+
+*以上这些属性在JavaScript 中都能通过对应的元素访问（或修改）。此外，还有两个方法：stepUp()和stepDown()，都接收一个可选的参数：要在当前值基础上加上或减去的数值。（默认是加或减1。）这两个方法还没有得到任何浏览器支持，*
+
+**4. 输入模式**
+
+HTML5 为文本字段新增了pattern 属性。这个属性的值是一个正则表达式，用于匹配文本框中的值。例如，如果只想允许在文本字段中输入数值，可以像下面的代码一样应用约束：
+
+``` xml
+<input type="text" pattern="\d+" name="count">
+```
+
+注意，模式的开头和末尾不用加^和$符号（假定已经有了）。这两个符号表示输入的值必须从头到尾都与模式匹配。
+与其他输入类型相似，指定pattern 也不能阻止用户输入无效的文本。这个模式应用给值，浏览器来判断值是有效，还是无效。在JavaScript 中可以通过pattern 属性访问模式。
+
+``` js
+var pattern = document.forms[0].elements["count"].pattern;
+```
+
+使用以下代码可以检测浏览器是否支持pattern 属性。
+
+``` js
+var isPatternSupported = "pattern" in document.createElement("input");
+```
+
+**5. 检测有效性**
+
+使用checkValidity()方法可以检测表单中的某个字段是否有效。所有表单字段都有个方法，如果字段的值有效，这个方法返回true，否则返回false。字段的值是否有效的判断依据是本节前面介绍过的那些约束。换句话说，必填字段中如果没有值就是无效的，而字段中的值与pattern 属性不匹配也是无效的。
+
+要检测整个表单是否有效，可以在表单自身调用checkValidity()方法。如果所有表单字段都有效，这个方法返回true；即使有一个字段无效，这个方法也会返回false。
+
+与checkValidity()方法简单地告诉你字段是否有效相比，validity 属性则会告诉你为什么字段有效或无效。这个对象中包含一系列属性，每个属性会返回一个布尔值。
+
+- customError ：如果设置了setCustomValidity()，则为true，否则返回false。
+- patternMismatch：如果值与指定的pattern 属性不匹配，返回true。
+- rangeOverflow：如果值比max 值大，返回true。
+- rangeUnderflow：如果值比min 值小，返回true。
+- stepMisMatch：如果min 和max 之间的步长值不合理，返回true。
+- tooLong：如果值的长度超过了maxlength 属性指定的长度，返回true。有的浏览器（如Firefox 4）会自动约束字符数量，因此这个值可能永远都返回false。
+- typeMismatch：如果值不是"mail"或"url"要求的格式，返回true。
+- valid：如果这里的其他属性都是false，返回true。checkValidity()也要求相同的值。
+- valueMissing：如果标注为required 的字段中没有值，返回true。
+
+因此，要想得到更具体的信息，就应该使用validity 属性来检测表单的有效性
+
+**6. 禁用验证**
+
+通过设置novalidate 属性，可以告诉表单不进行验证。
+
+``` xml
+<form method="post" action="signup.php" novalidate>
+<!--这里插入表单元素-->
+</form>
+```
+
+在JavaScript 中使用noValidate 属性可以取得或设置这个值，如果这个属性存在，值为true，如果不存在，值为false。
+
+如果一个表单中有多个提交按钮，为了指定点击某个提交按钮不必验证表单，可以在相应的按钮上添加formnovalidate 属性。
+
+### 选择框脚本
+
+选择框是通过<select>和<option>元素创建的。为了方便与这个控件交互，除了所有表单字段共有的属性和方法外，HTMLSelectElement 类型还提供了下列属性和方法：
+
+- add(newOption, relOption)：向控件中插入新<option>元素，其位置在相关项（relOption）之前。
+- multiple：布尔值，表示是否允许多项选择；等价于HTML 中的multiple 特性。
+- options：控件中所有<option>元素的HTMLCollection。
+- remove(index)：移除给定位置的选项。
+- selectedIndex：基于0 的选中项的索引，如果没有选中项，则值为-1。对于支持多选的控件，只保存选中项中第一项的索引。
+- size：选择框中可见的行数；等价于HTML 中的size 特性。
+
+选择框的type 属性不是"select-one"，就是"select-multiple"，这取决于HTML 代码中有没有multiple 特性。选择框的value 属性由当前选中项决定，相应规则如下：
+
+- 如果没有选中的项，则选择框的value 属性保存空字符串。
+- 如果有一个选中项，而且该项的value 特性已经在HTML 中指定，则选择框的value 属性等于选中项的value 特性。即使value 特性的值是空字符串，也同样遵循此条规则。
+- 如果有一个选中项，但该项的value 特性在HTML 中未指定，则选择框的value 属性等于该项的文本。
+- 如果有多个选中项，则选择框的value 属性将依据前两条规则取得第一个选中项的值。
+
+在DOM 中，每个<option>元素都有一个HTMLOptionElement 对象表示。为便于访问数据，HTMLOptionElement 对象添加了下列属性：
+
+- index：当前选项在options 集合中的索引。
+- label：当前选项的标签；等价于HTML 中的label 特性。
+- selected：布尔值，表示当前选项是否被选中。将这个属性设置为true 可以选中当前选项。
+- text：选项的文本。
+- value：选项的值（等价于HTML 中的value 特性）
+
+其中大部分属性的目的，都是为了方便对选项数据的访问。虽然也可以使用常规的DOM 功能来访问这些信息，但效率是比较低的。
+
+*选择框的change 事件与其他表单字段的change 事件触发的条件不一样。其他表单字段的change 事件是在值被修改且焦点离开当前字段时触发，而选择框的change 事件只要选中了选项就会触发。*
+
+*不同浏览器下，选项的value 属性返回什么值也存在差别。但是，在所有浏览器中，value 属性始终等于value 特性。在未指定value 特性的情况下，IE8 会返回空字符串，而IE9+、Safari、Firefox、Chrome 和Opera 则会返回与text 特性相同的值。*
+
+#### 选择的项
+
+对于只允许选择一项的选择框，访问选中项的最简单方式，就是使用选择框的selectedIndex 属性。
+对于可以选择多项的选择框，selectedfIndex 属性就好像只允许选择一项一样。设置selectedIndex 会导致取消以前的所有选项并选择指定的那一项，而读取selectedIndex 则只会返回选中项中第一项的索引值。
+
+另一种选择选项的方式，就是取得对某一项的引用，然后将其selected 属性设置为true。
+
+与selectedIndex 不同，在允许多选的选择框中设置选项的selected 属性，不会取消对其他选中项的选择，因而可以动态选中任意多个项。但是，如果是在单选选择框中，修改某个选项的selected 属性则会取消对其他选项的选择。需要注意的是，将selected 属性设置为false 对单选选择框没有影响。
+
+实际上，selected 属性的作用主要是确定用户选择了选择框中的哪一项。要取得所有选中的项，可以循环遍历选项集合，然后测试每个选项的selected 属性。
 
 
 ## 第二十章 JSON
