@@ -3975,6 +3975,277 @@ var isPatternSupported = "pattern" in document.createElement("input");
 
 实际上，selected 属性的作用主要是确定用户选择了选择框中的哪一项。要取得所有选中的项，可以循环遍历选项集合，然后测试每个选项的selected 属性。
 
+#### 添加选项
+
+- DOM方法动态创建
+- Option(text, value)构造函数
+- selectbox.add()方法
+
+#### 移除选项
+
+- removeChild()
+- selectbox.remove()
+- selectionbox.option[i] = null
+
+#### 移动和重排选项
+
+在DOM 标准出现之前，将一个选择框中的选项移动到另一个选择框中是非常麻烦的。整个过程要涉及从第一个选择框中移除选项，然后以相同的文本和值创建新选项，最后再将新选项添加到第二个选择框中。而使用DOM 的appendChild()方法，就可以将第一个选择框中的选项直接移动到第二个选择框中。我们知道，如果为appendChild()方法传入一个文档中已有的元素，那么就会先从该元素的父节点中移除它，再把它添加到指定的位置。
+
+移动选项与移除选项有一个共同之处，即会重置每一个选项的index 属性。
+重排选项次序的过程也十分类似，最好的方式仍然是使用DOM 方法。要将选择框中的某一项移动到特定位置，最合适的DOM 方法就是insertBefore()；appendChild()方法只适用于将选项添加到选择框的最后。
+
+### 表单序列化
+
+随着Ajax 的出现，表单序列化已经成为一种常见需求（第21 章将讨论Ajax）。在JavaScript 中，可以利用表单字段的type 属性，连同name 和value 属性一起实现对表单的序列化。在编写代码之前，有必须先搞清楚在表单提交期间，浏览器是怎样将数据发送给服务器的。
+
+- 对表单字段的名称和值进行URL 编码，使用和号（&）分隔。
+- 不发送禁用的表单字段。
+- 只发送勾选的复选框和单选按钮。
+- 不发送type 为"reset"和"button"的按钮。
+- 多选选择框中的每个选中的值单独一个条目。
+- 在单击提交按钮提交表单的情况下，也会发送提交按钮；否则，不发送提交按钮。也包括type为"image"的<input>元素。
+- <select>元素的值，就是选中的<option>元素的value 特性的值。如果<option>元素没有value 特性，则是<option>元素的文本值。
+
+在表单序列化过程中，一般不包含任何按钮字段，因为结果字符串很可能是通过其他方式提交的。除此之外的其他上述规则都应该遵循。
+
+### 富文本编辑
+
+富文本编辑，又称为WYSIWYG（What You See Is What You Get，所见即所得）。在网页中编辑富文本内容，是人们对Web 应用程序最大的期待之一。虽然也没有规范，但在IE 最早引入的这一功能基础上，已经出现了事实标准。而且，Opera、Safari、Chrome 和Firefox 都已经支持这一功能。这一技术的本质，就是在页面中嵌入一个包含空HTML 页面的iframe。通过设置designMode 属性，这个空白的HTML 页面可以被编辑，而编辑对象则是该页面<body>元素的HTML 代码。designMode 属性有两个可能的值："off"（默认值）和"on"。在设置为"on"时，整个文档都会变得可以编辑（显示插入符号），然后就可以像使用字处理软件一样，通过键盘将文本内容加粗、变成斜体，等等。
+
+可以给iframe 指定一个非常简单的HTML 页面作为其内容来源。例如：
+
+``` xml
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Blank Page for Rich Text Editing</title>
+  </head>
+  <body>
+  </body>
+</html>
+```
+
+这个页面在iframe 中可以像其他页面一样被加载。要让它可以编辑，必须要将designMode 设置为"on"，但只有在页面完全加载之后才能设置这个属性。因此，在包含页面中，需要使用onload 事件处理程序来在恰当的时刻设置designMode，如下面的例子所示：
+
+``` xml
+<iframe name="richedit" style="height:100px;width:100px;" src="blank.htm"></iframe>
+<script type="text/javascript">
+EventUtil.addHandler(window, "load", function(){
+  frames["richedit"].document.designMode = "on";
+});
+</script>
+```
+
+等到以上代码执行之后，你就会在页面中看到一个类似文本框的可编辑区字段。这个区字段具有与其他网页相同的默认样式；不过，通过为空白页面应用CSS 样式，可以修改可编辑区字段的外观。
+
+#### 使用contenteditable属性
+
+另一种编辑富文本内容的方式是使用名为contenteditable 的特殊属性，这个属性也是由IE 最早实现的。可以把contenteditable 属性应用给页面中的任何元素，然后用户立即就可以编辑该元素。这种方法之所以受到欢迎，是因为它不需要iframe、空白页和JavaScript，只要为元素设置contenteditable 属性即可。
+
+contenteditable 属性有三个可能的值："true"表示打开、"false"表示关闭，"inherit"表示从父元素那里继承（因为可以在contenteditable 元素中创建或删除元素）。支持contenteditable属性的元素有IE、Firefox、Chrome、Safari 和Opera。在移动设备上，支持contenteditable 属性的浏览器有iOS 5+中的Safari 和Android 3+中的WebKit。
+
+#### 操作富文本
+
+- execCommand()
+- queryCommandEnabled()
+- queryCommandState()
+- queryCommandValue()
+
+与富文本编辑器交互的主要方式，就是使用document.execCommand()。这个方法可以对文档执行预定义的命令，而且可以应用大多数格式。可以为document.execCommand()方法传递3 个参数：要执行的命令名称、表示浏览器是否应该为当前命令提供用户界面的一个布尔值和执行命令必须的一个值（如果不需要值，则传递null）。为了确保跨浏览器的兼容性，第二个参数应该始终设置为false，因为Firefox 会在该参数为true 时抛出错误。
+
+不同浏览器支持的预定义命令也不一样。下表列出了那些被支持最多的命令：
+
+|命 令 |值（第三个参数） |说 明
+|--|--|--|
+|backcolor |颜色字符串 |设置文档的背景颜色
+|bold |null |将选择的文本转换为粗体
+|copy |null |将选择的文本复制到剪贴板
+|createlink |URL字符串 |将选择的文本转换成一个链接，指向指定的URL
+|cut |null |将选择的文本剪切到剪贴板
+|delete |null |删除选择的文本
+|fontname |字体名称 |将选择的文本修改为指定字体
+|fontsize |1～7 |将选择的文本修改为指定字体大小
+|forecolor |颜色字符串 |将选择的文本修改为指定的颜色
+|formatblock |要包围当前文本块的HTML标签；如<h1>|使用指定的HTML标签来格式化选择的文本块
+|indent |null |缩进文本
+|inserthorizontalrule |null |在插入字符处插入一个<hr>元素
+|insertimage |图像的URL |在插入字符处插入一个图像
+|insertorderedlist |null |在插入字符处插入一个<ol>元素
+|insertunorderedlist |null |在插入字符处插入一个<ul>元素
+|insertparagraph |null |在插入字符处插入一个<p>元素
+|italic |null |将选择的文本转换成斜体
+|justifycenter |null |将插入光标所在文本块居中对齐
+|justifyleft |null |将插入光标所在文本块左对齐
+|outdent |null |凸排文本（减少缩进）
+|paste |null |将剪贴板中的文本粘贴到选择的文本
+|removeformat |null |移除插入光标所在文本块的块级格式。这是撤销formatblock命令的操作
+|selectall |null |选择文档中的所有文本
+|underline |null |为选择的文本添加下划线
+|unlink |null |移除文本的链接。这是撤销createlink命令的操作
+
+可以在任何时候使用这些命令来修改富文本区域的外观，同样的方法也适用于页面中contenteditable 属性为"true"的区块，只要把对框架的引用替换成当前窗口的document 对象即可。
+
+除了命令之外，还有一些与命令相关的方法。第一个方法就是queryCommandEnabled()，可以用它来检测是否可以针对当前选择的文本，或者当前插入字符所在位置执行某个命令。这个方法接收一个参数，即要检测的命令。如果当前编辑区域允许执行传入的命令，这个方法返回true，否则返回false。例如：
+
+``` js
+var result = frames["richedit"].document.queryCommandEnabled("bold");
+```
+
+如果能够对当前选择的文本执行"bold"命令，以上代码会返回true。需要注意的是，queryCommandEnabled()方法返回true，并不意味着实际上就可以执行相应命令，而只能说明对当前选择的文本执行相应命令是否合适。例如，Firefox 在默认情况下会禁用剪切操作，但执行queryCommandEnabled("cut")也可能会返回true。
+
+另外，queryCommandState()方法用于确定是否已将指定命令应用到了选择的文本。例如，要确定当前选择的文本是否已经转换成了粗体，可以使用如下代码。
+
+``` js
+var isBold = frames["richedit"].document.queryCommandState("bold");
+```
+
+如果此前已经对选择的文本执行了"bold"命令，那么上面的代码会返回true。一些功能全面的富文本编辑器，正是利用这个方法来更新粗体、斜体等按钮的状态的。
+
+最后一个方法是queryCommandValue()，用于取得执行命令时传入的值（即前面例子中传给document.execCommand()的第三个参数）。例如，在对一段文本应用"fontsize"命令时如果传入了7，那么下面的代码就会返回"7"：
+
+``` js
+var fontSize = frames["richedit"].document.queryCommandValue("fontsize");
+```
+
+通过这个方法可以确定某个命令是怎样应用到选择的文本的，可以据以确定再对其应用后续命令是否合适。
+
+#### 富文本选区
+
+在富文本编辑器中，使用框架（iframe）的getSelection()方法，可以确定实际选择的文本。这个方法是window 对象和document 对象的属性，调用它会返回一个表示当前选择文本的Selection对象。每个Selection 对象都有下列属性：
+
+- anchorNode：选区起点所在的节点。
+- anchorOffset：在到达选区起点位置之前跳过的anchorNode 中的字符数量。
+- focusNode：选区终点所在的节点。
+- focusOffset：focusNode 中包含在选区之内的字符数量。
+- isCollapsed：布尔值，表示选区的起点和终点是否重合。
+- rangeCount：选区中包含的DOM 范围的数量。
+
+Selection 对象的这些属性并没有包含多少有用的信息。好在，该对象的下列方法提供了更多信息，并且支持对选区的操作：
+
+- addRange(range)：将指定的DOM 范围添加到选区中。
+- collapse(node, offset)：将选区折叠到指定节点中的相应的文本偏移位置。
+- collapseToEnd()：将选区折叠到终点位置。
+- collapseToStart()：将选区折叠到起点位置。
+- containsNode(node)：确定指定的节点是否包含在选区中。
+- deleteFromDocument()：从文档中删除选区中的文本，与document.execCommand("delete",false, null)命令的结果相同。
+- extend(node, offset)：通过将focusNode 和focusOffset 移动到指定的值来扩展选区。
+- getRangeAt(index)：返回索引对应的选区中的DOM范围。
+- removeAllRanges()：从选区中移除所有DOM 范围。实际上，这样会移除选区，因为选区中至少要有一个范围。
+- reomveRange(range)：从选区中移除指定的DOM 范围。
+- selectAllChildren(node)：清除选区并选择指定节点的所有子节点。
+- toString()：返回选区所包含的文本内容
+
+#### 表单与富文本
+
+由于富文本编辑是使用iframe 而非表单控件实现的，因此从技术上说，富文本编辑器并不属于表单。换句话说，富文本编辑器中的HTML 不会被自动提交给服务器，而需要我们手工来提取并提交HTML。为此，通常可以添加一个隐藏的表单字段，让它的值等于从iframe 中提取出的HTML。具体来说，就是在提交表单之前，从iframe 中提取出HTML，并将其插入到隐藏的字段中。
+
+
+
+## 第十六章 HTML5 脚本编程
+
+### 跨文档消息传递
+
+跨文档消息传送（cross-document messaging），有时候简称为XDM，指的是在来自不同域的页面间传递消息。例如，www.wrox.com域中的页面与位于一个内嵌框架中的p2p.wrox.com 域中的页面通信。在XDM 机制出现之前，要稳妥地实现这种通信需要花很多工夫。XDM 把这种机制规范化，让我们能既稳妥又简单地实现跨文档通信。
+
+XDM 的核心是postMessage()方法。在HTML5 规范中，除了XDM部分之外的其他部分也会提到这个方法名，但都是为了同一个目的：向另一个地方传递数据。对于XDM而言，“另一个地方”指的是包含在当前页面中的<iframe>元素，或者由当前页面弹出的窗口。
+
+postMessage()方法接收两个参数：一条消息和一个表示消息接收方来自哪个域的字符串。第二个参数对保障安全通信非常重要，可以防止浏览器把消息发送到不安全的地方。来看下面的例子。
+
+``` js
+//注意：所有支持XDM 的浏览器也支持iframe 的contentWindow 属性
+var iframeWindow = document.getElementById("myframe").contentWindow;
+iframeWindow.postMessage("A secret", "http://www.wrox.com");
+```
+
+最后一行代码尝试向内嵌框架中发送一条消息，并指定框架中的文档必须来源于 ”http://www.wrox.com“ 域。如果来源匹配，消息会传递到内嵌框架中；否则，postMessage()什么也不做。这一限制可以避免窗口中的位置在你不知情的情况下发生改变。如果传给postMessage()的第二个参数是"*"，则表示可以把消息发送给来自任何域的文档，但我们不推荐这样做。
+
+接收到XDM消息时，会触发window 对象的message 事件。这个事件是以异步形式触发的，因此从发送消息到接收消息（触发接收窗口的message 事件）可能要经过一段时间的延迟。触发message事件后，传递给onmessage 处理程序的事件对象包含以下三方面的重要信息。
+
+data：作为postMessage()第一个参数传入的字符串数据。
+origin：发送消息的文档所在的域，例如"http://www.wrox.com"。
+source：发送消息的文档的window 对象的代理。这个代理对象主要用于在发送上一条消息的窗口中调用postMessage()方法。如果发送消息的窗口来自同一个域，那这个对象就是
+window。
+
+接收到消息后验证发送窗口的来源是至关重要的。就像给postMessage()方法指定第二个参数，以确保浏览器不会把消息发送给未知页面一样，在onmessage 处理程序中检测消息来源可以确保传入的消息来自已知的页面。基本的检测模式如下。
+
+``` js
+EventUtil.addHandler(window, "message", function(event){
+  //确保发送消息的域是已知的域
+  if (event.origin == "http://www.wrox.com"){
+    //处理接收到的数据
+    processMessage(event.data);
+    //可选：向来源窗口发送回执
+    event.source.postMessage("Received!", "http://p2p.wrox.com");
+  }
+});
+```
+
+还是要提醒大家，event.source 大多数情况下只是window 对象的代理，并非实际的window 对象。换句话说，不能通过这个代理对象访问window 对象的其他任何信息。记住，只通过这个代理调用postMessage()就好，这个方法永远存在，永远可以调用。
+
+XDM 还有一些怪异之处。首先，postMessage()的第一个参数最早是作为“永远都是字符串”来实现的。但后来这个参数的定义改了，改成允许传入任何数据结构。可是，并非所有浏览器都实现了这一变化。为保险起见，使用postMessage()时，最好还是只传字符串。如果你想传入结构化的数据，最佳选择是先在要传入的数据上调用JSON.stringify()，通过postMessage()传入得到的字符串，然后再在onmessage 事件处理程序中调用JSON.parse()。
+
+在通过内嵌框架加载其他域的内容时，使用XDM 是非常方便的。因此，在混搭（mashup）和社交网络应用中，这种传递消息的方法极为常用。有了XDM，包含<iframe>的页面可以确保自身不受恶意内容的侵扰，因为它只通过XDM 与嵌入的框架通信。而XDM 也可以在来自相同域的页面间使用。
+
+### 原生拖放
+
+最早在网页中引入JavaScript 拖放功能的是IE4。当时，网页中只有两种对象可以拖放：图像和某些文本。拖动图像时，把鼠标放在图像上，按住鼠标不放就可以拖动它。拖动文本时，要先选中文本，然后可以像拖动图像一样拖动被选中的文本。在IE 4 中，唯一有效的放置目标是文本框。到了IE5，拖放功能得到扩展，添加了新的事件，而且几乎网页中的任何元素都可以作为放置目标。IE5.5 更进一步，让网页中的任何元素都可以拖放。（IE6 同样也支持这些功能。）HTML5 以IE 的实例为基础制定了拖放规范。Firefox 3.5、Safari 3+和Chrome 也根据HTML5 规范实现了原生拖放功能。
+
+#### 拖放事件
+
+通过拖放事件，可以控制拖放相关的各个方面。其中最关键的地方在于确定哪里发生了拖放事件，有些事件是在被拖动的元素上触发的，而有些事件是在放置目标上触发的。拖动某元素时，将依次触发下列事件：
+
+1. dragstart
+2. drag
+3. dragend
+
+按下鼠标键并开始移动鼠标时，会在被拖放的元素上触发dragstart 事件。此时光标变成“不能放”符号（圆环中有一条反斜线），表示不能把元素放到自己上面。拖动开始时，可以通过ondragstart事件处理程序来运行JavaScript 代码。
+
+触发dragstart 事件后，随即会触发drag 事件，而且在元素被拖动期间会持续触发该事件。这个事件与mousemove 事件相似，在鼠标移动过程中，mousemove 事件也会持续发生。当拖动停止时（无论是把元素放到了有效的放置目标，还是放到了无效的放置目标上），会触发dragend 事件。
+
+上述三个事件的目标都是被拖动的元素。默认情况下，浏览器不会在拖动期间改变被拖动元素的外观，但你可以自己修改。不过，大多数浏览器会为正被拖动的元素创建一个半透明的副本，这个副本始终跟随着光标移动。
+
+当某个元素被拖动到一个有效的放置目标上时，下列事件会依次发生：
+
+1. dragenter
+2. dragover
+3. dragleave 或drop
+
+只要有元素被拖动到放置目标上，就会触发dragenter 事件（类似于mouseover 事件）。紧随其后的是dragover 事件，而且在被拖动的元素还在放置目标的范围内移动时，就会持续触发该事件。如果元素被拖出了放置目标，dragover 事件不再发生，但会触发dragleave 事件（类似于mouseout事件）。如果元素被放到了放置目标中，则会触发drop 事件而不是dragleave 事件。上述三个事件的目标都是作为放置目标的元素。
+
+#### 自定义放置目标
+
+在拖动元素经过某些无效放置目标时，可以看到一种特殊的光标（圆环中有一条反斜线），表示不能放置。虽然所有元素都支持放置目标事件，但这些元素默认是不允许放置的。如果拖动元素经过不允许放置的元素，无论用户如何操作，都不会发生drop 事件。不过，你可以把任何元素变成有效的放置目标，方法是重写dragenter 和dragover 事件的默认行为。例如，假设有一个ID 为"droptarget"的<div>元素，可以用如下代码将它变成一个放置目标。
+
+``` js
+var droptarget = document.getElementById("droptarget");
+EventUtil.addHandler(droptarget, "dragover", function(event){
+  EventUtil.preventDefault(event);
+});
+EventUtil.addHandler(droptarget, "dragenter", function(event){
+  EventUtil.preventDefault(event);
+});
+```
+
+以上代码执行后，你就会发现当拖动着元素移动到放置目标上时，光标变成了允许放置的符号。当然，释放鼠标也会触发drop 事件。
+在Firefox 3.5+中，放置事件的默认行为是打开被放到放置目标上的URL。换句话说，如果是把图像拖放到放置目标上，页面就会转向图像文件；而如果是把文本拖放到放置目标上，则会导致无效URL错误。因此，为了让Firefox 支持正常的拖放，还要取消drop 事件的默认行为，阻止它打开URL：
+
+``` js
+EventUtil.addHandler(droptarget, "drop", function(event){
+  EventUtil.preventDefault(event);
+});
+```
+
+#### dropEffect与effectAllowed
+
+
+
+
+
+
+
+
+
+
 
 ## 第二十章 JSON
 
