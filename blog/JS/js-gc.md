@@ -4427,7 +4427,26 @@ for (var i=0, len=mods.length; i < len; i++){
 
 ### 调试技术
 
+在不那么容易找到JavaScript 调试程序的年代，开发人员不得不发挥自己的创造力，通过各种方法来调试自己的代码。结果，就出现了以这样或那样的方式置入代码，从而输出调试信息的做法。其中，最常见的做法就是在要调试的代码中随处插入alert()函数。
+
+#### 将消息记录到控制台
+
+- console.error()
+- console.info()
+- console.log()
+- console.warn()
+
+还有一种方案是使用LiveConnect，也就是在JavaScript 中运行Java 代码。Firefox、Safari 和Opera都支持LiveConnect，因此可以操作Java 控制台。例如，通过下列代码就可以在JavaScript 中把消息写入到Java 控制台：
+
 ### 常见的IE错误
+
+1. 操作终止
+2. 无效字符
+3. 未找到成员
+4. 未知运行时错误
+5. 语法错误
+6. 系统无法找到指定资源
+
 
 
 
