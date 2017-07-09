@@ -4447,25 +4447,188 @@ for (var i=0, len=mods.length; i < len; i++){
 5. 语法错误
 6. 系统无法找到指定资源
 
+## 第十八章 JavaScript 与XML
 
+### 浏览器对XML DOM 的支持
 
+在正式的规范诞生以前，浏览器提供商实现的XML 解决方案不仅对XML 的支持程度参差不齐，而且对同一特性的支持也各不相同。DOM2 级是第一个提到动态创建XML DOM 概念的规范。DOM3级进一步增强了XML DOM，新增了解析和序列化等特性。然而，当DOM3 级规范的各项条款尘埃落定之后，大多数浏览器也都实现了各自不同的解决方案。
 
+#### DOM2 级核心
 
+#### DOMParser类型
 
+为了将XML 解析为DOM文档，Firefox 引入了DOMParser 类型；后来，IE9、Safari、Chrome 和Opera 也支持了这个类型。在解析XML 之前，首先必须创建一个DOMParser 的实例，然后再调用parseFromString()方法。这个方法接受两个参数：要解析的XML 字符串和内容类型（内容类型始终都应该是"text/xml"）。返回的值是一个Document 的实例。
 
+DOMParser 只能解析格式良好的XML，因而不能把HTML 解析为HTML 文档。在发生解析错误时， 仍然会从parseFromString() 中返回一个Document 对象， 但这个对象的文档元素是<parsererror>，而文档元素的内容是对解析错误的描述。
 
+#### XMLSerializer类型
 
+在引入DOMParser 的同时，Firefox 还引入了XMLSerializer 类型，提供了相反的功能：将DOM文档序列化为XML 字符串。后来，IE9+、Opera、Chrome 和Safari 都支持了XMLSerializer。要序列化DOM 文档，首先必须创建XMLSerializer 的实例，然后将文档传入其serializeTo-String ()方法
 
+但是，serializeToString()方法返回的字符串并不适合打印，因此看起来会显得乱糟糟的。
+
+XMLSerializer 可以序列化任何有效的DOM 对象，不仅包括个别的节点，也包括HTML 文档。将HTML 文档传入serializeToString()以后，HTML 文档将被视为XML 文档，因此得到的代码也将是格式良好的。
+
+*如果将非DOM 对象传入serializeToString()，会导致错误发生。*
+
+#### IE8 及之前版本中的XML
+
+#### 跨浏览器处理XML
+
+``` js
+function parseXml(xml) {
+  var xmldom = null;
+  if (typeof DOMParser != "undefined") {
+    xmldom = (new DOMParser()).parseFromString(xml, "text/xml");
+    var errors = xmldom.getElementsByTagName("parsererror");
+    if (errors.length) {
+      throw new Error("XML parsing error:" + errors[0].textContent);
+    }
+  } else if (typeof ActiveXObject != "undefined") {
+    xmldom = createDocument();
+    xmldom.loadXML(xml);
+    if (xmldom.parseError != 0) {
+      throw new Error("XML parsing error: " + xmldom.parseError.reason);
+    }
+  } else {
+    throw new Error("No XML parser available.");
+  }
+  return xmldom;
+}
+```
+
+这个parseXml()函数只接收一个参数，即可解析的XML 字符串。在函数内部，我们通过能力检测来确定要使用的XML 解析方式。DOMParser 类型是受支持最多的解决方案，因此首先检测该类型是否有效。如果是，则创建一个新的DOMParser 对象，并将解析XML 字符串的结果保存在变量xmldom中。由于DOMParser 对象在发生解析错误时不抛出错误（除IE9+之外），因此还要检测返回的文档以确定解析过程是否顺利。如果发现了解析错误，则根据错误消息抛出一个错误。
+函数的最后一部分代码检测了对ActiveX 的支持，并使用前面定义的createDocument()函数来创建适当版本的XML 文档。与使用DOMParser 时一样，这里也需要检测结果，以防有错误发生。如果确实有错误发生，同样也需要抛出一个包含错误原因的错误。
+如果上述XML 解析器都不可用，函数就会抛出一个错误，表示无法解析了。
+在使用这个函数解析XML 字符串时，应该将它放在try-catch 语句当中，以防发生错误。来看下面的例子。
+
+``` js
+var xmldom = null;
+try {
+  xmldom = parseXml("<root><child/></root>");
+} catch (ex){
+  alert(ex.message);
+}
+```
+
+对序列化XML 而言，也可以按照同样的方式编写一个能够在四大浏览器中运行的函数。例如：
+
+``` js
+function serializeXml(xmldom){
+  if (typeof XMLSerializer != "undefined"){
+    return (new XMLSerializer()).serializeToString(xmldom);
+  } else if (typeof xmldom.xml != "undefined"){
+    return xmldom.xml;
+  } else {
+    throw new Error("Could not serialize XML DOM.");
+  }
+}
+```
+
+这个serializeXml()函数接收一个参数，即要序列化的XML DOM 文档。与parseXml()函数一样，这个函数首先也是检测受到最广泛支持的特性，即XMLSerializer。如果这个类型有效，则使用它来生成并返回文档的XML 字符串。由于ActiveX 方案比较简单，只使用了一个xml 属性，因此这个函数直接检测了该属性。如果上述两方面尝试都失败了，函数就会抛出一个错误，说明序列化不能进行。一般来说，只要针对浏览器使用了适当的XML DOM 对象，就不会出现无法序列化的情况，因而也就没有必要在try-catch 语句中调用serializeXml()。结果，就只需如下一行代码即可：
+
+``` js
+var xml = serializeXml(xmldom);
+```
+
+只不过由于序列化过程的差异，相同的DOM 对象在不同的浏览器下，有可能会得到不同的XML字符串。
+
+### 浏览器对XPath 的支持
+
+#### DOM3 级XPath
+
+- XPathEvaluator
+- XPathResult
+
+#### IE中的XPath
+
+#### 跨浏览器使用XPath
+
+### 浏览器对XSLT 的支持
+
+XSLT 是与XML 相关的一种技术，它利用XPath 将文档从一种表现形式转换成另一种表现形式。与XML 和XPath 不同，XSLT 没有正式的API，在正式的DOM 规范中也没有它的位置。结果，只能依靠浏览器开发商以自己的方式来实现它。IE 是第一个支持通过JavaScript 处理XSLT 的浏览器。
+
+## 第十九章 E4X
+
+2002 年，由BEA Systems 为首的几家公司建议为ECMAScript 增加一项扩展，以便在这门语言中添加原生的XML 支持。2004 年6 月，E4X（ECMAScript for XML）以ECMA-357 标准的形式发布；2005 年12 月又发布了修订版。E4X 本身不是一门语言，它只是ECMAScript 语言的可选扩展。就其本身而言，E4X 为处理XML 定义了新的语法，也定义了特定于XML 的对象。
 
 
 ## 第二十章 JSON
 
-1、语法
+曾经有一段时间，XML 是互联网上传输结构化数据的事实标准。Web 服务的第一次浪潮很大程度上都是建立在XML 之上的，突出的特点是服务器与服务器间通信。然而，业界一直不乏质
+疑XML 的声音。不少人认为XML 过于烦琐、冗长。为解决这个问题，也涌现了一些方案。不过，Web的发展方向已经改变了。
+
+2006 年，Douglas Crockford 把JSON（JavaScript Object Notation，JavaScript 对象表示法）作为IETFRFC 4627 提交给IETF，而JSON 的应用早在2001 年就已经开始了。JSON 是JavaScript 的一个严格的子集，利用了JavaScript 中的一些模式来表示结构化数据。Crockford 认为与XML相比，JSON 是在JavaScript中读写结构化数据的更好的方式。因为可以把JSON 直接传给eval()，而且不必创建DOM 对象。
+
+关于JSON，最重要的是要理解它是一种数据格式，不是一种编程语言。虽然具有相同的语法形式，但JSON 并不从属于JavaScript。而且，并不是只有JavaScript 才使用JSON，毕竟JSON 只是一种数据格式。很多编程语言都有针对JSON 的解析器和序列化器。
+
+### 语法
 JSON语法可以表示以下三种类型的值：
-      ○ 简单值：可以在JSON中表示字符串（双引号）、数值、布尔值和null，不支持JS中的undefined
-      ○ 对象：一组无序的键值对（对象属性名要加双引号）
-      ○ 数组：一组有序的值列表（用中括号表示，不要末尾分号，与JS数组字面量表示类似）
-2、解析与序列化
+
+- 简单值：使用与JavaScript 相同的语法，可以在JSON 中表示字符串、数值、布尔值和null。但JSON 不支持JavaScript 中的特殊值undefined。
+- 对象：对象作为一种复杂数据类型，表示的是一组无序的键值对儿。而每个键值对儿中的值可以是简单值，也可以是复杂数据类型的值。
+- 数组：数组也是一种复杂数据类型，表示一组有序的值的列表，可以通过数值索引来访问其中的值。数组的值也可以是任意类型——简单值、对象或数组。
+
+JSON 不支持变量、函数或对象实例，它就是一种表示结构化数据的格式，虽然与JavaScript 中表示数据的某些语法相同，但它并不局限于JavaScript 的范畴。
+
+#### 简单值
+
+JavaScript 字符串与JSON 字符串的最大区别在于，JSON 字符串必须使用双引号（单引号会导致语法错误）。
+
+布尔值和null 也是有效的JSON 形式。但是，在实际应用中，JSON 更多地用来表示更复杂的数据结构，而简单值只是整个数据结构中的一部分。
+
+#### 对象
+
+JSON 中的对象与JavaScript 字面量稍微有一些不同。下面是一个JavaScript 中的对象字面量：
+
+``` js
+var person = {
+  name: "Nicholas",
+  age: 29
+};
+```
+
+这虽然是开发人员在JavaScript 中创建对象字面量的标准方式，但JSON 中的对象要求给属性加引号。实际上，在JavaScript 中，前面的对象字面量完全可以写成下面这样：
+
+``` js
+var object = {
+  "name": "Nicholas",
+  "age": 29
+};
+```
+
+JSON 表示上述对象的方式如下：
+
+``` js
+{
+  "name": "Nicholas",
+  "age": 29
+}
+```
+
+与JavaScript 的对象字面量相比，JSON 对象有两个地方不一样。首先，没有声明变量（JSON 中没有变量的概念）。其次，没有末尾的分号（因为这不是JavaScript 语句，所以不需要分号）
+
+对象的属性必须加双引号，这在JSON 中是必需的。属性的值可以是简单值，也可以是复杂类型值，因此可以像下面这样在对象中嵌入对象：
+
+``` js
+{
+  "name": "Nicholas",
+  "age": 29,
+  "school": {
+    "name": "Merrimack College",
+    "location": "North Andover, MA"
+  }
+}
+```
+
+#### 数组
+
+JSON 中的第二种复杂数据类型是数组。JSON 数组采用的就是JavaScript 中的数组字面量形式。
+
+同样要注意，JSON 数组也没有变量和分号。把数组和对象结合起来，可以构成更复杂的数据集合。
+
+### 解析与序列化
+
 早期使用JS的eval()函数。
 JSON对象有两个方法：
 JSON.stringify();
