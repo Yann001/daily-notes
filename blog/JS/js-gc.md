@@ -5499,5 +5499,7 @@ XHR 对象也提供了一些安全机制，虽然表面上看可以保证安全�
 xhr.open("get", "example.php", true, "username", "password"); //不要这样做！！
 ```
 
+## 第二十二章 高级技巧
+
 
 
