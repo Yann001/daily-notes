@@ -4629,64 +4629,875 @@ JSON 中的第二种复杂数据类型是数组。JSON 数组采用的就是Java
 
 ### 解析与序列化
 
-早期使用JS的eval()函数。
+#### JSON对象
+
+早期使用JS的eval()函数。由于JSON 是JavaScript 语法的子集，因此eval()函数可以解析、解释并返回JavaScript 对象和数组。在旧版本的浏览器中，使用eval()对JSON 数据结构求值存在风险，因为可能会执行一些恶意代码。
+
 JSON对象有两个方法：
-JSON.stringify();
-JSON.parse();
+
+- JSON.stringify();
+- JSON.parse();
+
+默认情况下，JSON.stringify()输出的JSON 字符串不包含任何空格字符或缩进，在序列化JavaScript 对象时，所有函数及原型成员都会被有意忽略，不体现在结果中。此外，值为undefined 的任何属性也都会被跳过。结果中最终都是值为有效JSON 数据类型的实例属性。
+
+如果传给JSON.parse()的字符串不是有效的JSON，该方法会抛出错误。
+
+#### 序列化选项
+
+JSON.stringify()除了要序列化的JavaScript 对象外，还可以接收另外两个参数，这两个参数用于指定以不同的方式序列化JavaScript 对象。第一个参数是个过滤器，可以是一个数组，也可以是一个函数；第二个参数是一个选项，表示是否在JSON 字符串中保留缩进。单独或组合使用这两个参数，可以更全面深入地控制JSON 的序列化。
+
+**1. 过滤结果**
+
+如果过滤器参数是数组，那么JSON.stringify()的结果中将只包含数组中列出的属性。来看下面的例子：
+
+``` js
+var book = {
+  "title": "Professional JavaScript",
+  "authors": [
+    "Nicholas C. Zakas"
+  ],
+  edition: 3,
+  year: 2011
+};
+var jsonText = JSON.stringify(book, ["title", "edition"]);
+```
+
+JSON.stringify()的第二个参数是一个数组，其中包含两个字符串："title"和"edition"。这两个属性与将要序列化的对象中的属性是对应的，因此在返回的结果字符串中，就只会包含这两个属性：
+
+``` js
+{"title":"Professional JavaScript","edition":3}
+```
+
+如果第二个参数是函数，行为会稍有不同。传入的函数接收两个参数，属性（键）名和属性值。根据属性（键）名可以知道应该如何处理要序列化的对象中的属性。属性名只能是字符串，而在值并非键值对儿结构的值时，键名可以是空字符串。
+
+为了改变序列化对象的结果，函数返回的值就是相应键的值。如果函数返回了undefined，那么相应的属性会被忽略。还是看一个例子吧。
+
+``` js
+var book = {
+  "title": "Professional JavaScript",
+  "authors": [
+    "Nicholas C. Zakas"
+  ],
+  edition: 3,
+  year: 2011
+};
+var jsonText = JSON.stringify(book, function(key, value){
+  switch(key){
+    case "authors":
+      return value.join(",")
+    case "year":
+      return 5000;
+   case "edition":
+     return undefined;
+   default:
+     return value;
+}
+});
+```
+
+这里，函数过滤器根据传入的键来决定结果。如果键为"authors"，就将数组连接为一个字符串；如果键为"year"，则将其值设置为5000；如果键为"edition"，通过返回undefined 删除该属性。最后，一定要提供default 项，此时返回传入的值，以便其他值都能正常出现在结果中。实际上，第一次调用这个函数过滤器，传入的键是一个空字符串，而值就是book 对象。序列化后的JSON 字符串如下所示：
+
+``` js
+{"title":"Professional JavaScript","authors":"Nicholas C. Zakas","year":5000}
+```
+
+要序列化的对象中的每一个对象都要经过过滤器，因此数组中的每个带有这些属性的对象经过过滤之后，每个对象都只会包含"title"、"authors"和"year"属性。
+
+**2. 字符串缩进**
+
+JSON.stringify()方法的第三个参数用于控制结果中的缩进和空白符。如果这个参数是一个数值，那它表示的是每个级别缩进的空格数。例如，要在每个级别缩进2 个空格，可以这样写代码：
+
+``` js
+var book = {
+  "title": "Professional JavaScript",
+  "authors": [
+    "Nicholas C. Zakas"
+  ],
+  edition: 3,
+  year: 2011
+};
+var jsonText = JSON.stringify(book, null, 2);
+
+保存在jsonText 中的字符串如下所示：
+
+``` js
+{
+  "title": "Professional JavaScript",
+  "authors": [
+    "Nicholas C. Zakas"
+  ],
+  "edition": 3,
+  "year": 2011
+}
+```
+
+不知道读者注意到没有，JSON.stringify()也在结果字符串中插入了换行符以提高可读性。只要传入有效的控制缩进的参数值，结果字符串就会包含换行符。（只缩进而不换行意义不大。）最大缩进空格数为10，所有大于10 的值都会自动转换为10。
+
+如果缩进参数是一个字符串而非数值，则这个字符串将在JSON 字符串中被用作缩进字符（不再使用空格）。在使用字符串的情况下，可以将缩进字符设置为制表符，或者两个短划线之类的任意字符。
+
+``` js
+var jsonText = JSON.stringify(book, null, " - -");
+```
+
+这样，jsonText 中的字符串将变成如下所示：
+
+``` js
+{
+--"title": "Professional JavaScript",
+--"authors": [
+----"Nicholas C. Zakas"
+--],
+--"edition": 3,
+--"year": 2011
+}
+```
+
+缩进字符串最长不能超过10 个字符长。如果字符串长度超过了10 个，结果中将只出现前10 个字符。
+
+**3. toJSON()方法**
+
+有时候，JSON.stringify()还是不能满足对某些对象进行自定义序列化的需求。在这些情况下，可以给对象定义toJSON()方法，返回其自身的JSON 数据格式。原生Date 对象有一个toJSON()方法，能够将JavaScript 的Date 对象自动转换成ISO 8601 日期字符串（与在Date 对象上调用toISOString()的结果完全一样）。
+
+可以为任何对象添加toJSON()方法，比如：
+
+``` js
+var book = {
+  "title": "Professional JavaScript",
+  "authors": [
+    "Nicholas C. Zakas"
+  ],
+  edition: 3,
+  year: 2011,
+  toJSON: function(){
+    return this.title;
+  }
+};
+var jsonText = JSON.stringify(book);
+
+以上代码在book 对象上定义了一个toJSON()方法，该方法返回图书的书名。与Date 对象类似，这个对象也将被序列化为一个简单的字符串而非对象。可以让toJSON()方法返回任何值，它都能正常工作。比如，可以让这个方法返回undefined，此时如果包含它的对象嵌入在另一个对象中，会导致它的值变成null，而如果它是顶级对象，结果就是undefined。
+
+toJSON()可以作为函数过滤器的补充，因此理解序列化的内部顺序十分重要。假设把一个对象传入JSON.stringify()，序列化该对象的顺序如下。
+
+1. 如果存在toJSON()方法而且能通过它取得有效的值，则调用该方法。否则，返回对象本身。
+2. 如果提供了第二个参数，应用这个函数过滤器。传入函数过滤器的值是第(1)步返回的值。
+3. 对第(2)步返回的每个值进行相应的序列化。
+4. 如果提供了第三个参数，执行相应的格式化。
+
+无论是考虑定义toJSON()方法，还是考虑使用函数过滤器，亦或需要同时使用两者，理解这个顺序都是至关重要的。
+
+#### 解析选项
+
+JSON.parse()方法也可以接收另一个参数，该参数是一个函数，将在每个键值对儿上调用。为了区别JSON.stringify()接收的替换（过滤）函数（replacer），这个函数被称为还原函数（reviver），但实际上这两个函数的签名是相同的——它们都接收两个参数，一个键和一个值，而且都需要返回一个值。
+
+如果还原函数返回undefined，则表示要从结果中删除相应的键；如果返回其他值，则将该值插入到结果中。在将日期字符串转换为Date 对象时，经常要用到还原函数。例如：
+
+``` js
+var book = {
+  "title": "Professional JavaScript",
+  "authors": [
+    "Nicholas C. Zakas"
+  ],
+  edition: 3,
+  year: 2011,
+  releaseDate: new Date(2011, 11, 1)
+};
+var jsonText = JSON.stringify(book);
+var bookCopy = JSON.parse(jsonText, function(key, value){
+  if (key == "releaseDate"){
+    return new Date(value);
+  } else {
+    return value;
+  }
+});
+alert(bookCopy.releaseDate.getFullYear());
+```
+
+以上代码先是为book 对象新增了一个releaseDate 属性，该属性保存着一个Date 对象。这个对象在经过序列化之后变成了有效的JSON 字符串，然后经过解析又在bookCopy 中还原为一个Date对象。还原函数在遇到"releaseDate"键时，会基于相应的值创建一个新的Date 对象。结果就是bookCopy.releaseDate 属性中会保存一个Date 对象。正因为如此，才能基于这个对象调用getFullYear()方法。
 
 ## 第二十一章 Ajax与Comet
 
-1、XMLHttpRequest对象
-var xhr=createXHR(); //创建
-xhr.open("get", "example.php", true); //准备发送
-xhr.send(null); //发送
-xhr.abort(); //取消发送
-xhr对象具有readyState属性，取值如下：
-- 0：未初始化。尚未调用open方法。
-- 1：启动。已调用open，未调用send方法。
-- 2：发送。已调用send方法，未接收到响应。
-- 3：接收。已接收到部分数据。
-- 4：完成。已接收到全部数据，而且已经可以在客户端使用了。
+Ajax 技术的核心是XMLHttpRequest 对象（简称XHR），这是由微软首先引入的一个特性，其他浏览器提供商后来都提供了相同的实现。在XHR 出现之前，Ajax 式的通信必须借助一些hack 手段来实现，大多数是使用隐藏的框架或内嵌框架。XHR 为向服务器发送请求和解析服务器响应提供了流畅的接口。能够以异步方式从服务器取得更多信息，意味着用户单击后，可以不必刷新页面也能取得新数据。也就是说，可以使用XHR 对象取得新数据，然后再通过DOM 将新数据插入到页面中。另外，虽然名字中包含XML 的成分，但Ajax 通信与数据格式无关；这种技术就是无须刷新页面即可从服务器取得数据，但不一定是XML 数据。
 
-HTTP头部信息
-setRequestHeader()方法设置自定义请求头部信息，接收两个参数，头部字段的名称和值，需在open之后，send之前调用该方法。
-getResponseHeader()方法并传入头部字段名称可取得相应头部信息。
-getAllResponseHeader()方法获取一个包含头部信息的长字符串。
-GET请求
-xhr.open("get", "example.php?name1=value1&name2=value2", true);
-POST请求
+实际上，Garrett 提到的这种技术已经存在很长时间了。在Garrett 撰写那篇文章之前，人们通常将这种技术叫做远程脚本（remote scripting），而且早在1998 年就有人采用不同的手段实现了这种浏览器与服务器的通信。再往前推，JavaScript 需要通过Java applet 或Flash 电影等中间层向服务器发送请求。而XHR 则将浏览器原生的通信能力提供给了开发人员，简化了实现同样操作的任务。
+
+
+### XMLHttpRequest对象
+
+IE5 是第一款引入XHR 对象的浏览器。在IE5 中，XHR 对象是通过MSXML 库中的一个ActiveX对象实现的。因此，在IE 中可能会遇到三种不同版本的XHR 对象，即MSXML2.XMLHttp、MSXML2.XMLHttp.3.0 和MXSML2.XMLHttp.6.0。
+
+IE7+、Firefox、Opera、Chrome 和Safari 都支持原生的XHR 对象，在这些浏览器中创建XHR 对象要像下面这样使用XMLHttpRequest 构造函数。
+
+``` js
+var xhr = new XMLHttpRequest();
+```
+
+#### XHR的用法
+
+- open()
+- send()
+
+在使用XHR 对象时，要调用的第一个方法是open()，它接受3 个参数：要发送的请求的类型（"get"、"post"等）、请求的URL 和表示是否异步发送请求的布尔值。下面就是调用这个方法的例子。
+
+``` js
+xhr.open("get", "example.php", false);
+```
+
+这行代码会启动一个针对example.php 的GET 请求。有关这行代码，需要说明两点：一是URL相对于执行代码的当前页面（当然也可以使用绝对路径）；二是调用open()方法并不会真正发送请求，而只是启动一个请求以备发送。
+
+*只能向同一个域中使用相同端口和协议的URL 发送请求。如果URL 与启动请求的页面有任何差别，都会引发安全错误。*
+
+要发送特定的请求，必须像下面这样调用send()方法：
+
+``` js
+xhr.open("get", "example.txt", false);
+xhr.send(null);
+```
+
+这里的send()方法接收一个参数，即要作为请求主体发送的数据。如果不需要通过请求主体发送数据，则必须传入null，因为这个参数对有些浏览器来说是必需的。调用send()之后，请求就会被分派到服务器。
+
+由于这次请求是同步的，JavaScript 代码会等到服务器响应之后再继续执行。在收到响应后，响应的数据会自动填充XHR 对象的属性，相关的属性简介如下。
+
+- responseText：作为响应主体被返回的文本。
+- responseXML：如果响应的内容类型是"text/xml"或"application/xml"，这个属性中将保存包含着响应数据的XML DOM 文档。
+- status：响应的HTTP 状态。
+- statusText：HTTP 状态的说明。
+
+在接收到响应后，第一步是检查status 属性，以确定响应已经成功返回。一般来说，可以将HTTP状态代码为200 作为成功的标志。此时，responseText 属性的内容已经就绪，而且在内容类型正确的情况下，responseXML 也应该能够访问了。此外，状态代码为304 表示请求的资源并没有被修改，可以直接使用浏览器中缓存的版本；当然，也意味着响应是有效的。为确保接收到适当的响应，应该像下面这样检查上述这两种状态代码：
+
+``` js
+xhr.open("get", "example.txt", false);
+xhr.send(null);
+if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
+  alert(xhr.responseText);
+} else {
+  alert("Request was unsuccessful: " + xhr.status);
+}
+//>
+```
+
+根据返回的状态代码，这个例子可能会显示由服务器返回的内容，也可能会显示一条错误消息。我们建议读者要通过检测status 来决定下一步的操作，不要依赖statusText，因为后者在跨浏览器使用时不太可靠。另外，无论内容类型是什么，响应主体的内容都会保存到responseText 属性中；而对于非XML 数据而言，responseXML 属性的值将为null。
+
+像前面这样发送同步请求当然没有问题，但多数情况下，我们还是要发送异步请求，才能让JavaScript 继续执行而不必等待响应。此时，可以检测XHR 对象的readyState 属性，该属性表示请求/响应过程的当前活动阶段。这个属性可取的值如下。
+
+- 0：未初始化。尚未调用open()方法。
+- 1：启动。已经调用open()方法，但尚未调用send()方法。
+- 2：发送。已经调用send()方法，但尚未接收到响应。
+- 3：接收。已经接收到部分响应数据。
+- 4：完成。已经接收到全部响应数据，而且已经可以在客户端使用了。
+
+只要readyState 属性的值由一个值变成另一个值，都会触发一次readystatechange 事件。可以利用这个事件来检测每次状态变化后readyState 的值。通常，我们只对readyState 值为4 的阶段感兴趣，因为这时所有数据都已经就绪。不过，必须在调用open()之前指定onreadystatechange事件处理程序才能确保跨浏览器兼容性。下面来看一个例子。
+
+``` js
+var xhr = new XMLHttpRequest();
+xhr.onreadystatechange = function(){
+  if (xhr.readyState == 4){
+    if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
+      alert(xhr.responseText);
+    } else {
+      alert("Request was unsuccessful: " + xhr.status);
+    }
+  }
+};
+xhr.open("get", "example.txt", true);
+xhr.send(null);
+//>
+```
+
+*这个例子在onreadystatechange 事件处理程序中使用了xhr 对象，没有使用this 对象，原因是onreadystatechange 事件处理程序的作用域问题。如果使用this 对象，在有的浏览器中会导致函数执行失败，或者导致错误发生。因此，使用实际的XHR 对象实例变量是较为可靠的一种方式。*
+
+另外，在接收到响应之前还可以调用abort()方法来取消异步请求，如下所示：
+
+``` js
+xhr.abort();
+```
+
+调用这个方法后，XHR 对象会停止触发事件，而且也不再允许访问任何与响应有关的对象属性。在终止请求之后，还应该对XHR 对象进行解引用操作。由于内存原因，不建议重用XHR 对象。
+
+#### HTTP头部信息
+
+每个HTTP 请求和响应都会带有相应的头部信息，其中有的对开发人员有用，有的也没有什么用。XHR 对象也提供了操作这两种头部（即请求头部和响应头部）信息的方法。
+
+默认情况下，在发送XHR 请求的同时，还会发送下列头部信息。
+
+- Accept：浏览器能够处理的内容类型。
+- Accept-Charset：浏览器能够显示的字符集。
+- Accept-Encoding：浏览器能够处理的压缩编码。
+- Accept-Language：浏览器当前设置的语言。
+- Connection：浏览器与服务器之间连接的类型。
+- Cookie：当前页面设置的任何Cookie。
+- Host：发出请求的页面所在的域 。
+- Referer：发出请求的页面的URI。注意，HTTP 规范将这个头部字段拼写错了，而为保证与规范一致，也只能将错就错了。（这个英文单词的正确拼法应该是referrer。）
+- User-Agent：浏览器的用户代理字符串。
+
+虽然不同浏览器实际发送的头部信息会有所不同，但以上列出的基本上是所有浏览器都会发送的。使用setRequestHeader()方法可以设置自定义的请求头部信息。这个方法接受两个参数：头部字段的名称和头部字段的值。要成功发送请求头部信息，必须在调用open()方法之后且调用send()方法之前调用setRequestHeader()，如下面的例子所示。
+
+``` js
+var xhr = createXHR();
+xhr.onreadystatechange = function(){
+  if (xhr.readyState == 4){
+    if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
+      alert(xhr.responseText);
+    } else {
+      alert("Request was unsuccessful: " + xhr.status);
+    }
+  }
+};
 xhr.open("get", "example.php", true);
-send(data);
-XMLHttpRequest 2级
-- FormData类型
-- 超时设定：timeout属性，ontimeout事件。
-- overrideMimeType()方法
+xhr.setRequestHeader("MyHeader", "MyValue");
+xhr.send(null);
+//>
+```
 
-进度事件
-- loadstart事件
-- progress事件
-- error事件
-- abort事件
-- load事件
-- loadend事件
+服务器在接收到这种自定义的头部信息之后，可以执行相应的后续操作。我们建议读者使用自定义的头部字段名称，不要使用浏览器正常发送的字段名称，否则有可能会影响服务器的响应。有的浏览器允许开发人员重写默认的头部信息，但有的浏览器则不允许这样做。
 
-跨域资源共享
-CORS（跨源资源共享）
-- 设置请求头Origin
-- 使用绝对地址
-- 其他跨域技术：
-  - 图像Ping（只能发送GET请求，无法访问服务器的响应文本）
-  - JSONP（JSON with padding）（从其他域中加载代码执行，不安全，请求失败验证不容易）
-  - Comet（长轮询，短轮询，定时发送数据；HTTP流，一次请求，定时发送）
+调用XHR 对象的getResponseHeader()方法并传入头部字段名称，可以取得相应的响应头部信息。而调用getAllResponseHeaders()方法则可以取得一个包含所有头部信息的长字符串。
 
-服务器发送事件
-- SSE（Server Send Events，服务器发送事件） API
-- 事件流
+#### GET请求
 
-Web Sockets
-全双工、双向通信
-建立连接取得响应后升级为Web Socket协议，URL的模式也不同，未加密http://变为
-ws://，加密https://变为ws://。
+GET 是最常见的请求类型，最常用于向服务器查询某些信息。必要时，可以将查询字符串参数追加到URL 的末尾，以便将信息发送给服务器。对XHR 而言，位于传入open()方法的URL 末尾的查询字符串必须经过正确的编码才行。
+
+使用GET 请求经常会发生的一个错误，就是查询字符串的格式有问题。查询字符串中每个参数的名称和值都必须使用encodeURIComponent()进行编码，然后才能放到URL 的末尾；而且所有名-值对儿都必须由和号（&）分隔。
+
+#### POST请求
+
+使用频率仅次于GET 的是POST 请求，通常用于向服务器发送应该被保存的数据。POST 请求应该把数据作为请求的主体提交，而GET 请求传统上不是这样。POST 请求的主体可以包含非常多的数据，而且格式不限。在open()方法第一个参数的位置传入"post"，就可以初始化一个POST 请求，如下面的例子所示。
+
+``` js
+xhr.open("post", "example.php", true);
+```
+
+发送POST 请求的第二步就是向send()方法中传入某些数据。由于XHR 最初的设计主要是为了处理XML，因此可以在此传入XML DOM 文档，传入的文档经序列化之后将作为请求主体被提交到服务器。当然，也可以在此传入任何想发送到服务器的字符串。
+
+默认情况下，服务器对POST 请求和提交Web 表单的请求并不会一视同仁。因此，服务器端必须有程序来读取发送过来的原始数据，并从中解析出有用的部分。不过，我们可以使用XHR 来模仿表单提交：首先将Content-Type 头部信息设置为application/x-www-form-urlencoded，也就是表单提交时的内容类型，其次是以适当的格式创建一个字符串。第14 章曾经讨论过，POST 数据的格式与查询字符串格式相同。如果需要将页面中表单的数据进行序列化，然后再通过XHR 发送到服务器，那么就可以使用第14 章介绍的serialize()函数来创建这个字符串：
+
+``` js
+function submitData() {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function () {
+    if (xhr.readyState == 4) {
+      if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+        alert(xhr.responseText);
+      } else {
+        alert("Request was unsuccessful: " + xhr.status);
+      }
+    }
+  };
+  xhr.open("post", "postexample.php", true);
+  xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+  var form = document.getElementById("user-info");
+  xhr.send(serialize(form));
+}
+//>
+```
+
+这个函数可以将ID 为"user-info"的表单中的数据序列化之后发送给服务器。
+
+*与GET 请求相比，POST 请求消耗的资源会更多一些。从性能角度来看，以发送相同的数据计，GET 请求的速度最多可达到POST 请求的两倍。*
+
+### XMLHttpRequest 2 级
+
+鉴于XHR 已经得到广泛接受，成为了事实标准，W3C 也着手制定相应的标准以规范其行为。XMLHttpRequest 1 级只是把已有的XHR 对象的实现细节描述了出来。而XMLHttpRequest 2 级则进一步发展了XHR。并非所有浏览器都完整地实现了XMLHttpRequest 2 级规范，但所有浏览器都实现了它规定的部分内容。
+
+#### FormData
+
+现代Web 应用中频繁使用的一项功能就是表单数据的序列化，XMLHttpRequest 2 级为此定义了FormData 类型。FormData 为序列化表单以及创建与表单格式相同的数据（用于通过XHR 传输）提供了便利。下面的代码创建了一个FormData 对象，并向其中添加了一些数据。
+
+``` js
+var data = new FormData();
+data.append("name", "Nicholas");
+```
+
+这个append()方法接收两个参数：键和值，分别对应表单字段的名字和字段中包含的值。可以像这样添加任意多个键值对儿。而通过向FormData 构造函数中传入表单元素，也可以用表单元素的数据预先向其中填入键值对儿：
+
+``` js
+var data = new FormData(document.forms[0]);
+```
+
+创建了FormData 的实例后，可以将它直接传给XHR 的send()方法，如下所示：
+
+``` js
+var xhr = createXHR();
+xhr.onreadystatechange = function () {
+  if (xhr.readyState == 4) {
+    if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+      alert(xhr.responseText);
+    } else {
+      alert("Request was unsuccessful: " + xhr.status);
+    }
+  }
+};
+xhr.open("post", "postexample.php", true);
+var form = document.getElementById("user-info");
+xhr.send(new FormData(form));
+//>
+```
+
+使用FormData 的方便之处体现在不必明确地在XHR 对象上设置请求头部。XHR 对象能够识别传入的数据类型是FormData 的实例，并配置适当的头部信息。
+
+支持FormData 的浏览器有Firefox 4+、Safari 5+、Chrome 和Android 3+版WebKit。
+
+#### 超时设定
+
+IE8 为XHR 对象添加了一个timeout 属性，表示请求在等待响应多少毫秒之后就终止。在给timeout 设置一个数值后，如果在规定的时间内浏览器还没有接收到响应，那么就会触发timeout 事件，进而会调用ontimeout 事件处理程序。这项功能后来也被收入了XMLHttpRequest 2 级规范中。来看下面的例子。
+
+``` js
+var xhr = createXHR();
+xhr.onreadystatechange = function () {
+  if (xhr.readyState == 4) {
+    try {
+      if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+        alert(xhr.responseText);
+      } else {
+        alert("Request was unsuccessful: " + xhr.status);
+      }
+    } catch (ex) {
+      //假设由ontimeout 事件处理程序处理
+    }
+  }
+};
+xhr.open("get", "timeout.php", true);
+xhr.timeout = 1000; //将超时设置为1 秒钟（仅适用于IE8+）
+xhr.ontimeout = function () {
+  alert("Request did not return in a second.");
+};
+xhr.send(null);
+//>
+```
+
+#### overrideMimeType()方法
+
+Firefox 最早引入了overrideMimeType()方法，用于重写XHR 响应的MIME 类型。这个方法后来也被纳入了XMLHttpRequest 2 级规范。因为返回响应的MIME 类型决定了XHR 对象如何处理它，所以提供一种方法能够重写服务器返回的MIME 类型是很有用的。
+
+比如，服务器返回的MIME 类型是text/plain，但数据中实际包含的是XML。根据MIME 类型，即使数据是XML，responseXML 属性中仍然是null。通过调用overrideMimeType()方法，可以保证把响应当作XML 而非纯文本来处理。
+
+调用overrideMimeType()必须在send()方法之前，才能保证重写响应的MIME 类型。
+支持overrideMimeType()方法的浏览器有Firefox、Safari 4+、Opera 10.5 和Chrome。
+
+### 进度事件
+
+Progress Events 规范是W3C 的一个工作草案，定义了与客户端服务器通信有关的事件。这些事件最早其实只针对XHR 操作，但目前也被其他API 借鉴。有以下6 个进度事件。
+
+- loadstart：在接收到响应数据的第一个字节时触发。
+- progress：在接收响应期间持续不断地触发。
+- error：在请求发生错误时触发。
+- abort：在因为调用abort()方法而终止连接时触发。
+- load：在接收到完整的响应数据时触发。
+- loadend：在通信完成或者触发error、abort 或load 事件后触发。
+
+每个请求都从触发loadstart 事件开始，接下来是一或多个progress 事件，然后触发error、abort 或load 事件中的一个，最后以触发loadend 事件结束。
+
+支持前5 个事件的浏览器有Firefox 3.5+、Safari 4+、Chrome、iOS 版Safari 和Android 版WebKit。Opera（从第11 版开始）、IE 8+只支持load 事件。目前还没有浏览器支持loadend 事件。
+
+#### load事件
+
+Firefox 在实现XHR 对象的某个版本时，曾致力于简化异步交互模型。最终，Firefox 实现中引入了load 事件，用以替代readystatechange 事件。响应接收完毕后将触发load 事件，因此也就没有必要去检查readyState 属性了。而onload 事件处理程序会接收到一个event 对象，其target 属性就指向XHR 对象实例，因而可以访问到XHR 对象的所有方法和属性。然而，并非所有浏览器都为这个事件实现了适当的事件对象。
+
+#### progress事件
+
+Mozilla 对XHR 的另一个革新是添加了progress 事件，这个事件会在浏览器接收新数据期间周期性地触发。而onprogress 事件处理程序会接收到一个event 对象，其target 属性是XHR 对象，但包含着三个额外的属性：lengthComputable、position 和totalSize。其中，lengthComputable是一个表示进度信息是否可用的布尔值，position 表示已经接收的字节数，totalSize 表示根据Content-Length 响应头部确定的预期字节数。有了这些信息，我们就可以为用户创建一个进度指示器了。
+
+### 跨源资源共享
+
+通过XHR 实现Ajax 通信的一个主要限制，来源于跨域安全策略。默认情况下，XHR 对象只能访问与包含它的页面位于同一个域中的资源。这种安全策略可以预防某些恶意行为。但是，实现合理的跨域请求对开发某些浏览器应用程序也是至关重要的。
+
+CORS（Cross-Origin Resource Sharing，跨源资源共享）是W3C 的一个工作草案，定义了在必须访问跨源资源时，浏览器与服务器应该如何沟通。
+**CORS 背后的基本思想，就是使用自定义的HTTP 头部让浏览器与服务器进行沟通，从而决定请求或响应是应该成功，还是应该失败。**
+
+比如一个简单的使用GET 或POST 发送的请求，它没有自定义的头部，而主体内容是text/plain。在发送该请求时，需要给它附加一个额外的Origin 头部，其中包含请求页面的源信息（协议、域名和端口），以便服务器根据这个头部信息来决定是否给予响应。下面是Origin 头部的一个示例：
+
+``` js
+Origin: http://www.nczonline.net
+```
+
+如果服务器认为这个请求可以接受，就在Access-Control-Allow-Origin 头部中回发相同的源信息（如果是公共资源，可以回发"*"）。例如：
+
+``` js
+Access-Control-Allow-Origin: http://www.nczonline.net
+```
+
+如果没有这个头部，或者有这个头部但源信息不匹配，浏览器就会驳回请求。正常情况下，浏览器会处理请求。注意，请求和响应都不包含cookie 信息。
+
+#### IE对CORS的实现
+
+微软在IE8 中引入了XDR（XDomainRequest）类型。这个对象与XHR 类似，但能实现安全可靠的跨域通信。
+
+#### 其他浏览器对CORS的实现
+
+Firefox 3.5+、Safari 4+、Chrome、iOS 版Safari 和Android 平台中的WebKit 都通过XMLHttpRequest对象实现了对CORS 的原生支持。在尝试打开不同来源的资源时，无需额外编写代码就可以触发这个行为。要请求位于另一个域中的资源，使用标准的XHR 对象并在open()方法中传入绝对URL 即可，例如：
+
+``` js
+var xhr = createXHR();
+xhr.onreadystatechange = function(){
+if (xhr.readyState == 4){
+if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304){
+alert(xhr.responseText);
+} else {
+alert("Request was unsuccessful: " + xhr.status);
+}
+}
+};
+xhr.open("get", "http://www.somewhere-else.com/page/", true);
+xhr.send(null);
+//>
+```
+
+与IE 中的XDR 对象不同，通过跨域XHR 对象可以访问status 和statusText 属性，而且还支持同步请求。跨域XHR 对象也有一些限制，但为了安全这些限制是必需的。以下就是这些限制。
+
+- 不能使用setRequestHeader()设置自定义头部。
+- 不能发送和接收cookie。
+- 调用getAllResponseHeaders()方法总会返回空字符串。
+
+由于无论同源请求还是跨源请求都使用相同的接口，因此对于本地资源，最好使用相对URL，在访问远程资源时再使用绝对URL。这样做能消除歧义，避免出现限制访问头部或本地cookie 信息等问题。
+
+#### Preflighted Reqeusts
+
+CORS 通过一种叫做Preflighted Requests 的透明服务器验证机制支持开发人员使用自定义的头部、GET 或POST 之外的方法，以及不同类型的主体内容。在使用下列高级选项来发送请求时，就会向服务器发送一个Preflight 请求。这种请求使用OPTIONS 方法，发送下列头部。
+
+- Origin：与简单的请求相同。
+- Access-Control-Request-Method：请求自身使用的方法。
+- Access-Control-Request-Headers：（可选）自定义的头部信息，多个头部以逗号分隔。
+
+以下是一个带有自定义头部NCZ 的使用POST 方法发送的请求：
+
+- Origin: http://www.nczonline.net
+- Access-Control-Request-Method: POST
+- Access-Control-Request-Headers: NCZ
+
+发送这个请求后，服务器可以决定是否允许这种类型的请求。服务器通过在响应中发送如下头部与浏览器进行沟通。
+
+- Access-Control-Allow-Origin：与简单的请求相同。
+- Access-Control-Allow-Methods：允许的方法，多个方法以逗号分隔。
+- Access-Control-Allow-Headers：允许的头部，多个头部以逗号分隔。
+- Access-Control-Max-Age：应该将这个Preflight 请求缓存多长时间（以秒表示）。
+
+例如：
+
+Access-Control-Allow-Origin: http://www.nczonline.net
+Access-Control-Allow-Methods: POST, GET
+Access-Control-Allow-Headers: NCZ
+Access-Control-Max-Age: 1728000
+
+Preflight 请求结束后，结果将按照响应中指定的时间缓存起来。而为此付出的代价只是第一次发送这种请求时会多一次HTTP 请求。
+
+支持Preflight 请求的浏览器包括Firefox 3.5+、Safari 4+和Chrome。IE 10 及更早版本都不支持。
+
+#### 带凭据的请求
+
+默认情况下，跨源请求不提供凭据（cookie、HTTP 认证及客户端SSL 证明等）。通过将withCredentials 属性设置为true，可以指定某个请求应该发送凭据。如果服务器接受带凭据的请求，会用下面的HTTP 头部来响应。
+
+Access-Control-Allow-Credentials: true
+
+如果发送的是带凭据的请求，但服务器的响应中没有包含这个头部，那么浏览器就不会把响应交给JavaScript（于是，responseText 中将是空字符串，status 的值为0，而且会调用onerror()事件处理程序）。另外，服务器还可以在Preflight 响应中发送这个HTTP 头部，表示允许源发送带凭据的请求。
+
+支持withCredentials 属性的浏览器有Firefox 3.5+、Safari 4+和Chrome。IE 10 及更早版本都不支持。
+
+#### 跨浏览器的CORS
+
+即使浏览器对CORS 的支持程度并不都一样，但所有浏览器都支持简单的（非Preflight 和不带凭据的）请求，因此有必要实现一个跨浏览器的方案。检测XHR 是否支持CORS 的最简单方式，就是检查是否存在withCredentials 属性。再结合检测XDomainRequest 对象是否存在，就可以兼顾所有浏览器了。
+
+``` js
+function createCORSRequest(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+    xhr.open(method, url, true);
+  } else if (typeof XDomainRequest != "undefined") {
+    vxhr = new XDomainRequest();
+    xhr.open(method, url);
+  } else {
+    xhr = null;
+  }
+  return xhr;
+}
+var request = createCORSRequest("get", "http://www.somewhere-else.com/page/");
+if (request) {
+  request.onload = function () {
+    //对request.responseText 进行处理
+  };
+  request.send();
+}
+```
+
+Firefox、Safari 和Chrome 中的XMLHttpRequest 对象与IE 中的XDomainRequest 对象类似，都提供了够用的接口，因此以上模式还是相当有用的。这两个对象共同的属性/方法如下。
+
+- abort()：用于停止正在进行的请求。
+- onerror：用于替代onreadystatechange 检测错误。
+- onload：用于替代onreadystatechange 检测成功。
+- responseText：用于取得响应内容。
+- send()：用于发送请求。
+
+以上成员都包含在createCORSRequest()函数返回的对象中，在所有浏览器中都能正常使用。
+
+### 其他跨域技术
+
+#### 图像Ping
+
+种跨域请求技术是使用<img>标签。我们知道，一个网页可以从任何网页中加载图像，不用担心跨域不跨域。这也是在线广告跟踪浏览量的主要方式。正如第13 章讨论过的，也可以动态地创
+建图像，使用它们的onload 和onerror 事件处理程序来确定是否接收到了响应。
+
+动态创建图像经常用于图像Ping。图像Ping 是与服务器进行简单、单向的跨域通信的一种方式。请求的数据是通过查询字符串形式发送的，而响应可以是任意内容，但通常是像素图或204 响应。通过图像Ping，浏览器得不到任何具体的数据，但通过侦听load 和error 事件，它能知道响应是什么时候接收到的。来看下面的例子。
+
+``` js
+var img = new Image();
+img.onload = img.onerror = function(){
+  alert("Done!");
+};
+img.src = "http://www.example.com/test?name=Nicholas";
+```
+
+这里创建了一个Image 的实例，然后将onload 和onerror 事件处理程序指定为同一个函数。这样无论是什么响应，只要请求完成，就能得到通知。请求从设置src 属性那一刻开始，而这个例子在请求中发送了一个name 参数。
+
+图像Ping 最常用于跟踪用户点击页面或动态广告曝光次数。图像Ping 有两个主要的缺点，一是只能发送GET 请求，二是无法访问服务器的响应文本。因此，图像Ping 只能用于浏览器与服务器间的单向通信。
+
+#### JSONP
+
+JSONP 是JSON with padding（填充式JSON 或参数式JSON）的简写，是应用JSON 的一种新方法，在后来的Web 服务中非常流行。JSONP 看起来与JSON 差不多，只不过是被包含在函数调用中的JSON，就像下面这样。
+
+``` js
+callback({ "name": "Nicholas" });
+```
+
+JSONP 由两部分组成：回调函数和数据。回调函数是当响应到来时应该在页面中调用的函数。回调函数的名字一般是在请求中指定的。而数据就是传入回调函数中的JSON数据。下面是一个典型的JSONP请求。
+http://freegeoip.net/json/?callback=handleResponse
+这个URL 是在请求一个JSONP 地理定位服务。通过查询字符串来指定JSONP 服务的回调参数是很常见的，就像上面的URL 所示，这里指定的回调函数的名字叫handleResponse()。
+
+JSONP 是通过动态<script>元素（要了解详细信息，请参考第13 章）来使用的，使用时可以为src 属性指定一个跨域URL。这里的<script>元素与<img>元素类似，都有能力不受限制地从其他域加载资源。因为JSONP 是有效的JavaScript 代码，所以在请求完成后，即在JSONP 响应加载到页面中以后，就会立即执行。来看一个例子。
+
+``` js
+function handleResponse(response){
+  alert("You’re at IP address " + response.ip + ", which is in " +
+  response.city + ", " + response.region_name);
+}
+var script = document.createElement("script");
+script.src = "http://freegeoip.net/json/?callback=handleResponse";
+document.body.insertBefore(script, document.body.firstChild);
+```
+
+这个例子通过查询地理定位服务来显示你的IP 地址和位置信息。
+
+JSONP 之所以在开发人员中极为流行，主要原因是它非常简单易用。与图像Ping 相比，它的优点在于能够直接访问响应文本，支持在浏览器与服务器之间双向通信。不过，JSONP 也有两点不足。
+
+首先，JSONP 是从其他域中加载代码执行。如果其他域不安全，很可能会在响应中夹带一些恶意代码，而此时除了完全放弃JSONP 调用之外，没有办法追究。因此在使用不是你自己运维的Web 服务时，一定得保证它安全可靠。
+
+其次，要确定JSONP 请求是否失败并不容易。虽然HTML5 给<script>元素新增了一个onerror事件处理程序，但目前还没有得到任何浏览器支持。为此，开发人员不得不使用计时器检测指定时间内是否接收到了响应。但就算这样也不能尽如人意，毕竟不是每个用户上网的速度和带宽都一样。
+
+#### Comet
+
+Comet 是Alex Russell①发明的一个词儿，指的是一种更高级的Ajax 技术（经常也有人称为“服务器推送”）。Ajax 是一种从页面向服务器请求数据的技术，而Comet 则是一种服务器向页面推送数据的技术。Comet 能够让信息近乎实时地被推送到页面上，非常适合处理体育比赛的分数和股票报价。
+
+有两种实现Comet 的方式：
+
+- 长轮询
+- HTTP 流
+
+长轮询是传统轮询（也称为短轮询）的一个翻版，即浏览器定时向服务器发送请求，看有没有更新的数据。
+
+长轮询把短轮询颠倒了一下。页面发起一个到服务器的请求，然后服务器一直保持连接打开，直到有数据可发送。发送完数据之后，浏览器关闭连接，随即又发起一个到服务器的新请求。这一过程在页面打开期间一直持续不断。
+
+无论是短轮询还是长轮询，浏览器都要在接收数据之前，先发起对服务器的连接。两者最大的区别在于服务器如何发送数据。短轮询是服务器立即发送响应，无论数据是否有效，而长轮询是等待发送响应。轮询的优势是所有浏览器都支持，因为使用XHR 对象和setTimeout()就能实现。而你要做的就是决定什么时候发送请求。
+
+第二种流行的Comet 实现是HTTP 流。流不同于上述两种轮询，因为它在页面的整个生命周期内只使用一个HTTP 连接。具体来说，就是浏览器向服务器发送一个请求，而服务器保持连接打开，然后周期性地向浏览器发送数据。
+
+在Firefox、Safari、Opera 和Chrome 中，通过侦听readystatechange 事件及检测readyState的值是否为3，就可以利用XHR 对象实现HTTP 流。在上述这些浏览器中，随着不断从服务器接收数据，readyState 的值会周期性地变为3。当readyState 值变为3 时，responseText 属性中就会保存接收到的所有数据。此时，就需要比较此前接收到的数据，决定从什么位置开始取得最新的数据。使用XHR 对象实现HTTP 流的典型代码如下所示。
+
+``` js
+function createStreamingClient(url, progress, finished){
+var xhr = new XMLHttpRequest(),
+received = 0;
+xhr.open("get", url, true);
+xhr.onreadystatechange = function(){
+var result;
+if (xhr.readyState == 3){
+//只取得最新数据并调整计数器
+result = xhr.responseText.substring(received);
+received += result.length;
+//调用progress 回调函数
+progress(result);
+} else if (xhr.readyState == 4){
+finished(xhr.responseText);
+}
+};
+xhr.send(null);
+return xhr;
+}
+var client = createStreamingClient("streaming.php", function(data){
+alert("Received: " + data);
+}, function(data){
+alert("Done!");
+});
+```
+
+这个createStreamingClient()函数接收三个参数：要连接的URL、在接收到数据时调用的函数以及关闭连接时调用的函数。有时候，当连接关闭时，很可能还需要重新建立，所以关注连接什么时候关闭还是有必要的。
+
+只要readystatechange 事件发生，而且readyState 值为3，就对responseText 进行分割以取得最新数据。这里的received 变量用于记录已经处理了多少个字符，每次readyState 值为3 时都递增。然后，通过progress 回调函数来处理传入的新数据。而当readyState 值为4 时，则执行finished 回调函数，传入响应返回的全部内容。
+
+虽然这个例子比较简单，而且也能在大多数浏览器中正常运行（IE 除外），但管理Comet 的连接是很容易出错的，需要时间不断改进才能达到完美。浏览器社区认为Comet 是未来Web 的一个重要组成部分，为了简化这一技术，又为Comet 创建了两个新的接口。
+
+#### 服务器发送事件
+
+SSE（Server-Sent Events，服务器发送事件）是围绕只读Comet 交互推出的API 或者模式。SSE API用于创建到服务器的单向连接，服务器通过这个连接可以发送任意数量的数据。服务器响应的MIME类型必须是text/event-stream，而且是浏览器中的JavaScript API 能解析格式输出。SSE 支持短轮询、长轮询和HTTP 流，而且能在断开连接时自动确定何时重新连接。有了这么简单实用的API，再实现Comet 就容易多了。
+
+支持SSE 的浏览器有Firefox 6+、Safari 5+、Opera 11+、Chrome 和iOS 4+版Safari。
+
+**1. SSE API**
+
+SSE 的JavaScript API 与其他传递消息的JavaScript API 很相似。要预订新的事件流，首先要创建一个新的EventSource 对象，并传进一个入口点：
+
+``` js
+var source = new EventSource("myevents.php");
+```
+
+注意，传入的URL 必须与创建对象的页面同源（相同的URL 模式、域及端口）。EventSource 的实例有一个readyState 属性，值为0 表示正连接到服务器，值为1 表示打开了连接，值为2 表示关闭了连接。
+
+另外，还有以下三个事件：
+
+- open：在建立连接时触发。
+- message：在从服务器接收到新事件时触发。
+- error：在无法建立连接时触发。
+
+就一般的用法而言，onmessage 事件处理程序也没有什么特别的。
+
+``` js
+source.onmessage = function(event){
+  var data = event.data;
+  //处理数据
+};
+```
+
+服务器发回的数据以字符串形式保存在event.data 中。
+默认情况下，EventSource 对象会保持与服务器的活动连接。如果连接断开，还会重新连接。这就意味着SSE 适合长轮询和HTTP 流。如果想强制立即断开连接并且不再重新连接，可以调用close()方法。
+
+``` js
+source.close();
+```
+
+**2. 事件流**
+
+所谓的服务器事件会通过一个持久的HTTP 响应发送，这个响应的MIME 类型为text/eventstream。响应的格式是纯文本，最简单的情况是每个数据项都带有前缀data。
+
+#### Web Sockets
+
+Web Sockets 的目标是在一个单独的持久连接上提供全双工、双向通信。在JavaScript 中创建了Web Socket 之后，会有一个HTTP 请求发送到浏览器以发起连接。在取得服务器响应后，建立的连接会使用HTTP 升级从HTTP 协议交换为WebSocket 协议。也就是说，使用标准的HTTP 服务器无法实现Web Sockets，只有支持这种协议的专门服务器才能正常工作。
+
+由于Web Sockets 使用了自定义的协议，所以URL 模式也略有不同。未加密的连接不再是http://，而是ws://；加密的连接也不是https://，而是wss://。在使用Web Socket URL 时，必须带着这个模式，因为将来还有可能支持其他模式。
+
+使用自定义协议而非HTTP 协议的好处是，能够在客户端和服务器之间发送非常少量的数据，而不必担心HTTP 那样字节级的开销。由于传递的数据包很小，因此Web Sockets 非常适合移动应用。毕竟对移动应用而言，带宽和网络延迟都是关键问题。使用自定义协议的缺点在于，制定协议的时间比制定JavaScript API 的时间还要长。Web Sockets 曾几度搁浅，就因为不断有人发现这个新协议存在一致性和安全性的问题。Firefox 4 和Opera 11 都曾默认启用Web Sockets，但在发布前夕又禁用了，因为又发现了安全隐患。目前支持Web Sockets 的浏览器有Firefox 6+、Safari 5+、Chrome 和iOS 4+版Safari。
+
+**1. Web Sockets API**
+
+要创建Web Socket，先实例一个WebSocket 对象并传入要连接的URL：
+
+``` js
+var socket = new WebSocket("ws://www.example.com/server.php");
+```
+
+注意，必须给WebSocket 构造函数传入绝对URL。同源策略对Web Sockets 不适用，因此可以通过它打开到任何站点的连接。至于是否会与某个域中的页面通信，则完全取决于服务器。（通过握手信息就可以知道请求来自何方。）
+
+实例化了WebSocket 对象后，浏览器就会马上尝试创建连接。与XHR 类似，WebSocket 也有一个表示当前状态的readyState 属性。不过，这个属性的值与XHR 并不相同，而是如下所示。
+
+- WebSocket.OPENING (0)：正在建立连接。
+- WebSocket.OPEN (1)：已经建立连接。
+- WebSocket.CLOSING (2)：正在关闭连接。
+- WebSocket.CLOSE (3)：已经关闭连接。
+
+WebSocket 没有readystatechange 事件；不过，它有其他事件，对应着不同的状态。readyState的值永远从0 开始。
+
+要关闭Web Socket 连接，可以在任何时候调用close()方法。
+
+``` js
+socket.close();
+```
+
+调用了close()之后，readyState 的值立即变为2（正在关闭），而在关闭连接后就会变成3。
+
+**2. 发送和接收数据**
+
+Web Socket 打开之后，就可以通过连接发送和接收数据。要向服务器发送数据，使用send()方法并传入任意字符串，例如：
+
+``` js
+var socket = new WebSocket("ws://www.example.com/server.php");
+socket.send("Hello world!");
+```
+
+因为Web Sockets 只能通过连接发送纯文本数据，所以对于复杂的数据结构，在通过连接发送之前，必须进行序列化。下面的例子展示了先将数据序列化为一个JSON 字符串，然后再发送到服务器。
+
+``` js
+var message = {
+  time: new Date(),
+  text: "Hello world!",
+  clientId: "asdfp8734rew"
+};
+socket.send(JSON.stringify(message));
+```
+
+接下来，服务器要读取其中的数据，就要解析接收到的JSON 字符串。
+当服务器向客户端发来消息时，WebSocket 对象就会触发message 事件。这个message 事件与其他传递消息的协议类似，也是把返回的数据保存在event.data 属性中。
+
+``` js
+socket.onmessage = function(event){
+var data = event.data;
+  //处理数据
+};
+```
+
+与通过send()发送到服务器的数据一样，event.data 中返回的数据也是字符串。如果你想得到其他格式的数据，必须手工解析这些数据。
+
+**3. 其他事件**
+
+WebSocket 对象还有其他三个事件，在连接生命周期的不同阶段触发。
+
+- open：在成功建立连接时触发。
+- error：在发生错误时触发，连接不能持续。
+- close：在连接关闭时触发。
+
+WebSocket 对象不支持DOM 2 级事件侦听器，因此必须使用DOM 0 级语法分别定义每个事件处理程序。
+
+``` js
+var socket = new WebSocket("ws://www.example.com/server.php");
+socket.onopen = function(){
+  alert("Connection established.");
+};
+socket.onerror = function(){
+  alert("Connection error.");
+};
+socket.onclose = function(){
+  alert("Connection closed.");
+};
+```
+
+在这三个事件中，只有close 事件的event 对象有额外的信息。这个事件的事件对象有三个额外的属性：wasClean、code 和reason。其中，wasClean 是一个布尔值，表示连接是否已经明确地关闭；code 是服务器返回的数值状态码；而reason 是一个字符串，包含服务器发回的消息。可以把这些信息显示给用户，也可以记录到日志中以便将来分析。
+
+``` js
+socket.onclose = function(event){
+  console.log("Was clean? " + event.wasClean + " Code=" + event.code + " Reason=" + event.reason);
+};
+```
+
+#### SSE与Web Sockets
+
+面对某个具体的用例，在考虑是使用SSE 还是使用Web Sockets 时，可以考虑如下几个因素。首先，你是否有自由度建立和维护Web Sockets 服务器？因为Web Socket 协议不同于HTTP，所以现有服务器不能用于Web Socket 通信。SSE 倒是通过常规HTTP 通信，因此现有服务器就可以满足需求。
+
+第二个要考虑的问题是到底需不需要双向通信。如果用例只需读取服务器数据（如比赛成绩），那么SSE 比较容易实现。如果用例必须双向通信（如聊天室），那么Web Sockets 显然更好。别忘了，在不能选择Web Sockets 的情况下，组合XHR 和SSE 也是能实现双向通信的。
+
+### 安全
+
+对于未被授权系统有权访问某个资源的情况，我们称之为CSRF（Cross-Site Request Forgery，跨站点请求伪造）。未被授权系统会伪装自己，让处理请求的服务器认为它是合法的。受到CSRF 攻击的Ajax程序有大有小，攻击行为既有旨在揭示系统漏洞的恶作剧，也有恶意的数据窃取或数据销毁。
+
+为确保通过XHR 访问的URL 安全，通行的做法就是验证发送请求者是否有权限访问相应的资源。有下列几种方式可供选择。
+
+- 要求以SSL 连接来访问可以通过XHR 请求的资源。
+- 要求每一次请求都要附带经过相应算法计算得到的验证码。
+
+请注意，下列措施对防范CSRF 攻击不起作用。
+
+- 要求发送POST 而不是GET 请求——很容易改变。
+- 检查来源URL 以确定是否可信——来源记录很容易伪造。
+- 基于cookie 信息进行验证——同样很容易伪造。
+
+XHR 对象也提供了一些安全机制，虽然表面上看可以保证安全，但实际上却相当不可靠。实际上，前面介绍的open()方法还能再接收两个参数：要随请求一起发送的用户名和密码。带有这两个参数的请求可以通过SSL 发送给服务器上的页面，如下面的例子所示。
+
+``` js
+xhr.open("get", "example.php", true, "username", "password"); //不要这样做！！
+```
 
 
 
