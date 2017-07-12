@@ -5519,6 +5519,55 @@ bind()
 
 #### 函数柯里化
 
+### 防篡改对象
+
+#### 不可扩展对象
+
+- Object.preventExtensions()
+- Object.istExtensible()
+
+#### 密封的对象
+
+- Object.seal()
+- Object.isSealed()
+
+#### 冻结的对象
+
+- Object.freeze()
+- Object.isFrozen()
+
+### 高级定时器
+
+#### 重复定时器
+
+#### Yielding Processes
+
+#### 函数节流
+
+### 自定义事件
+
+## 第二十三章 离线应用与客户端存储
+
+### 离线检测
+
+### 应用缓存
+
+HTML5 的应用缓存（application cache），或者简称为appcache，是专门为开发离线Web 应用而设计的。Appcache 就是从浏览器的缓存中分出来的一块缓存区。要想在这个缓存中保存数据，可以使用一个描述文件（manifest file），列出要下载和缓存的资源。
+
+虽然应用缓存的意图是确保离线时资源可用，但也有相应的JavaScript API 让你知道它都在做什么。这个API 的核心是applicationCache 对象，这个对象有一个status 属性，属性的值是常量，表示应用缓存的如下当前状态。
+
+### 数据存储
+
+#### Cookie
+
+#### IE用户数据
+
+#### Web存储机制
+
+#### IndexedDB
+
+
+
 
 
 
