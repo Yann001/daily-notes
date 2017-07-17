@@ -1,0 +1,9 @@
+.components {
+  margin: 20px;
+}
+
+.components .item {
+  margin-bottom: 10px;
+  border-bottom: 1px solid #999;
+}
+

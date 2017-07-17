@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+    <title>Document</title>
+</head>
+<body>
+    <h1>文字复制功能</h1>
+    <p>文字-Word</p>
+    <button class="btn-copy" onclick="copy()">复制</button>
+    <button class="btn-alert">输出</button>
+    <script>
+        var copy =function () {
+            var words = document.querySelector("btn-copy");
+            window.clipboardData.setData("Text", words.innerText);
+            // words.select();
+            // document.execCommand('Copy');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<view class="components">
+  <view wx:for="{{ components }}" wx:for-index="idx" bindtap="gotoItem(item.id)" class="item">{{ (idx+1) + ". " + item.name }}</view>
+</view>
+<template is="{{ modalName }}"></template>
+<template name="view">
+  <view class="section">
+    <view class="section__title">flex-direction: row</view>
+    <view class="flex-wrp" style="flex-direction:row;">
+      <view class="flex-item bc_green">1</view>
+      <view class="flex-item bc_red">2</view>
+      <view class="flex-item bc_blue">3</view>
+    </view>
+  </view>
+  <view class="section">
+    <view class="section__title">flex-direction: column</view>
+    <view class="flex-wrp" style="height: 300px;flex-direction:column;">
+      <view class="flex-item bc_green">1</view>
+      <view class="flex-item bc_red">2</view>
+      <view class="flex-item bc_blue">3</view>
+    </view>
+  </view>
+</template>
+<template name="scroll-view">
+  <view class="section">
+    <view class="section__title">vertical scroll</view>
+    <scroll-view scroll-y style="height: 200px;" bindscrolltoupper="upper" bindscrolltolower="lower" bindscroll="scroll" scroll-into-view="{{toView}}" scroll-top="{{scrollTop}}">
+      <view id="green" class="scroll-view-item bc_green"></view>
+      <view id="red"  class="scroll-view-item bc_red"></view>
+      <view id="yellow" class="scroll-view-item bc_yellow"></view>
+      <view id="blue" class="scroll-view-item bc_blue"></view>
+    </scroll-view>
+
+    <view class="btn-area">
+      <button size="mini" bindtap="tap">click me to scroll into view </button>
+      <button size="mini" bindtap="tapMove">click me to scroll</button>
+    </view>
+  </view>
+  <view class="section section_gap">
+    <view class="section__title">horizontal scroll</view>
+    <scroll-view class="scroll-view_H" scroll-x style="width: 100%">
+      <view id="green" class="scroll-view-item_H bc_green"></view>
+      <view id="red"  class="scroll-view-item_H bc_red"></view>
+      <view id="yellow" class="scroll-view-item_H bc_yellow"></view>
+      <view id="blue" class="scroll-view-item_H bc_blue"></view>
+    </scroll-view>
+  </view>
+</template>
+<template name="swiper">
+  <swiper indicator-dots="{{indicatorDots}}"
+    autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}">
+    <block wx:for="{{imgUrls}}">
+      <swiper-item>
+        <image src="{{item}}" class="slide-image" width="355" height="150"/>
+      </swiper-item>
+    </block>
+  </swiper>
+  <button bindtap="changeIndicatorDots"> indicator-dots </button>
+  <button bindtap="changeAutoplay"> autoplay </button>
+  <slider bindchange="intervalChange" show-value min="500" max="2000"/> interval
+  <slider bindchange="durationChange" show-value min="1000" max="10000"/> duration
+</template>
+<template name="movable-view">
+  <view class="section">
+    <view class="section__title">movable-view区域小于movable-area</view>
+    <movable-area style="height: 200px;width: 200px;background: red;">
+      <movable-view style="height: 50px; width: 50px; background: blue;" x="{{x}}" y="{{y}}" direction="all">
+      </movable-view>
+    </movable-area>
+    <view class="btn-area">
+      <button size="mini" bindtap="tap">click me to move to (30px, 30px)</button>
+    </view>
+    <view class="section__title">movable-view区域大于movable-area</view>
+    <movable-area style="height: 100px;width: 100px;background: red;" direction="all">
+      <movable-view style="height: 200px; width: 200px; background: blue;">
+      </movable-view>
+    </movable-area>
+  </view>
+</template>
+<template name="cover-view">
+  <video id="myVideo" src="http://wxsnsdy.tc.qq.com/105/20210/snsdyvideodownload?filekey=30280201010421301f0201690402534804102ca905ce620b1241b726bc41dcff44e00204012882540400&bizid=1023&hy=SH&fileparam=302c020101042530230204136ffd93020457e3c4ff02024ef202031e8d7f02030f42400204045a320a0201000400" controls="{{false}}" event-model="bubble">
+    <cover-view class="controls">
+      <cover-view class="play" bindtap="play">
+        <cover-image class="img" src="/path/to/icon_play" />
+      </cover-view>
+      <cover-view class="pause" bindtap="pause">
+        <cover-image class="img" src="/path/to/icon_pause" />
+      </cover-view>
+      <cover-view class="time">00:00</cover-view>
+    </cover-view>
+  </video>
+</template>

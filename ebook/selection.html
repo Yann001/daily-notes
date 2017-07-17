@@ -11,6 +11,7 @@
       margin: 0;
       padding: 0;
       font-family: 18px/1.5 "Arial", "Microsoft YaHei", "黑体", "宋体", sans-serif;
+      user-select: none;
     }
 
     * {
@@ -29,7 +30,7 @@
       height: 100%;
       margin: 0 auto;
       position: relative;
-      overflow: hidden;
+      overflow: auto;
     }
 
     .container .ebook .page {
@@ -75,6 +76,7 @@
       -ms-user-select: none;
       -moz-user-select: none;*/
       user-select: none;
+      /*-webkit-touch-callout: none;*/
     }
 
     .container .ebook mark {
@@ -288,7 +290,20 @@
         </p>
         <p>5.setEndBefore:表示用于将某个节点的起点位置设置为range对象的终点位置; 6.setEndAfter:表示用于将某个节点的终点位置设置为range对象的终点位置;
         </p>
-
+        <p>5.setEndBefore:表示用于将某个节点的起点位置设置为range对象的终点位置; 6.setEndAfter:表示用于将某个节点的终点位置设置为range对象的终点位置;
+        </p>
+        <p>1.setStart:表示某个节点的range对象的起点位置;2.setEnd:表示某个节点的range对象的结束位置;</p>
+        <p>3.setStartBefore:表示用于将某个节点的起点位置设置为range对象的起点位置;
+        </p>
+        <p>4.setStartAfter:表示用于将某个节点的终点位置设置为range对象的起点位置;
+        </p>
+        <p>5.setEndBefore:表示用于将某个节点的起点位置设置为range对象的终点位置; 6.setEndAfter:表示用于将某个节点的终点位置设置为range对象的终点位置;
+        </p>
+        <p>5.setEndBefore:表示用于将某个节点的起点位置设置为range对象的终点位置; 6.setEndAfter:表示用于将某个节点的终点位置设置为range对象的终点位置;
+        </p>
+        <h2>第二章</h2>
+        <p>第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容第一段内容</p>
+        <p>第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容第二段内容</p>
       </div>
       <div class="page page2">
         <h2>第二章</h2>
@@ -329,14 +344,7 @@
   </div>
 
   <script>
-    window.ontouchstart = function (e) {
-      e.preventDefault();
-    }
-    window.onselect = function (e) {
-      e.preventDefault();
-    }
-    var ebook = document.querySelector('.ebook');
-    var Selection_ = (function () {
+    window.Selection_ = (function () {
       document.Range_ = null;
       var range = document.Range_
       var ssBtn, seBtn;
@@ -357,20 +365,24 @@
           range = document.caretRangeFromPoint(point.x, point.y);
           var n = 1;
           var caretRangeStart = null, caretRangeEnd = null;
-          while (range.toString().length < 2 && n < 16) {
-            // 为使坐标向左右扩展的速度更快，故设为2n
-            touch.startBtnX = point.x - 2 * n;
-            touch.startBtnY = point.y - n;
-            touch.endBtnX = point.x + 2 * n;
-            touch.endBtnY = point.y + n;
-            caretRangeStart = document.caretRangeFromPoint(touch.startBtnX, touch.startBtnY);
-            caretRangeEnd = document.caretRangeFromPoint(touch.endBtnX, touch.endBtnY);
-            range.setStart(caretRangeStart.startContainer, caretRangeStart.startOffset);
-            range.setEnd(caretRangeEnd.endContainer, caretRangeEnd.endOffset);
-            n++;
+          if (range) {
+            while (range.toString().length < 2 && n < 16) {
+              // 为使坐标向左右扩展的速度更快，故设为2n
+              touch.startBtnX = point.x - 2 * n;
+              touch.startBtnY = point.y - n;
+              touch.endBtnX = point.x + 2 * n;
+              touch.endBtnY = point.y + n;
+              caretRangeStart = document.caretRangeFromPoint(touch.startBtnX, touch.startBtnY);
+              caretRangeEnd = document.caretRangeFromPoint(touch.endBtnX, touch.endBtnY);
+              range.setStart(caretRangeStart.startContainer, caretRangeStart.startOffset);
+              range.setEnd(caretRangeEnd.endContainer, caretRangeEnd.endOffset);
+              n++;
+            }
+            console.log('loop ', n, ' times');
+            textNode = range.startContainer;
+          } else {
+            console.log('range is null');
           }
-          console.log('loop ', n, ' times');
-          textNode = range.startContainer;
         }
         caretRangeStart.detach();
         caretRangeStart = null;
@@ -671,16 +683,19 @@
         var ssBtn = document.querySelector('#btn-ss-js');
         var seBtn = document.querySelector('#btn-se-js');
         if (operatePanel && ssBtn && seBtn) {
-          var ssTop = ssBtn.getBoundingClientRect().top;
-          var seTop = seBtn.getBoundingClientRect().top;
+          var ssTop = ssBtn.getBoundingClientRect().top - 20;
+          var seTop = seBtn.getBoundingClientRect().top + 20;
+          // 未显示无法用getComputedStyle获取高度
+          // var panelHeight = window.getComputedStyle(operatePanel).height;
+          var panelHeight = 75;
           // 显示在startBtn上面
-          var panelTop = ssTop - 100;
+          var panelTop = ssTop - panelHeight;
           // 显示在endBtn下面
-          if (ssTop < 200) {
-            panelTop = seTop + 30;
+          if (ssTop < panelHeight) {
+            panelTop = seTop + 10;
             // 显示在页面中间
-            if (seTop + 30 + 100 > 568) {
-              panelTop = 568 / 2 - 50
+            if (seTop + panelHeight + 10 > window.screen.height) {
+              panelTop = (window.screen.height) / 2 - panelHeight / 2;
             }
           }
           panelTop = panelTop + 'px';
@@ -694,7 +709,7 @@
         if (operatePanel) {
           operatePanel.style.display = 'none';
         }
-      }
+      };
       // 绑定选区光标拖动事件
       var bindEventForSelection = function () {
         var ssBtn = document.getElementById('btn-ss-js');
@@ -752,25 +767,42 @@
         range: range
       };
     })();
+    // 禁用系统长按选取文字事件
+    document.body.ontouchstart = function (e) {
+      // e.preventDefault();
+    };
+    window.onselect = function (e) {
+      e.preventDefault();
+    };
+    var fn = function (e) {
+      e.preventDefault();
+    }
+    window.addEventListener('touchstart', fn);
+
+    var ebook = document.querySelector('.ebook');
     var longPressFlag = false;
-    var noteDiv = document.querySelector('.note');
     ebook.addEventListener('touchstart', function (e) {
+      // window.addEventListener('touchstart', fn);
       longPressFlag = true;
       var point = {
         x: e.touches[0].clientX,
         y: e.touches[0].clientY
       }
-      if (Selection_) {
-        Selection_.destorySelectionArea();
+      if (window.Selection_) {
+        window.Selection_.destorySelectionArea();
       }
       var longPressTimer = setTimeout(function () {
+        window.removeEventListener('touchstart', fn);
+        ebook.addEventListener('touchstart', fn);
         if (longPressFlag) {
           longPressFlag = false;
-          var selection = Selection_.createSelectionArea(point);
+          var selection = window.Selection_.createSelectionArea(point);
         }
-      }, 500);
+      }, 800, e);
     });
     ebook.addEventListener('touchmove', function (e) {
+      window.removeEventListener('touchstart', fn);
+      ebook.removeEventListener('touchstart', fn);
       longPressFlag = false;
     });
     ebook.addEventListener('touchend', function (e) {

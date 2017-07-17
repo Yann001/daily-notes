@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+  <script src="js/jquery-3.2.1.min.js"></script>
+  <title>Voice</title>
+</head>
+
+<body>
+  <div class="container">
+    <h1> 语音合成 REST API</h1>
+    <p>对本文中将提到的名词约定如下：
+      <ul>
+        <li>语音合成：也被称为文本转换技术（TTS），它是将计算机自己产生的、或外部输入的文字信息转变为可以听得懂的、流利的口语输出的技术。
+        </li>
+        <li>应用程序：在开发中调用了API、具有语音合成功能的产品线产品。</li>
+        <li>开发者：想在应用程序中使用API、正在阅读本文档的开发人员。</li>
+      </ul>
+    </p>
+    <p>
+      百度语音合成通过REST API的方式给开发者提供一个通用的HTTP接口，基于该接口，开发者可以轻松的获取语音合成能力，本文档描述了使用语音合成服务REST API的方法。
+    </p>
+    <p>
+      <strong>功能介绍</strong> REST API支持对一段文本的合成，其中对于文本格式以及参数有一定的要求。请按照文档中描述进行相应请求操作。 本文档适用使用HTTP接口的开发人员。
+    </p>
+  </div>
+  <!--<iframe src="" frameborder="0"></iframe>-->
+  <script>
+    class $Http {
+      constructor(timeout) {
+        this.timeout = timeout;
+      }
+      get(url, callback) {
+        let request = new XMLHttpRequest();
+        let timeout = false;
+        let timer = setTimeout(() => {
+          timeout = true;
+          request.abort();
+        }, this.timeout);
+        request.open('GET', url);
+        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        request.setRequestHeader("Access-Control-Allow-Origin", "192.168.1.25");
+        request.onreadystatechange = (req, res) => {
+          if (request.readyState !== 4) {
+            return;
+          }
+          if (timeout) {
+            return;
+          }
+          clearTimeout(timer);
+          if (request.status === 200) {
+            res.writeHead(200, {
+              "Content-Type": "text/html; charset=UTF-8",
+              "Access-Control-Allow-Origin": '192.168.1.25'
+            });
+            callback(request.responseText);
+          }
+        }
+        request.send(null);
+      }
+      getJSONP(url, callback) {
+        var cbnum = "cb" + getJSONP.counter++;
+        var cbname = "getJSONP." + cbnum;
+        if (url.indexOf("?") === -1) {
+          url += "?jsonp=" + cbname;
+        } else {
+          url += "&jsonp" + cbname
+        }
+        var script = document.createElement("script");
+        // 回调函数
+        getJSONP[cbnum] = function (response) {
+          try {
+            callback(response);
+          } finally {
+            delete getJSONP[num];
+            script.parentNode.removeChild(script);
+          }
+        };
+        script.src = url;
+        document.body.appendChild(script);
+      }
+    }
+    let http = new $Http(1000);
+    let text = document.querySelector('.container h1').innerText,
+      lan = 'zh',
+      tok = '24.e0faa7caf5c88b4b681ff0d1d1273085.2592000.1501290248.282335-9821326',
+      ctp = 1,
+      // cuid = 'D8-CB-8A-5A-5B-D9';
+      cuid = '1235';
+    let url = `http://tsn.baidu.com/text2audio?tex=${text}&lan=${lan}&cuid=${cuid}&ctp=${ctp}&tok=${tok}`;
+    //document.querySelector('iframe').setAttribute('src', url);
+    var audio = document.createElement('audio');
+    audio.setAttribute('src', url);
+    audio.setAttribute('controls', 'controls');
+    document.body.appendChild(audio);
+    audio.play();
+    // http.get(url, (res) => {
+    //   console.log(res);
+    // });
+    // http.getJSONP.counter = 0;
+    // http.getJSONP(url, (res) => {
+    //   console.log(res);
+    // });
+    // $.ajax({
+    //   url: url,
+    //   type: 'GET',
+    //   dataType: 'JSONP',
+    //   success: (res) => {
+    //     // document.body.appendChild(res);
+    //     console.log(res);
+    //   },
+    //   error: (err) => {
+    //     console.log(err);
+    //     throw err;
+    //   },
+    //   complete: () => {
+
+    //   }
+    // })
+    /**
+     * 百度OAuth
+     * 获取Access Token 
+     * 请求数据包格式:
+     * 使用Client Credentials获取Access Token需要应用在其服务端发送请求（推荐用POST方法）到百度OAuth2.0授权服务的“https://openapi.baidu.com/oauth/2.0/token”地址上，并带上以下参数：
+     * grant_type：必须参数，固定为“client_credentials”；
+     * client_id：必须参数，应用的API Key；
+     * client_secret：必须参数，应用的Secret Key;
+     * scope：非必须参数。以空格分隔的权限列表，采用本方式获取Access Token时只能申请跟用户数据无关的数据访问权限。
+     * 响应数据包格式:
+     * 若参数无误，服务器将返回一段JSON文本，包含以下参数：
+     * access_token：要获取的Access Token；
+     * expires_in：Access Token的有效期，以秒为单位；请参考“Access Token生命周期”
+     * refresh_token：用于刷新Access Token 的 Refresh Token,所有应用都会返回该参数；（10年的有效期）
+     * scope：Access Token最终的访问范围，即用户实际授予的权限列表（用户在授权页面时，有可能会取消掉某些请求的权限），关于权限的具体信息参考“权限列表”一节；
+     * session_key：基于http调用Open API时所需要的Session Key，其有效期与Access Token一致；
+     * session_secret：基于http调用Open API时计算参数签名用的签名密钥。
+     **/
+    // let getTokenUrl = `https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&client_id=eoAkceGyq8c7HgIYXfXaBSAl&client_secret=a51b5432f5d36ef33315bf990ab877e0&`
+    // let result = {
+    //   "access_token": "24.e0faa7caf5c88b4b681ff0d1d1273085.2592000.1501290248.282335-9821326",
+    //   "session_key": "9mzdXvWq9sKs6n5q\/vS9d8RzPyAwhLayDo9bXdg6bhN5ZZa4yAhthLh+8EwDMj4sHb4oc08xCA3wqEyKyl+o2t6iOtrK",
+    //   "scope": "public audio_voice_assistant_get audio_tts_post wise_adapt lebo_resource_base lightservice_public hetu_basic lightcms_map_poi kaidian_kaidian wangrantest_test wangrantest_test1 bnstest_test1 bnstest_test2 vis-classify_flower",
+    //   "refresh_token": "25.0323e7b445bf7638ba689a61e706214f.315360000.1814058248.282335-9821326", "session_secret": "8b080969526b25dec6ff6f33c810ff15",
+    //   "expires_in": 2592000
+    // }
+  </script>
+  <script>
+  var s = document.createElement('script');
+  s.setAttribute('src','https://openapi.baidu.com/oauth/2.0/token?grant_type=client_credentials&client_id=yI5zyrQDos0SEysfVOWXVGM3&client_secret=XDX1tqxY7TkkeN3dSUM92brclqb3G0Qb')
+  document.body.appendChild(s);
+
+  </script>
+</body>
+
+</html>
