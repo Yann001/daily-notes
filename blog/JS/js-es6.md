@@ -134,6 +134,97 @@ ES6 允许按照一定模式，从数组和对象中提取值，对变量进行�
 
 ### 5. Object.assign()
 
+### 6. 属性的可枚举性
+
+### 7. 属性的遍历
+
+- for in
+- Object.keys(obj)
+- Object.getOwnPropertyNames(obj)
+- Object.getOwnPropertySymbols(obj)
+- Reflect.ownKeys(obj)
+
+### 8. __proto__属性，Object.setPrototypeOf()，Object.getPrototypeOf()
+
+### 9. Object.keys()，Object.values()，Object.entries()
+
+### 10. 对象的扩展运算符
+
+### 11. Object.getOwnPropertyDescriptors()
+
+### 12. Null 传导运算符
+
+- ?.
+
+``` js
+const firstName = (message
+  && message.body
+  && message.body.user
+  && message.body.user.firstName) || 'default';
+// 等效于
+const firstName = message?.body?.user?.firstName || 'default';
+```
+
+## Symbol()
+
+### 1. 概述
+
+### 2. 作为属性名的Symbol
+
+### 3. 实例：消除魔术字符串
+
+### 4. 属性名的遍历
+
+### 5. Symbol.for()，Symbol.keyFor()
+
+### 6. 内置的Symbol值
+
+## Set和Map数据结构
+
+### 1. Set
+
+### 2. WeakSet
+
+### 3. Map
+
+### 4. WeakMap
+
+## Proxy
+
+### 1. 概述
+
+### 2. Proxy实例的方法
+
+### 3. Proxy.revocable()
+
+### 4. this问题
+
+### 5. 实例：Web服务器的客户端
+
+## Reflect
+
+### 1. 概述
+
+### 2. 静态方法
+
+### 3. 实例：使用Proxy实现观察者模式
+
+**使用Proxy拦截赋值操作**
+
+## Promise()对象
+
+### 1. Promise的含义
+
+### 2. 基本用法
+
+### 3. Promise.prototype.then()
+
+### 4. Promise.prototype.catch()
+
+### 5. Promise.all()
+
+
+
 
 
 
