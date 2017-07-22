@@ -223,6 +223,30 @@ const firstName = message?.body?.user?.firstName || 'default';
 
 ### 5. Promise.all()
 
+### 6. Promise.race()
+
+### 7. Promise.resolve()
+
+### 8. Promise.reject()
+
+### 9. 两个附加方法
+
+- done()
+- finally()
+
+### 10. 应用
+
+- 加载图片
+- Generator函数与Promise的结合
+
+### 11. Promise.try()
+
+## Iterator和for of循环
+
+### 1. Iterator（遍历器）的概念
+
+
+
 
 
 
