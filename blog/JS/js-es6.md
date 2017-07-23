@@ -245,6 +245,83 @@ const firstName = message?.body?.user?.firstName || 'default';
 
 ### 1. Iterator（遍历器）的概念
 
+### 2. 默认Iterator接口
+
+### 3. 调用Iterator接口的场合
+
+- for of
+- 解构赋值
+- 扩展运算符
+- yield*
+- Array.from
+- Map(),WeakMap(),Set(),WeakSet()
+- Promise.all()
+- Promise.race()
+
+### 4. 字符串的Iterator（）接口
+
+### 5. Iterator接口与Generator()函数
+
+### 6. 遍历器对象的return(),throw()
+
+### 7. for of 循环
+
+## Generator函数的语法
+
+### 1. 简介
+
+### 2. next()方法的参数
+
+### 3. for of 循环
+
+### 4. Generator.prototype.throw()
+
+### 5. Generator.property.return()
+
+### 6. yield*
+
+### 7. 作为对象属性的Generator函数
+
+### 8. Generator函数的this
+
+### 9. 含义
+
+### 10. 应用
+
+- 异步操作的同步化表达
+- 控制流管理
+- 部署Iterator()接口
+- 作为数据结构
+
+## Generator函数的异步应用
+
+### 1. 传统方法
+
+- 回调函数
+- 事件监听
+- 发布/订阅
+- Promise对象
+
+### 2. 基本概念
+
+### 3. Generator函数
+
+### 4. Thunk函数
+
+### 5. co模块
+
+## async函数
+
+
+
+
+
+
+
+
+
+
+
 
 
 
