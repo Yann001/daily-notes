@@ -326,6 +326,8 @@ const firstName = message?.body?.user?.firstName || 'default';
 
 ### 7. 异步遍历器
 
+## Class的基本语法
+
 ### 1. 简介
 
 ### 2. 严格模式
@@ -346,4 +348,49 @@ const firstName = message?.body?.user?.firstName || 'default';
 
 ### 10. name属性
 
+### 11. Class的取值函数（getter）和存值函数（setter）
+
+### 12. Class的Generator方法
+
+### 13. Class的静态方法
+
+### 14. Class的静态属性和实例属性
+
+### 15. new.target属性
+
+## Class继承
+
+### 1. 简介
+
+### 2. Object.getPrototypeOf()
+
+### 3. super关键字
+
+### 4. 类的prototype属性和__proto__属性
+
+### 5. 原生构造函数的继承
+
+- Boolean()
+- Number()
+- String()
+- Array()
+- Date()
+- Function()
+- RegExp()
+- Error()
+- Object()
+
+### 6. Mixin模式的实现
+
+## 修饰
+
+### 1. 类的修饰
+
+### 2. 方法的修饰
+
+### 3. 为什么修饰器不能用于函数
+
+- 函数提升
+
+### 4. core-decorators.js
 
