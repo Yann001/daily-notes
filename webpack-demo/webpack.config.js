@@ -14,5 +14,29 @@ module.exports = {
     colors: true, // 终端输出结果为彩色
     historyApiFallback: true, // 不跳转
     inline: true // 实时刷新
-  }
+  },
+  module: {
+    loaders: [
+      {
+        test: /\.json$/,
+        loader: 'json-loader'
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader'
+      },
+      {
+        test: /\.css$/,
+        // loader: 'style-loader!css-loader' // 感叹号的作用在于使同一文件能够使用不同类型的loader
+        loader: 'style-loader!css-loader?modules!postcss' // css module
+      }
+    ]
+  },
+  postcss: [
+    require('autoprefixer') //调用autoprefixer插件
+  ],
+  plugins: [
+    new webpack.BannerPlugin("Copyright Flying Unicorns inc.")
+  ]
 }

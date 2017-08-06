@@ -1,3 +1,13 @@
 // mian.js
-var greeter = require('./Greeter.js');
-document.getElementById('root').appendChild(greeter());
+
+// var greeter = require('./Greeter.js');
+// document.getElementById('root').appendChild(greeter());
+
+// react
+import React from 'react';
+import {render} from 'react-dom';
+import Greeter from './Greeter';
+
+import './main.css';
+
+render(<Greeter />, document.getElementById('root'));
