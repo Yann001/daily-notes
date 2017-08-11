@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      width: 100%;
+      height: 100%;
+    }
+    .smile-box {
+      width: 100px;
+      height: 100px;
+    }
+    .smile-box .smile {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #ff0;
+    }
+    .smile-box .smile .eye {
+      position: absolute;
+      top: 20%;
+      width: 10%;
+      height: 10%;
+      margin-left: -5%;
+      background-color: #000;
+      border-radius: 50%;
+    }
+    .smile-box .smile .eye.l {
+      left: 30%;
+    }
+    .smile-box .smile .eye.r {
+      left: 70%;
+    }
+    .smile-box .smile .mouth {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      width: 30%;
+      height: 30%;
+      margin-left: -15%;
+      /* background-color: #000; */
+      border-radius: 50%;
+    }
+  </style>
+  <title>圆脸表情</title>
+</head>
+<body>
+  <div class="container">
+    <div class="smile-box">
+      <div class="smile">
+        <div class="eye l"></div>
+        <div class="eye r"></div>
+        <div class="mouth"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
