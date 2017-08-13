@@ -128,3 +128,9 @@ backgroud: -webkit-gradient(radial,50 50,50,50 50,0,from(black),color-stop(0.5,r
 
 ## CSS3的背景效果
 
+“Background Clip”，该属确定背景画区，有以下几种可能的属性：
+
+* background-clip: border-box; 背景从 border 开始显示 ;
+* background-clip: padding-box; 背景从 padding 开始显示 ;
+* background-clip: content-box; 背景显 content 区域开始显示 ;
+* background-clip: no-clip; 默认属性，等同于 border-box;
