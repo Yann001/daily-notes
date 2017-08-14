@@ -134,3 +134,59 @@ backgroud: -webkit-gradient(radial,50 50,50,50 50,0,from(black),color-stop(0.5,r
 * background-clip: padding-box; 背景从 padding 开始显示 ;
 * background-clip: content-box; 背景显 content 区域开始显示 ;
 * background-clip: no-clip; 默认属性，等同于 border-box;
+
+“Background Origin”，用于确定背景的位置，它通常与 background-position 联合使用，您可以从 border、padding、content 来计算 background-position（就像 background-clip）。
+
+* background-origin: border-box; 从 border. 开始计算 background-position;
+* background-origin: padding-box; 从 padding. 开始计算 background-position;
+* background-origin: content-box; 从 content. 开始计算 background-position;
+
+“Background Size”，常用来调整背景图片的大小，注意别和 clip 弄混，这个主要用于设定图片本身。有以下可能的属性：
+
+* background-size: contain; 缩小图片以适合元素（维持像素长宽比）
+* background-size: cover; 扩展元素以填补元素（维持像素长宽比）
+* background-size: 100px 100px; 缩小图片至指定的大小 .
+* background-size: 50% 100%; 缩小图片至指定的大小，百分比是相对包	含元素的尺寸 .
+
+“Background Break”属性，CSS3 中，元素可以被分成几个独立的盒子（如使内联元素 span 跨越多行），background-break 属性用来控制背景怎样在这些不同的盒子中显示。
+
+* background-break: continuous; 默认值。忽略盒之间的距离（也就是像元	素没有分成多个盒子，依然是一个整体一样）
+* background-break: bounding-box; 把盒之间的距离计算在内；
+* background-break: each-box; 为每个盒子单独重绘背景。
+
+CSS3 中支持多背景图片
+
+## CSS3 的盒子模型
+
+- display: box;
+- box-flex: 1;
+
+## CSS3 的 Transitions, Transforms 和 Animation
+
+### Transitions
+
+Transition 有下面些具体属性：
+
+- transition-property：用于指定过渡的性质，比如 transition-property:backgrond 就是指 backgound 参与这个过渡
+- transition-duration：用于指定这个过渡的持续时间
+- transition-delay：用于制定延迟过渡的时间
+- transition-timing-function：用于指定过渡类型，有 ease | linear | ease-in | ease-out | ease-in-out | cubic-bezier
+
+### Transform
+
+Transform，其实就是指拉伸，压缩，旋转，偏移等等一些图形学里面的基本变换。
+
+“skew”是倾斜，“scale”是缩放，“rotate”是旋转，“translate”是平移。最后需要说明一点，transform 支持综合变换。
+
+### Animation
+
+- animation-name: anim1; 动画名称
+- animation-duration: 1.5s; 动画持续时间
+- animation-iteration-count: 4; 动画重复次数
+- animation-direction: alternate; 动画执行完一次后方向的变化方式
+- animation-timing-function: ease-in-out; 变化的模式
+
+
+
+
+
