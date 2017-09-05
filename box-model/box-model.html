@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>盒模型学习</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .box1 {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background-color: #999;
+    }
+
+    .box1 .rect {
+      box-sizing: content-box;
+      width: 100px;
+      height: 100px;
+      background-color: #eee;
+      float: left;
+      margin: 10px;
+      padding: 10px;
+      border: 10px solid #333;
+    }
+
+    .box2 {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background-color: #666;
+    }
+
+    .box2 .rect {
+      box-sizing: border-box;
+      width: 100px;
+      height: 100px;
+      background-color: #eee;
+      float: left;
+      margin: 10px;
+      padding: 10px;
+      border: 10px solid #333;
+    }
+
+    .box1 .explain,
+    .box2 .explain {
+      position: absolute;
+      left: 0;
+      bottom: 2px;
+      width: 100%;
+    }
+
+    .box1 .css-code,
+    .box2 .css-code {
+      float: left;
+      width: 250px;
+      height: 150px;
+      border: 1px solid #333;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="box1">
+    <div class="rect i1"></div>
+    <div class="rect i2"></div>
+    <div class="rect i3"></div>
+    <div class="css-code">
+      <pre>
+        .rect {
+          box-sizing: content-box;
+          width: 100px;
+          height: 100px;
+          margin: 10px;
+          padding: 10px;
+          border: 10px solid #333;
+        }
+      </pre>
+    </div>
+    <div class="explain">
+      标准盒模型：盒子宽高 = margin + padding + border + content(width) = 10 * 2 + 10 * 2 + 100 = 160px
+    </div>
+  </div>
+  <div class="box2">
+    <div class="rect i1"></div>
+    <div class="rect i2"></div>
+    <div class="rect i3"></div>
+    <div class="css-code">
+      <pre>
+          .rect {
+            box-sizing: border-box;
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            padding: 10px;
+            border: 10px solid #333;
+          }
+        </pre>
+    </div>
+    <div class="explain">
+      IE盒模型：盒子宽高 = width + margin = margin + padding + border + content(width - padding - border) = 120px
+    </div>
+  </div>
+</body>
+
+</html>
