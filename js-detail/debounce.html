@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>消抖</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #bird {
+      position: absolute;
+      left: 100px;
+      top: 100px;
+      transform: scale(0.5);
+      transform-origin: -50% -50%;
+      display: inline-block;
+      overflow: hidden;
+      background-repeat: no-repeat;
+      background-image: url(img/bird.png);
+      transition: top 0.5s cubic-bezier(0.25,-0.22, 1, 1), left 0.5s cubic-bezier(0.25,-0.22, 1, 1);
+    }
+
+    .left0 {
+      width: 86px;
+      height: 60px;
+      background-position: -178px -2px;
+    }
+
+    .left1 {
+      width: 86px;
+      height: 60px;
+      background-position: -90px -2px;
+    }
+
+    .left1 {
+      width: 86px;
+      height: 60px;
+      background-position: -2px -2px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="bird" class="left0"></div>
+  <script>
+    let
+      i = 0,
+      bird = document.querySelector('#bird');
+    setInterval(() => {
+      bird.className = `left${ (i++) % 3 }`;
+    }, 100)
+    function debounce (fn, dur) {
+      dur = dur || 100;
+      let timer;
+      return function () {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          fn.apply(this, arguments);
+        }, dur);
+      }
+    }
+    document.addEventListener('mousemove', debounce(function (e) {
+      let
+        x = e.clientX,
+        y = e.clientY,
+        x0 = bird.offsetLeft,
+        y0 = bird.offsetTop;
+      console.log(x, y);
+      bird.style.left = x0 + (x - x0) + 'px';
+      bird.style.top = y0 + (y - y0) + 'px';
+    }, 100))
+  </script>
+</body>
+
+</html>

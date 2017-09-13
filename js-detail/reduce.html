@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>迭代</title>
+</head>
+
+<body>
+  <h1>reduce迭代</h1>
+  <script>
+    function add(x, y) {
+      return x + y;
+    }
+
+    function sub(x, y) {
+      return x - y;
+    }
+
+    function addMany(...args) {
+      return args.reduce(add);
+    }
+
+    function subMany(...args) {
+      return args.reduce(sub);
+    }
+
+    console.log(addMany(1, 2, 3, 4));
+    console.log(subMany(1, 2, 3, 4));
+  </script>
+</body>
+
+</html>
