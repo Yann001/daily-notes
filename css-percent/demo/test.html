@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>CSS中的百分数值</title>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .box {
+      width: 200px;
+      height: 400px;
+      background-color: #eee;
+    }
+    .box .inner {
+      position: relative;
+      top: 10%;
+      left: 10%;
+      width: 50%;
+      height: 50%;
+      background-color: #aaa;
+    }
+    .box .inner .inner-inner {
+      position: absolute;
+      top: 10%;
+      left: 10%;
+      width: 50%;
+      height: 50%;
+      background-color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <div class="inner">
+      <div class="inner-inner">
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>

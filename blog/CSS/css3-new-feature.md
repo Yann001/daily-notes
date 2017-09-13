@@ -91,14 +91,14 @@ selector {
 ## CSS3 的渐变效果（Gradient）
 
 1. 线性渐变
-左上（0% 0%）到右上（0% 100%）即从左到右水平渐变：
+  左上（0% 0%）到右上（0% 100%）即从左到右水平渐变：
 ``` css
 background-image:-webkit-gradient(linear,0% 0%,100% 0%,from(#2A8BBE),to(#FE280E));
 background-image:-webkit-gradient(linear,0% 0%,100% 0%,from(#2A8BBE),color-stop(0.33,#AAD010),color-stop(0.33,#FF7F00),to(#FE280E));
 ```
 
 2. 径向渐变
-从一个圆到另一个圆的渐变。
+  从一个圆到另一个圆的渐变。
 ``` css
 backgroud: -webkit-gradient(radial,50 50,50,50 50,0,from(black),color-stop(0.5,red),to(blue));
 ```
@@ -109,10 +109,10 @@ backgroud: -webkit-gradient(radial,50 50,50,50 50,0,from(black),color-stop(0.5,r
 阴影效果既可用于普通元素，也可用于文字。
 
 ``` css
-.class1{
+.class1 {
   text-shadow:5px 2px 6px rgba(64, 64, 64, 0.5);
 }
-.class2{
+.class2 {
   box-shadow:3px 3px 3px rgba(0, 64, 128, 0.3);
 }
 ```
@@ -148,7 +148,7 @@ backgroud: -webkit-gradient(radial,50 50,50,50 50,0,from(black),color-stop(0.5,r
 * background-size: contain; 缩小图片以适合元素（维持像素长宽比）
 * background-size: cover; 扩展元素以填补元素（维持像素长宽比）
 * background-size: 100px 100px; 缩小图片至指定的大小 .
-* background-size: 50% 100%; 缩小图片至指定的大小，百分比是相对包	含元素的尺寸 .
+  * background-size: 50% 100%; 缩小图片至指定的大小，百分比是相对包含元素的尺寸 .
 
 “Background Break”属性，CSS3 中，元素可以被分成几个独立的盒子（如使内联元素 span 跨越多行），background-break 属性用来控制背景怎样在这些不同的盒子中显示。
 
