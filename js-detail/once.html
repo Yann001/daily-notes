@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>只执行一次</title>
+</head>
+
+<body>
+  <h1>函数只执行一次</h1>
+  <script>
+    function once(fn) {
+      return function (...args) {
+        if (fn) {
+          let ret = fn.apply(this, args);
+          fn = null;
+          return ret;
+        }
+      }
+    }
+
+    function sayName(name) {
+      console.log(`Hi, I'm ${name}`);
+    }
+
+    sayName('zhansan');
+    sayName('lisi');
+    sayName('wangwu');
+
+    sayName = once(sayName);
+
+    sayName('zhansan');
+    sayName('lisi');
+    sayName('wangwu');
+  </script>
+</body>
+
+</html>

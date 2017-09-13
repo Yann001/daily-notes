@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>函数节流</title>
+  <style>
+    #cycle {
+      width: 30px;
+      height: 30px;
+      line-height: 30px;
+      text-align: center;
+      border-radius: 50%;
+      background-color: #f00;
+      opacity: 1;
+      transition: opacity 0.25s;
+    }
+    #cycle.fade {
+      opacity: 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>函数节流</h1>
+  <label>每500ms记录一次</label>
+  <button id="btn">点我</button>
+  <div id="cycle">0</div>
+  <script>
+    function throttle (fn, time = 500) {
+      let timer;
+      return function (...args) {
+        if (timer == null) {
+          fn.apply(this, args);
+          timer = setTimeout(() => {
+            timer = null;
+          }, time);
+        }
+      }
+    }
+    let
+      btn = document.querySelector('#btn'),
+      cycle = document.querySelector('#cycle');
+    btn.addEventListener('click', throttle(function () {
+      cycle.textContent = parseInt(cycle.textContent) + 1;
+      cycle.className = 'fade';
+      setTimeout(() => cycle.className = '', 250);
+    }));
+  </script>
+</body>
+</html>
