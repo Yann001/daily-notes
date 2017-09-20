@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>链式调用</title>
+</head>
+
+<body>
+  <h1>链式调用</h1>
+  <script>
+    function Cal(val) {
+      this._value = val || 0;
+    }
+    Cal.prototype = {
+      add: (a) => {
+        this._value += a;
+        return this;
+      },
+      sub: (b) => {
+        this._value -= b;
+        return this;
+      },
+      mul: (c) => {
+        this.val *= c;
+        return this;
+      },
+      div: (d) => {
+        this._value /= d;
+        return this;
+      },
+      valueOf: () => this._value,
+      toString: () => this._value + ''
+    }
+    new Cal(1).add(5).sub(2).div(3);
+  </script>
+</body>
+
+</html>

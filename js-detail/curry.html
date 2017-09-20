@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edeg">
+  <title>函数柯里化</title>
+</head>
+
+<body>
+  <h1>函数柯里化</h1>
+  <script>
+    function curry(fn) {
+      var args = [];
+      return function cb() {
+        if (arguments.length === 0) {
+          return fn.apply(this, args);
+        }
+        Array.prototype.push.apply(args, arguments);
+        return cb;
+      }
+    }
+    // var add = curry(function() {
+    //   return Array.prototype.slice.call(arguments).reduce(function (a, b) {
+    //     return a + b;
+    //   })
+    // })
+    // var res = add(1)(2)();
+    // console.log(res);
+    var add = function (x) {
+      var sum = x;
+      var fn = (y) => {
+        sum += y;
+        return fn;
+      }
+      fn.toString = () => sum + '';
+      fn.valueOf = () => sum;
+      return fn;
+    }
+    console.log(add(1)(2)(3)(4)); // toString()
+    console.log(+add(1)(2)(3)(4)); // valueOf()
+    console.log(add(1));
+    console.log(add(1)(2));
+    console.log(add(1)(2)(3));
+  </script>
+</body>
+
+</html>
