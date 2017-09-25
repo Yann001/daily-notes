@@ -40,7 +40,7 @@ var p = new Person();
 
    > https://www.nowcoder.com/discuss/44247?type=0&order=0&pos=8&page=1
 
-   1. cookie和session, cookie和webStorage的区别，如果cookie被篡改怎么办  
+   1. cookie和session, cookie和webStorage的区别，如果cookie被篡改怎么办
 
       2. 跨域的方法  
 
@@ -56,7 +56,7 @@ var p = new Person();
 
       8. http连接性能优化，长连接，keep-alive  
 
-      9. 从输入url到看到页面发生了什么  
+   2. 从输入url到看到页面发生了什么  http://www.cnblogs.com/xianyulaodi/p/6547807.html
 
       10. 前端缓存机制，如果去掉etagslast-modefiedcache-control这些控制缓存的字段，浏览器会怎么处理缓存  
 
@@ -99,3 +99,76 @@ var p = new Person();
    ​    30.数组去重问题   
 
    ​    31.React的思想和原理，虚拟DOM树和diff算法   
+
+> https://www.nowcoder.com/discuss/46726?type=0&order=0&pos=30&page=1
+
+https://www.nowcoder.com/discuss/46726?type=0&order=0&pos=30&page=1
+
+## html CSS
+
+- js版本实现快排，优化。
+
+- overflow问题
+- em和rem和px
+- bfc原理
+- 弹性盒子问题， flex布局
+- 绝对定位和相对定位
+- 让一个不知道尺寸的元素居中。
+
+## JavaScript
+
+- 深度克隆。
+- 数组去重所有方法，如果里面有function怎么办？
+- 对象的遍历。（hasOwnproperty，for。。。in区别）
+- 对象的方法。（能说少说多少）
+- 作用域相关知识（ES5中的理解，和Es6中的理解，最好都说一下）
+- 箭头函数
+- 懒加载
+- 声明提升问题（ES5和ES6中的各种区别）
+- 事件委托机制的原理（这里可以展开讲，1000万个li，逐一绑定使用事件委托）
+- Object.assign方法
+- break对forEach的影响。会不会终止forEach循环？
+- js中的对象属于什么数据结构?
+- 原生实现call apply new
+- ES6 中的set
+- ES6中的继承（class）
+- 设计模式，策略模式，观察者模式
+- 判断数组和对象的方法（典型的有三种，toString，instanceof，constructor）
+- this的指向问题
+- class和prototype的区别，prototype和**proto** 的区别
+
+## 网络
+
+- 手动封装一个ajax
+- 手写一个jsonp
+- jsonp和ajax的区别
+- 跨域相关问题（方法，区别）
+- 输入一个URL，发生了什么事情？
+- 手写解析URL参数
+- 网络协议，各种网络协议分别属于什么层？
+- http和https长连接
+- 请求报文heade常用字段
+- 状态码403和500 分别代表什么
+- get和post的区别
+
+## 框架和库其他
+
+- zepto和jQuery事件委托的区别？
+- webpack的有什么用
+- vue和vuex的区别
+- onload和onready的区别
+- vue是怎样实现双向绑定的？
+- react的生命周期
+
+## 计算机相关知识
+
+- 服务端变成怎样提高效率
+- 操作系统的功能
+- 寄存器存的是什么的。
+- js中的对象属于什么数据结构?
+- 链表和数组的区别
+- 排序有哪些（你会的），快排的原理
+- 数据库的常用方法
+- 操作系统 线程有什么状态
+- js的线程机制
+- 求二叉树的深度
