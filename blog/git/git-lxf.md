@@ -66,3 +66,27 @@ git 版本库示意图：
 
 ## 标签管理
 
+- git tag <name> [commit_id] ，默认标签是打在最新提交的commit上的，也可带上commit_id参数为指定提交打上标签
+- git tag，查看标签，标签不是按时间列出，而是按字母排序的。
+- git show <tagname> ，查看标签信息。
+- git tag -a <tagname> -m 'message' [commit_id] ，创建带有说明的标签，用-a指定标签名，-m指定说明文字。
+- git tag -s <tagname> -m 'message' ，用PGP签名标签。
+- git tag -d <tagname> ，删除标签。
+- git push origin <tagname> ，推送某个标签到远程。
+- git push origin --tags，一次性推送尚未推送的全部标签到远程。
+- git tag -d v0.9 ->git push origin :refs/tags/v0.9，删除远程仓库标签。
+
+## 自定义Git
+
+- git config
+- .gitignore 文件
+- git add -f <file> ，强制添加（被忽略）的文件。
+- git check-ignore -v <file> ，检查因为哪条忽略规则导致不能添加。
+- git config --global <alias.st status><alias.ci commit><alias.br branch> ，配置别名。
+
+配置Git的时候，加上`--global`是针对当前用户起作用的，如果不加，那只针对当前的仓库起作用。每个仓库的Git配置文件都放在`.git/config`文件中，当前用户的Git配置文件放在用户主目录下的一个隐藏文件`.gitconfig`中。别名就在`[alias]`后面，要删除别名，直接把对应的行删掉即可。
+
+## 搭建Git服务器
+
+[搭建Git服务器](https://www.liaoxuefeng.com/wiki/0013739516305929606dd18361248578c67b8067c8c017b000/00137583770360579bc4b458f044ce7afed3df579123eca000)
+
