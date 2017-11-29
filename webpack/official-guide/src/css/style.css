@@ -1,0 +1,9 @@
+@font-face {
+  font-family: 'museo';
+  src: url('../font/Museo300-Regular.otf');
+}
+.hello {
+  color: red;
+  font-family: 'museo';
+  background: url('../img/webpack.png');
+}
