@@ -88,3 +88,44 @@ Language Log（博客）
 
 
 
+## 第2章 获得文本预料和词汇资源
+
+### 2.1 获取文本语料库
+
+#### 古腾堡语料库
+
+``` python
+import nltk
+nltk.corpus.gutenberg.fileids()
+nltk.corpus.gutenberg.words('austen-emma.txt')
+
+emma = nltk.Text(nltk.corpus.gutenberg.words('austen-emma.txt'))
+emma.concordance('surprize')
+
+# from nltk.corpus import gutenberg
+# gutenberg.fileids()
+```
+
+nltk 方法：
+
+- fileids()
+
+
+- raw()
+- words()
+- sents()
+
+**网络和聊天文本**
+
+```python
+from nltk.corpus import webtext
+webtext.fileids()
+
+from nltk.corpus import nps_chat
+nps_chat.fileids()
+```
+
+**布朗语料库**
+
+
+
