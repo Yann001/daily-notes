@@ -92,7 +92,7 @@ Language Log（博客）
 
 ### 2.1 获取文本语料库
 
-#### 古腾堡语料库
+**古腾堡语料库**
 
 ``` python
 import nltk
@@ -126,6 +126,76 @@ nps_chat.fileids()
 ```
 
 **布朗语料库**
+
+```python
+from nltk.corpus import brown
+brown.categories()
+cfd = nltk.ConditionFreqDist()
+```
+
+**路透社语料库**
+
+```python
+from nltk.corpus import reuters
+```
+
+**就职演说语料库**
+
+```python
+from nltk.corpus import inaugural
+```
+
+**标注文本语料库**
+
+**其他语言语料库**
+
+**文本语料库结构**
+
+**载入自己的语料库**
+
+```python
+from nltk.corpus import PlaintextCorpusReader
+from nltk.corpus import BracketParseCorpusReader
+```
+
+
+
+### 2.2 条件频率分布
+
+**条件和事件**
+
+**按文体计数词汇**
+
+```py
+from nltk.corpus import brown
+cfd = nltk.ConditionFreqDist(
+	(genre, word)
+	for genre in brown.categories()
+	for word in brown.words(categories=genre))
+```
+
+**绘制频率分布图和分布表**
+
+- plot()
+- tabulate()
+
+**使用双连词生成随机文本**
+
+
+
+### 2.3 更多关于Python：代码重用
+
+**使用文本编辑器创建程序**
+
+- IDLE，Python自带GUI
+
+**函数**
+
+
+
+
+
+
 
 
 
