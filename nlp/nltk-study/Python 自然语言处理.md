@@ -415,5 +415,195 @@ def stem(word):
 
 ### 3.6 规范化文本
 
+**词干提取器**
+
+```python
+import nltk
+porter = nltk.PorterStemmer() # 效果好一些
+lancaster = nltk.LancasterStemmer()
+[porter.stem(w) for w in tokens]
+[lancaster.stem(w) for w in tokens]
+```
+
+**词形归并**
+
+WordNet词形归并器
+
+```python
+import nltk
+wnl = nltk.WordNetLemmatizer()
+[wnl.lemmatize(w) for w in tokens]
+```
+
+
+
+### 3.7 用正则表达式为文本分词
+
+**分词的简单方法**
+
+```python
+import re
+re.split(regexp, raw)
+re,findall(regexp, raw)
+# regexp = r'[ \t\n]+' or regexp = r'\s+'
+```
+
+**NLTK 正则表达式分词器**
+
+```python
+import nltk
+nltk.regexp_tokenize(text, pattern)
+```
+
+**分词的进一步问题**
+
+NLTK语料库集合中的宾州树库的数据样本
+
+```python
+# 华尔街日报原始文本
+nltk.corpus.treebank_raw.raw()
+# 华尔街日报分好词的版本
+nltk.corpus.treebank.words()
+```
+
+
+
+### 3.8 分割
+
+**断句**
+
+**分词**
+
+模拟退火算法
+
+
+
+### 3.9 格式化：从链表到字符串
+
+**从链表到字符串**
+
+- join()
+
+**字符串与格式**
+
+- %s
+- %d
+
+**排列**
+
+- %6s
+- %-6d
+
+**将结果写入文件**
+
+```python
+output_file = open('output.txt', 'w')
+output_file.write(text)
+output_file.close()
+```
+
+**文本换行**
+
+```python
+from textwrap import fill
+fill(output)
+```
+
+
+
+## 第4章 编写结构化程序
+
+### 4.1 回到基础
+
+**赋值**
+
+**等式**
+
+**条件语句**
+
+
+
+### 4.2 序列
+
+- 字符串 （join(), str()）
+- 链表（list()）
+- 元组（tuple()）
+
+方法：
+
+- zip()
+- enumerate()
+
+SAMPA ，计算机可读音标
+
+产生器表达式
+
+
+
+### 4.3 风格的问题
+
+
+
+### 4.4 函数：结构化编程的基础
+
+docstring
+
+
+
+### 4.5 更多关于函数
+
+- 作为参数的函数
+- 累计函数
+- 高阶函数
+- 参数的命名
+
+
+
+### 4.6 程序开发
+
+
+
+### 4.7 算法设计
+
+- 递归
+- 空间与时间的权衡
+- 动态规划
+
+Python装饰器：memoize
+
+
+
+### 4.8 Python 库的样例
+
+**Matplotlib 绘图工具**
+
+**NetworkX**
+
+**CSV**
+
+**NumPy**
+
+包括线性代数函数。矩阵的奇异值分解，是在**潜在语义分析**中使用的操作，它能帮助识别一个文档集合中的隐含概念。
+
+
+
+### 4.9 小结
+
+
+
+### 4.10 深入阅读
+
+
+
+## 第5章 分类和标注词汇
+
+词性，parts-of-speech，POS
+
+词性标注，part-of-speech tagging，POS tagging
+
+
+
+### 5.1 使用词性标注器
+
 
 
