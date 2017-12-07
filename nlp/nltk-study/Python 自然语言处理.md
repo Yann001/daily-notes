@@ -605,5 +605,311 @@ Python装饰器：memoize
 
 ### 5.1 使用词性标注器
 
+```python
+import nltk
+text = nltk.word_tokenize(sentence)
+nltk.pos_tag(text)
+```
 
+
+
+### 5.2 标注语料库
+
+**表示已标注的标识符**
+
+```python
+import nltk
+tagged_token = nltk.tag.str2tuple('fly/NN grand/JJ')
+```
+
+**读取已标注的语料库**
+
+```python
+import nltk
+nltk.corpus.brown.tagged_words()
+nltk.corpus.brown.tagged_sents()
+```
+
+**简化的词性标记集**
+
+| 标记   | 含义    |
+| ---- | ----- |
+| ADJ  | 形容词   |
+| ADV  | 动词    |
+| CNJ  | 连词    |
+| DET  | 限定词   |
+| EX   | 存在量词  |
+| FW   | 外来词   |
+| MOD  | 情态动词  |
+| N    | 名词    |
+| NP   | 专有名词  |
+| NUM  | 数词    |
+| PRO  | 代词    |
+| P    | 介词    |
+| TO   | 词to   |
+| UH   | 感叹词   |
+| V    | 动词    |
+| VD   | 动词过去式 |
+| VG   | 现在分词  |
+| VN   | 过去分词  |
+| WH   | Wh限定词 |
+
+**名词**
+
+一般指的是人、地点、事情和概念。可能出现在限定词和形容词之后，可以是动词的主语或宾语。
+
+**动词**
+
+用来描述事件和行动的词。
+
+**形容词和副词**
+
+形容词修饰名词，可以作为修饰符或谓语。副词修饰动词，也可以修饰形容词。
+
+**未简化的标记**
+
+**探索已标注的语料库**
+
+
+
+### 5.3 使用Python 字典映射词及其属性
+
+**索引链表 VS 字典**
+
+**Python 字典**
+
+- dict.keys()
+- dict.values()
+- dict.items()
+
+**定义字典**
+
+```python
+pos1 = {'key', 'value'} # 推荐
+pos2 = dict(key='value')
+```
+
+**默认字典**
+
+defaultdict()
+
+**递增地更新字典**
+
+**复杂的键和值**
+
+**颠倒字典**
+
+
+
+### 5.4 自动标注
+
+**默认标注器**
+
+```python
+import nltk
+raw = 'I do not like green eggs and ham.'
+tokens = nltk.tokenize(raw)
+default_tagger = nltk.DefaultTagger('NN')
+default_tagger.tag(tokens)
+```
+
+**正则表达式标注器**
+
+```python
+import nltk
+patterns = [
+    (r'.*ing$', 'VBG'),
+    (r'.*ed$', 'VBD'),
+    (r'.*es$', 'VBZ'),
+    (r'.*ould$', 'MD'),
+    (r'.*\'s$', 'NN$'),
+    (r'.*s$', 'NNS'),
+    (r'.*^-?[0-9]+(.[0-9]+)?$', 'CD'),
+    (r'.*', 'NN'),
+]
+
+regexp_tagger = nltk.RegexpTagger(patterns)
+regexp_tagger.tag(sentence)
+```
+
+**查询标注器**
+
+`nltk.UnigramTagger()`
+
+**评估**
+
+黄金标准测试数据
+
+
+
+### 5.5 N-gram 标注
+
+**一元标注器（Unigram Tagging）**
+
+```python
+from nltk.corpus import brown
+brown_tagged_sents = brown.tagged_sents(categories='news')
+brown_sents = brown.sents(categories='news')
+# 训练
+unigram_tagger = nltk.UnigramTagger(brown_tagged_sents)
+# 标注
+unigram_tagger.tag(brown_sents[2007])
+# 评估
+unigram_tagger.evaluate(brown_tagged_sents)
+```
+
+**分离训练数据和测试数据**
+
+```python
+from nltk.corpus import brown
+brown_tagged_sents = brown.tagged_sents(categories='news')
+size = int(len(brown_tagged_sents) * 0.9)
+train_sents = brown_tagged_sents[:size]
+test_sents = brown_tagged_sents[size:]
+# 训练
+unigram_tagger = nltk.UnigramTagger(train_sents)
+# 评估
+unigram_tagger.evaluate(test_sents)
+```
+
+**一般的N-gram 的标注**
+
+- 1-gram
+- 2-gram
+- 3-gram
+- bigram(BigramTagger)
+
+数据稀疏问题（研究结果精度和覆盖范围之间要有一个权衡）
+
+精度/召回权衡
+
+**组合标注器**
+
+```python
+t0 = nltk.DefaultTagger('NN')
+t1 = nltk.UnigramTagger(train_sents, backoff=t0)
+t2 = nltk.BigramTagger(train_sents, backoff=t1)
+t2.evaluate(test_sents)
+```
+
+**标注生词**
+
+**存储标注器**
+
+```python
+# 将标注器t2保存到t2.pkl文件
+from cPickle import dump
+output = open('t2.pkl', 'wb')
+dump(t2, output, -1)
+output.close()
+
+# 载入保存的标注器
+from cPickle import load
+input = open('t2.pkl', 'rb')
+tagger = load(input)
+input.close()
+```
+
+**性能限制**
+
+n-gram性能的上下界
+
+混淆矩阵
+
+词性消歧
+
+**跨句子边界标注**
+
+
+
+### 5.6 基于转换的标注
+
+Brill 标注器
+
+
+
+### 5.7 如何确定一个词的分类
+
+**形态学线索**
+
+**句法线索**
+
+**语义线索**
+
+**新词**
+
+**词性标记中的形态学**
+
+
+
+### 5.8 小结
+
+
+
+### 5.9 深入阅读
+
+
+
+## 第6章 学习分类文本
+
+### 6.1 监督式分类
+
+分类是为给定的输入选择正确的类标签
+
+在基本的分类任务中，每个输入被认为是与其他输入隔离的，并且标签集是预先定义的。
+
+**性别鉴定**
+
+```python
+import nltk
+def gender_features(word):
+    return {'last_letter': word[-1]}
+
+nltk.NaiveBayesClassifier.train(train_set)
+classifier.classify(gender_features('test_name'))
+```
+
+**选择正确的特征**
+
+过拟合
+
+开发集（包括训练集和开发测试集），测试集
+
+**文档分类**
+
+**词性标注**
+
+**探索上下文语境**
+
+**序列分类**
+
+**其他序列分类方法**
+
+隐马尔可夫模型
+
+动态规划
+
+最大熵马尔可夫模型
+
+线性链条件随机场模型
+
+
+
+### 6.2 监督式分类的举例
+
+**句子分割**
+
+**识别对话行为类型**
+
+**识别文字蕴涵**
+
+**扩展到大型数据集**
+
+
+
+### 6.3 评估
+
+**测试集**
+
+**准确度**
 
