@@ -913,3 +913,100 @@ classifier.classify(gender_features('test_name'))
 
 **准确度**
 
+**精确度和召回率**
+
+- 真阳性
+- 真阴性
+- 假阳性
+- 假阴性
+
+指标：
+
+- 精确度（Precision），表示发现的项目中有多少是相关的，TP/(TP+FP)
+- 召回率（Recall），表示相关的项目中发现了多少，TP/(FP+FN)
+- F-度量值（F-Measure）（或F-得分，F-Score），组合精度和召回率为一个单独得分，被定义为精度和召回率的**组合平均数(2 × Precision × Recall) / (Precision + Recall)**
+
+**混淆矩阵**
+
+`nltk.ConfusionMatrix(gold, test)`
+
+**交叉验证**
+
+
+
+### 6.4 决策树
+
+决策树是一个为输入值选择标签的简单流程图。
+
+**熵和信息增益**
+
+定义：
+
+$ H =  \sum_{l \in labels} P(l) \times \log_{2}P(l)$
+
+
+
+### 6.5 朴素贝叶斯分类器
+
+**潜在概率模型**
+
+$P(label | features) = P(features, label) / P(features)$
+
+$P(features) = \sum_{label \in labels}P(features,label)$
+
+$P(features,label) = P(label) \times P(features|label)$
+
+$P(features, label) = P(label) \times \prod _{f \in features}P(f|label)$$
+
+**零计数和平滑**
+
+$P(f|label)=count(f,label)/count(label)$
+
+**非二元特征**
+
+**独立的朴素性**
+
+相互作用，双重计数
+
+**双重计数的原因**
+
+
+
+### 6.6 最大熵分类器
+
+定义：
+
+$P(features)=\sum_{x \in corpus}P(label(x)|features(x))$
+
+$P(label|features)=P(label,features)/\sum_{label}P(label,features)$
+
+迭代优化技术
+
+**最大熵模型**
+
+**熵的最大化**
+
+ **生成式分类器 VS 条件式分类器**
+
+
+
+### 6.7 为语言模式建模
+
+
+
+### 6.8 小结
+
+
+
+### 6.9 深入阅读
+
+
+
+## 第7章 从文本提取信息
+
+
+
+
+
+
+
